@@ -151,9 +151,9 @@ class Gstr1Report(object):
 					taxable_value += abs(net_amount)
 				else:
 					taxable_value += abs(net_amount)
-				
+		#Finbyz changes for getting taxable value with transport and other charges.		
 				for taxes in frappe.get_list("Sales Taxes and Charges", {'parent': invoice}, '*'):
-					if taxes.account_head.find('GST') == -1:
+					if taxes.account_head.find('GST') == -1 and taxes.account_head.find('TCS') == -1:
 						iwtd = json.loads(taxes.item_wise_tax_detail)
 						taxable_value += abs(iwtd[item_code][1])
 
@@ -281,7 +281,7 @@ class Gstr1Report(object):
 
 						if not (cgst_or_sgst or account in self.gst_accounts.igst_account):
 							if "gst" in account.lower() and account not in unidentified_gst_accounts:
-								unidentified_gst_accounts.append(account)
+								unidentified_gst_accounts.append(account)							
 							continue
 
 						for item_code, tax_amounts in item_wise_tax_detail.items():
