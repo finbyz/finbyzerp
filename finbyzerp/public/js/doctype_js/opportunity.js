@@ -1,0 +1,46 @@
+frappe.ui.form.on('Opportunity', {
+	refresh: function(frm) {
+		if(!frm.doc.__islocal){
+			frm.add_custom_button(__("Meeting Schedule"), function() {
+				return frappe.call({
+					method : "finbyzerp.api.make_meetings",
+					args: {
+						"source_name": frm.doc.name,
+						"doctype": 'Opportunity',
+						"ref_doctype": 'Meeting Schedule'
+					},
+					callback: function(r) {
+						if(!r.exc) {
+							var doc = frappe.model.sync(r.message);
+							frappe.set_route("Form", r.message.doctype, r.message.name);
+						}
+					}
+				})
+			}, __("Make"));
+			
+			frm.add_custom_button(__("Meeting"), function() {
+				return frappe.call({
+					method : "finbyzerp.api.make_meetings",
+					args: {
+						"source_name": frm.doc.name,
+						"doctype": 'Opportunity',
+						"ref_doctype": 'Meeting'
+					},
+					callback: function(r) {
+						if(!r.exc) {
+							var doc = frappe.model.sync(r.message);
+							frappe.set_route("Form", r.message.doctype, r.message.name);
+						}
+					}
+				})
+			}, __("Make"));
+		}
+	},
+	status: function(frm) {
+		if (frm.doc.status== "Not Interested" || frm.doc.status== "Do Not Contact" ){
+			frm.set_value("contact_by", "");
+			frm.set_value("contact_date", "");
+		}
+	},
+
+});

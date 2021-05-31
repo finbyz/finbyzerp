@@ -1,0 +1,42 @@
+{
+ "creation": "2017-11-20 17:45:11.708963",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "actionable",
+  "responsible",
+  "expected_completion_date"
+ ],
+ "fields": [
+  {
+   "fieldname": "actionable",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Actionable"
+  },
+  {
+   "fieldname": "responsible",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Responsible"
+  },
+  {
+   "fieldname": "expected_completion_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Expected Completion Date"
+  }
+ ],
+ "istable": 1,
+ "modified": "2021-04-06 14:47:40.652644",
+ "modified_by": "Administrator",
+ "module": "Finbyzerp",
+ "name": "Meeting Actionable",
+ "owner": "info@finbyz.in",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

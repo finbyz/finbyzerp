@@ -1,0 +1,23 @@
+{
+ "creation": "2021-03-13 10:58:58.779566",
+ "docstatus": 0,
+ "doctype": "Number Card",
+ "dynamic_filters_json": "{}",
+ "filters_json": "{}",
+ "function": "Count",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "label": "Quantity to be Deliver",
+ "modified": "2021-03-13 11:02:19.902937",
+ "modified_by": "Administrator",
+ "module": "Finbyzerp",
+ "name": "Quantity to be Deliver",
+ "owner": "matilda.kathi@ornetgroup.com",
+ "report_field": "Qty to Deliver",
+ "report_function": "Sum",
+ "report_name": "Ordered Items To Be Delivered",
+ "show_percentage_stats": 1,
+ "stats_time_interval": "Daily",
+ "type": "Report"
+}

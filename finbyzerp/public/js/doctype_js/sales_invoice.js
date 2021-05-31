@@ -12,7 +12,6 @@ frappe.ui.form.on('Sales Invoice', {
 	naming_series: function (frm) {
 		if (frappe.meta.get_docfield("Sales Invoice", "series_value", frm.doc.name)){
 			if (frm.doc.__islocal && frm.doc.company && !frm.doc.amended_from) {
-				console.log('test')
 				frappe.call({
 					method: "finbyzerp.api.check_counter_series",
 					args: {

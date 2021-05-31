@@ -12,7 +12,6 @@ frappe.ui.form.on('Delivery Note', {
 	naming_series: function (frm) {
 		if (frappe.meta.get_docfield("Delivery Note", "series_value", frm.doc.name)){
 			if (frm.doc.__islocal && frm.doc.company && !frm.doc.amended_from) {
-				console.log('test')
 				frappe.call({
 					method: "finbyzerp.api.check_counter_series",
 					args: {

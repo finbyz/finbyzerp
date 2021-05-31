@@ -1,0 +1,18 @@
+{
+    "short_name": "FinbyzERP",
+    "name": "FinbyzERP",
+    "description": "FinbyzERP",
+    "icons": [
+      {
+        "src": "/files/favicon.png",
+        "type": "image/png",
+        "sizes": "512x512",
+        "purpose": "any maskable"
+      }
+    ],
+    "start_url": "/?source=pwa",
+    "background_color": "#1AA8E2",
+    "display": "standalone",
+    "scope": "/",
+    "theme_color": "#1AA8E2"
+  }

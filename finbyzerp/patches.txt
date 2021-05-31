@@ -1,0 +1,1 @@
+finbyzerp.patches.set_app_name_system_settings
