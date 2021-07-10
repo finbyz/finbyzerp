@@ -42,10 +42,6 @@ def get_data(data):
 				'items': ['Pricing Rule']
 			},
 			{
-				'label': _('Subscriptions'),
-				'items': ['Subscription']
-			},
-			{
 				'label': _('Meeting'),
 				'items': ['Meeting Schedule','Meeting']
 			},

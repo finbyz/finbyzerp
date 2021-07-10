@@ -3,6 +3,7 @@ from frappe import _
 from frappe.permissions import get_doctypes_with_read
 from frappe.model.naming import parse_naming_series
 
+@frappe.whitelist()
 def get_transactions(self, arg=None):
 	doctypes = list(set(frappe.db.sql_list("""select parent
 			from `tabDocField` df where fieldname='naming_series'""")

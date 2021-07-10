@@ -11,11 +11,56 @@ frappe.ui.form.on('Payment Entry', {
 		cur_frm.set_query("address", function (doc) {
 			return {
 				query: "frappe.contacts.doctype.address.address.address_query",
-				filters: { link_doctype: "Customer", link_name: doc.party }
+				filters: { link_doctype: doc.party_type, link_name: doc.party }
 			};
 		})
+		frm.trigger('set_address');
 	},
-
+	before_save: function(frm){
+		frm.trigger('set_address');
+	},
+	party: function(frm){
+		if(frm.doc.party_type in ["Customer","Supplier"] && frm.doc.party){
+		frappe.call({
+			method:"erpnext.accounts.party.get_party_details",
+			args:{
+				party: frm.doc.party,
+				party_type: frm.doc.party_type
+			},
+			callback: function(r){
+				if(r.message){
+					var adrr = frappe.scrub(frm.doc.party_type) + "_address"
+					if(frm.doc.address != r.message[adrr]){
+						frm.set_value('address', r.message[adrr])
+					}
+				}
+			}
+		})
+		}
+	},
+	validate: function(frm) {
+		
+		if(!frm.doc.address){
+			if(frm.doc.party_type in ["Customer","Supplier"] && frm.doc.party){
+				frappe.call({
+					method:"erpnext.accounts.party.get_party_details",
+					args:{
+						party: frm.doc.party,
+						party_type: frm.doc.party_type
+					},
+					callback: function(r){
+						if(r.message){
+							var adrr = frappe.scrub(frm.doc.party_type) + "_address"
+							if(frm.doc.address != r.message[adrr]){
+								frm.set_value('address', r.message[adrr])
+							}
+						}
+						frm.refresh();
+					}
+				})
+			}
+		}
+	},
 	naming_series: function (frm) {
 		if (frappe.meta.get_docfield("Payment Entry", "series_value", frm.doc.name)){
 			if (frm.doc.__islocal && frm.doc.company && !frm.doc.amended_from) {
@@ -31,7 +76,7 @@ frappe.ui.form.on('Payment Entry', {
 						// frm.doc.series_value = e.message;
 					}
 				});
-				// frm.refresh_field('series_value')
+				
 			}
 		}
 	},

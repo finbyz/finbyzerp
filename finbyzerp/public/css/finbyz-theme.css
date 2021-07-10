@@ -10,6 +10,12 @@
 body{
 	font-family: Helvetica Neue,Helvetica,Arial,Open Sans,sans-serif !important;
 }
+.standard-icon-sidebar-section a:hover{
+	text-decoration: none;
+}
+.d__none{
+	display: none ;
+}
 .navbar-brand{
 	padding: 10px 15px;
 }
@@ -102,9 +108,57 @@ body{
 .list-row-head .level-left, 
 .list-row .level-left{
     min-width: 90%;
+	
 }
 .datatable .dt-scrollable .dt-cell__content{
 	font-weight: 450;
+}
+.desk-icon-sidebar .standard-sidebar-item{
+	display: flex;
+    align-items: center;
+    font-size: var(--text-base);
+    padding: 8px 8px;
+    margin-bottom: 2px;
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    cursor: pointer;
+}
+.desk-icon-sidebar .standard-sidebar-item.selected,
+.desk-icon-sidebar .standard-sidebar-item:hover{
+	background-color: var(--sidebar-select-color);
+}
+.icon-side-section{
+	width: 55px;
+	margin: 10px 10px 0px 10px;
+	height: calc(100vh - var(--navbar-height) - var(--page-head-height) - 5px);
+	transition: all 2s linear;
+	overflow-y:scroll;
+}
+.icon-side-section:hover{
+	width: auto;
+}
+.desk-icon-sidebar{
+	margin-right: 6px;
+}
+.hide_icon_bar .icon-side-section{
+	display: none;
+	
+}
+.icon-base, .icon-md{
+	height: 25px;
+	width: 25px;
+}
+
+@media (max-width: 992px){
+	.icon-side-section{
+		display: none !important;
+	}
+}
+.Administration_section {
+	border-top:1px solid rgba(0,0,0,.1);
+}
+.widget-group .grid-col-1{
+	grid-template-columns: repeat(auto-fill,minmax(49%,1fr));
 }
 /*-------- end common theme------------ */
 
@@ -112,7 +166,6 @@ body{
 [data-theme="light"] .navbar .navbar-nav > li > a:hover{
 	text-decoration: none !important;
 }
-
 [data-theme="light"] .list-row-head .list-subject,
 [data-theme="light"] .list-row-head .list-row-col span,
 [data-theme="light"] .list-row-head .level-right .list-count span,
@@ -154,7 +207,7 @@ body{
 	background-color: var(--gray-600) !important;
 }
 /*---------- end dark theme ------------- */
-/* hover effect */
+
 /* [data-theme="light"] .list-row-head:hover:not(.list-row-head),
 [data-theme="light"] .list-row:hover:not(.list-row-head){
 	transform: scale(1,1.002);
@@ -172,4 +225,87 @@ body{
 	background: #edf3f8 !important;
 } */
 /* end */
+/*----------- icons -----------  */
+.Accounting-sidebar-icon{
+	background: url(/assets/finbyzerp/images/accounts.svg);
+}
+.Buying-sidebar-icon{
+	background: url(/assets/finbyzerp/images/buying.svg);
+}
+.Selling-sidebar-icon{
+	background: url(/assets/finbyzerp/images/selling.svg);
+}
+.Stock-sidebar-icon{
+	background: url(/assets/finbyzerp/images/stock.svg);
+}
+.Assets-sidebar-icon{
+	background: url(/assets/finbyzerp/images/assets.svg);
+}
+.Projects-sidebar-icon{
+	background: url(/assets/finbyzerp/images/projects.svg);
+}
+.CRM-sidebar-icon{
+	background: url(/assets/finbyzerp/images/CRM.svg);
+}
+.Support-sidebar-icon{
+	background: url(/assets/finbyzerp/images/support.svg);
+}
+.HR-sidebar-icon{
+	background: url(/assets/finbyzerp/images/human_resource.svg);
+}
+.Quality-sidebar-icon{
+	background: url(/assets/finbyzerp/images/quality.svg);
+}
+.Tools-sidebar-icon,.Build-sidebar-icon{
+	background: url(/assets/finbyzerp/images/tools.svg);
+}
+.Settings-sidebar-icon{
+	background: url(/assets/finbyzerp/images/settings.svg);
+}
+.Users-sidebar-icon{
+	background: url(/assets/finbyzerp/images/user_permission.svg);
+}
+.Integrations-sidebar-icon{
+	background: url(/assets/finbyzerp/images/integration.svg);
+}
+.Website-sidebar-icon{
+	background: url(/assets/finbyzerp/images/website.svg);
+}
+.Customization-sidebar-icon{
+	background: url(/assets/finbyzerp/images/customization.svg);
+}
+.Home-sidebar-icon{
+	background: url(/assets/finbyzerp/images/home.svg);
+}
+.Management-sidebar-icon,
+.Loans-sidebar-icon{
+	background: url(/assets/finbyzerp/images/Loan_Management.svg);
+}
+.Utilities-sidebar-icon{
+	background: url(/assets/finbyzerp/images/utilities.svg);	
+}
+.Payroll-sidebar-icon{
+	background: url(/assets/finbyzerp/images/payroll.svg);	
+}
+.Manufacturing-sidebar-icon{
+	background: url(/assets/finbyzerp/images/manufacturing.svg);	
+}
+/*-------- custom icon ----------*/
+.Chemical-sidebar-icon,.Rohandyes-sidebar-icon{
+	background: url(/assets/finbyzerp/images/chemical.svg);
+}
+.Elkins-sidebar-icon{	
+	background: url(/assets/finbyzerp/images/yarn.svg);
+}
 
+.desk-sidebar-item span{
+	background-repeat: no-repeat;
+}
+/*----------- endicons------- */
+/*-------- media queries ------- */
+@media (max-width: 787px) {
+    .layout-side-section {
+        display: block !important;
+    }
+}
+/*------- end media queries -------*/

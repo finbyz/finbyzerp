@@ -44,8 +44,11 @@ def get_data(filters):
 		sl['value_diff'] = round((flt(sl['gl_value']) - flt(sl['sle_value'])),0)
 		if sl['value_diff']:
 			data.append(sl)
-	#frappe.msgprint(str(gl_data.get(sl.voucher_no)))
+	frappe.msgprint(str(gl_data.get(sl.voucher_no)))
 	return data
+
+
+
 	
 
 
@@ -66,7 +69,7 @@ def get_sle_value(filters):
 				sum(sle.stock_value_difference) as sle_value, sle.posting_date, sle.voucher_type, sle.voucher_no, sle.company
 			from
 				`tabStock Ledger Entry` sle
-			where sle.docstatus < 2 and sle.stock_value_difference<>0%s
+			where sle.docstatus < 2 and sle.is_cancelled = 0 and sle.stock_value_difference<>0%s
 			group by sle.voucher_no
 			order by sle.posting_date""" %
 			(conditions), as_dict=1)
@@ -88,7 +91,7 @@ def get_gl_value(filters):
 				sum(gl.debit_in_account_currency - gl.credit_in_account_currency) as gl_value, gl.voucher_no
 			from
 				`tabGL Entry` gl JOIN `tabAccount` ac ON gl.account = ac.name
-			where gl.docstatus < 2 and ac.account_type in ("Stock","Capital Work in Progress","Fixed Asset")%s
+			where gl.docstatus < 2 and gl.is_cancelled = 0 and ac.account_type in ("Stock","Capital Work in Progress","Fixed Asset")%s
 			group by gl.voucher_no
 			order by gl.posting_date""" %
 			(conditions), as_dict=1)
