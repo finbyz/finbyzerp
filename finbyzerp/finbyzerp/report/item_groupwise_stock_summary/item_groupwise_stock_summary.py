@@ -89,10 +89,15 @@ def get_item_group(filters):
 	
 
 def get_item_map(filters):
-	gst_accounts = frappe.get_doc("GST Account",{"parent":"GST Settings","company":filters.company})
+	gst_accounts = frappe.get_doc("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":0})
+	gst_accounts_reverse = frappe.get_doc("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":1})
 	accounts = frappe._dict({"cgst_account":gst_accounts.cgst_account,"sgst_account":gst_accounts.sgst_account,
 							"igst_account":gst_accounts.igst_account,"cess_account":gst_accounts.cess_account,
 							"tcs_account":gst_accounts.tcs_account,"export_reverse_charge_account":gst_accounts.export_reverse_charge_account})
+
+	reverse_accounts = frappe._dict({"cgst_account":gst_accounts_reverse.cgst_account,"sgst_account":gst_accounts_reverse.sgst_account,
+							"igst_account":gst_accounts_reverse.igst_account,"cess_account":gst_accounts_reverse.cess_account,
+							"tcs_account":gst_accounts_reverse.tcs_account,"export_reverse_charge_account":gst_accounts_reverse.export_reverse_charge_account})
 
 	purchase_tax_amount_data = purchase_execute(filters)
 	sales_tax_amount_data = sales_execute(filters)
@@ -107,25 +112,32 @@ def get_item_map(filters):
 	item_map = {}
 	item_tax_map = {}
 	if filters.get('purchase') and not filters.get('sales'):
-		item_map, item_tax_map = get_purchase_data(filters,accounts,item_map,item_tax_map,purchase_tax_amount_data)
+		item_map, item_tax_map = get_purchase_data(filters,accounts,reverse_accounts,item_map,item_tax_map,purchase_tax_amount_data)
 	elif filters.get('sales') and not filters.get('purchase'):
-		item_map, item_tax_map = get_sales_data(filters,accounts,item_map,item_tax_map,sales_tax_amount_data)
+		item_map, item_tax_map = get_sales_data(filters,accounts,reverse_accounts,item_map,item_tax_map,sales_tax_amount_data)
 	else:
-		item_map, item_tax_map = get_purchase_data(filters,accounts,item_map,item_tax_map,purchase_tax_amount_data)
-		item_map, item_tax_map = get_sales_data(filters,accounts,item_map,item_tax_map,sales_tax_amount_data)
+		item_map, item_tax_map = get_purchase_data(filters,accounts,reverse_accounts,item_map,item_tax_map,purchase_tax_amount_data)
+		item_map, item_tax_map = get_sales_data(filters,accounts,reverse_accounts,item_map,item_tax_map,sales_tax_amount_data)
 
 	return item_map, item_tax_map
 
-def get_purchase_data(filters,accounts,item_map,item_tax_map,purchase_tax_amount_data):
+def get_purchase_data(filters,accounts,reverse_accounts,item_map,item_tax_map,purchase_tax_amount_data):
 	for tax in purchase_tax_amount_data[1]:
 		if tax['item_code'] in item_tax_map:
 			item_tax_map[tax['item_code']] += ((flt(tax.get(frappe.scrub(accounts.get("cgst_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(accounts.get("sgst_account") or "") + "_amount")) or 0)
 									+ (flt(tax.get(frappe.scrub(accounts.get("igst_account") or "") + "_amount"))or 0) + (flt(tax.get(frappe.scrub(accounts.get("cess_account") or "") + "_amount")) or 0) 
-									+ (flt(tax.get(frappe.scrub(accounts.get("tcs_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(accounts.get("export_reverse_charge_account") or "") + "_amount")) or 0))
+									+ (flt(tax.get(frappe.scrub(accounts.get("tcs_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(accounts.get("export_reverse_charge_account") or "") + "_amount")) or 0)
+									+ (flt(tax.get(frappe.scrub(reverse_accounts.get("cgst_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(reverse_accounts.get("sgst_account") or "") + "_amount")) or 0)
+									+ (flt(tax.get(frappe.scrub(reverse_accounts.get("igst_account") or "") + "_amount"))or 0) + (flt(tax.get(frappe.scrub(reverse_accounts.get("cess_account") or "") + "_amount")) or 0) 
+									+ (flt(tax.get(frappe.scrub(reverse_accounts.get("tcs_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(reverse_accounts.get("export_reverse_charge_account") or "") + "_amount")) or 0))
+
 		else:
 			item_tax_map[tax['item_code']] = ((flt(tax.get(frappe.scrub(accounts.get("cgst_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(accounts.get("sgst_account") or "") + "_amount")) or 0)
 									+ (flt(tax.get(frappe.scrub(accounts.get("igst_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(accounts.get("cess_account") or "") + "_amount")) or 0) 
-									+ (flt(tax.get(frappe.scrub(accounts.get("tcs_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(accounts.get("export_reverse_charge_account") or "") + "_amount")) or 0))
+									+ (flt(tax.get(frappe.scrub(accounts.get("tcs_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(accounts.get("export_reverse_charge_account") or "") + "_amount")) or 0)
+									+ (flt(tax.get(frappe.scrub(reverse_accounts.get("cgst_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(reverse_accounts.get("sgst_account") or "") + "_amount")) or 0)
+									+ (flt(tax.get(frappe.scrub(reverse_accounts.get("igst_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(reverse_accounts.get("cess_account") or "") + "_amount")) or 0) 
+									+ (flt(tax.get(frappe.scrub(reverse_accounts.get("tcs_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(reverse_accounts.get("export_reverse_charge_account") or "") + "_amount")) or 0))
 
 		if tax['item_code'] in item_map:
 			item_map[tax['item_code']] += tax.get('amount') or 0
@@ -140,7 +152,7 @@ def get_purchase_data(filters,accounts,item_map,item_tax_map,purchase_tax_amount
 
 	return item_map, item_tax_map
 
-def get_sales_data(filters,accounts,item_map,item_tax_map,sales_tax_amount_data):
+def get_sales_data(filters,accounts,reverse_accounts,item_map,item_tax_map,sales_tax_amount_data):
 	for tax in sales_tax_amount_data[1]:
 		if tax['item_code'] in item_tax_map:
 			item_tax_map[tax['item_code']] += ((flt(tax.get(frappe.scrub(accounts.get("cgst_account") or "") + "_amount")) or 0) + (flt(tax.get(frappe.scrub(accounts.get("sgst_account") or "") + "_amount")) or 0)

@@ -76,6 +76,9 @@ from frappe.model import sync
 from finbyzerp.api import get_doc_files
 sync.get_doc_files = get_doc_files
 
+from erpnext.hr.doctype.expense_claim.expense_claim import ExpenseClaim
+from finbyzerp.finbyzerp.doc_events.expense_claim import set_status
+ExpenseClaim.set_status = set_status
 
 app_include_css = ["/assets/finbyzerp/css/permission.css","/assets/finbyzerp/css/finbyz-theme.css"]
 app_include_js = [
@@ -233,3 +236,5 @@ utils.get_timespan_date_range = get_timespan_date_range
 from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
+
+

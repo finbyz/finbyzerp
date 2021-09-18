@@ -1,0 +1,33 @@
+{
+ "cards_label": "Credit and Debit Note",
+ "category": "Modules",
+ "charts": [],
+ "creation": "2021-08-19 13:59:42.571669",
+ "developer_mode_only": 0,
+ "disable_user_customization": 0,
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "extends": "Accounting",
+ "extends_another_page": 1,
+ "hide_custom": 0,
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "label": "Credit and Debit Note",
+ "links": [],
+ "modified": "2021-08-19 14:10:22.199186",
+ "modified_by": "Administrator",
+ "module": "Finbyzerp",
+ "name": "Credit and Debit Note",
+ "owner": "Administrator",
+ "pin_to_bottom": 0,
+ "pin_to_top": 0,
+ "shortcuts": [
+  {
+   "doc_view": "List",
+   "label": "Credit and Debit Note",
+   "link_to": "Credit and Debit Note",
+   "type": "DocType"
+  }
+ ]
+}

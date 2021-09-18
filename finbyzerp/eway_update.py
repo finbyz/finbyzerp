@@ -193,7 +193,7 @@ def get_ewb_data(dt, dn):
 		ewaybills.append(data)
 
 	data = {
-		'version': '1.0.0621', # Finbyz change
+		'version': '1.0.0421', # Finbyz change
 		'billLists': ewaybills
 	}
 

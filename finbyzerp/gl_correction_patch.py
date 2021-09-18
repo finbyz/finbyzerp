@@ -74,6 +74,7 @@ def check_bin_multiple_items_with_warehouse():
 # Patch End
 def patch():
 	data = get_data()
+	print(data)
 	for row in data:
 		if row['voucher_type'] in ["Stock Entry","Stock Reconciliation"]:
 			se_doc = frappe.get_doc(row['voucher_type'],row['voucher_no'])
