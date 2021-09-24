@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 import frappe
+#import re
 from frappe import _
 from frappe.utils import getdate, cstr, flt, date_diff
 
@@ -43,3 +44,28 @@ def get_gl_data(from_date,to_date,company,account):
             date_wise_balance.append({"date":previous_date,"balance":previous_balance, "days":day_diff})
             
     return date_wise_balance
+
+def after_insert(self,method):
+    create_item(self)
+
+def create_item(self):
+    if self.account_type == "Expense Account":
+        if not frappe.db.exists("Item Group","Expense Accounts"):
+            frappe.throw("Please Create Item group 'Expense Accounts' for creating Item")
+        item = frappe.new_doc('Item')    
+        final_name = self.name.split("-")[0].strip()
+        item.item_name = final_name
+        item.item_code = final_name
+        item.item_group = 'Expense Accounts'
+        item.append('item_defaults',{
+            "company":self.company,
+            "expense_account":self.name
+        })
+        item.is_sales_item = 0
+        item.save(ignore_permissions=True)
+   
+
+    
+
+
+
