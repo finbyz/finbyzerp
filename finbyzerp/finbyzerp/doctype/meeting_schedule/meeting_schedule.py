@@ -123,10 +123,12 @@ def make_meeting(source_name, target_doc=None):
 					"name": "schedule_ref",
 					"scheduled_from": "meeting_from",
 					"scheduled_to": "meeting_to",
-					"party": "lead"
 				},
 				"field_no_map": [
-					"naming_series"
+					"naming_series",
+					"lead",
+					"customer",
+					"opportunity"
 				]
 			}
 	}, target_doc)	

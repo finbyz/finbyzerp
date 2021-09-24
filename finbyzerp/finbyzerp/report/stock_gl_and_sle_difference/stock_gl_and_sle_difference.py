@@ -44,7 +44,7 @@ def get_data(filters):
 		sl['value_diff'] = round((flt(sl['gl_value']) - flt(sl['sle_value'])),0)
 		if sl['value_diff']:
 			data.append(sl)
-	frappe.msgprint(str(gl_data.get(sl.voucher_no)))
+
 	return data
 
 

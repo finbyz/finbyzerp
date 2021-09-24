@@ -36,7 +36,7 @@ frappe.ui.form.on('Meeting Schedule', {
 			if(frm.doc.is_online){
 				is_online = " Online ";
 			}
-			let message = "<p>Dear " + frm.doc.contact_person_name + ",</p><p>Greeting from Finbyz Tech Pvt. Ltd.</p><p> This is regarding the telephonic conversation that we had about " + frm.doc.service + " for your organization " + frm.doc.organisation + ". The" + is_online + " Meeting has been scheduled on " + date + " at " + time + "</p><p>In case of Any Changes in your Schedule request you to inform us timely.</p><p></p>Thanks & Regards,<p>" + sign + "</p>";
+			let message = "<p>Dear " + frm.doc.contact_person_name + ",</p><p>Greeting from "+ frm.doc.company + "</p><p> This is regarding the telephonic conversation that we had about " + frm.doc.service + " for your organization " + frm.doc.organisation + ". The" + is_online + " Meeting has been scheduled on " + date + " at " + time + "</p><p>In case of Any Changes in your Schedule request you to inform us timely.</p><p></p>Thanks & Regards,<p>" + sign + "</p>";
 			frm.set_value("invitation_message", message);
 		}
 	},

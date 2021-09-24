@@ -58,8 +58,8 @@ def _execute(filters=None, additional_table_columns=None, additional_query_colum
 			'invoice': d.parent,
 			'posting_date': d.posting_date,
 			'customer': d.customer,
-			'customer_name': customer_record.customer_name,
-			'customer_group': customer_record.customer_group,
+			'customer_name': customer_record.customer_name if customer_record else '',
+			'customer_group': customer_record.customer_group if customer_record else '',
 		}
 
 		if additional_query_columns:
@@ -331,6 +331,7 @@ def get_conditions(filters):
 		("customer", " and `tabSales Invoice`.customer = %(customer)s"),
 		("item_code", " and `tabSales Invoice Item`.item_code = %(item_code)s"),
 		("from_date", " and `tabSales Invoice`.posting_date>=%(from_date)s"),
+		("cost_center", " and `tabSales Invoice`.cost_center=%(cost_center)s"),
 		("to_date", " and `tabSales Invoice`.posting_date<=%(to_date)s")):
 			if filters.get(opts[0]):
 				conditions += opts[1]

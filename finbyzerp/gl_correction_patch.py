@@ -36,25 +36,45 @@ def check_bin_multiple_items_with_warehouse():
 	duplicate = []
 	total_stock_value = 0
 	for b in bin_list:
-		if frappe.db.sql("select sum(stock_value_difference) from `tabStock Ledger Entry` where item_code = '{}' and warehouse = '{}' and is_cancelled = 0 group by item_code".format(b.item_code,b.warehouse)):
-			stock_value = frappe.db.sql("select sum(stock_value_difference) from `tabStock Ledger Entry` where item_code = '{}' and warehouse = '{}' and is_cancelled = 0 group by item_code".format(b.item_code,b.warehouse))[0][0]
-		else:
-			stock_value = 0.0
-		
-		total_stock_value += stock_value
-		if stock_value != b.stock_value:
-			print(b.name, b.item_code)
-			#frappe.db.set_value("Bin",b.name,"stock_value",stock_value)
-		
 		if (b.item_code,b.warehouse) not in bin_dict:
 			bin_dict[(b.item_code,b.warehouse)] = b
 		else:
 			duplicate.append(frappe._dict({"item_code":b.item_code,"warehouse":b.warehouse}))
+
+		stock_value_diff_query = frappe.db.sql("""select sum(stock_value_difference)
+			from `tabStock Ledger Entry`
+			where item_code = '{}' and warehouse = '{}' and is_cancelled = 0
+			group by item_code""".format(b.item_code,b.warehouse))
+			
+		if stock_value_diff_query:
+			stock_value_diff = stock_value_diff_query[0][0]
+		else:
+			stock_value_diff = 0.0
+
+		# stock_value_query = frappe.db.sql("""select stock_value,name
+		# from `tabStock Ledger Entry`
+		# where item_code = '{}' and warehouse = '{}' and is_cancelled = 0
+		# order by timestamp(posting_date, posting_time) DESC, creation DESC limit 1""".format(b.item_code,b.warehouse))
+
+		# if stock_value_query:
+		# 	stock_value = stock_value_query[0][0]
+		# else:
+		# 	stock_value = 0
+
+		# if stock_value != stock_value_diff:
+		# 	print(b.name,b.item_code,b.warehouse,stock_value_query[0][1])
+
+		total_stock_value += stock_value_diff
+		if stock_value_diff != b.stock_value:
+			print(b.name, b.item_code)
+			# frappe.db.set_value("Bin",b.name,"stock_value",stock_value_diff)
+		
 	print(total_stock_value)
 
 # Patch End
 def patch():
 	data = get_data()
+	print(data)
 	for row in data:
 		if row['voucher_type'] in ["Stock Entry","Stock Reconciliation"]:
 			se_doc = frappe.get_doc(row['voucher_type'],row['voucher_no'])

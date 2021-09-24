@@ -3,13 +3,17 @@ import frappe
 from erpnext.accounts.utils import get_fiscal_year, flt
 import datetime
 from frappe.utils.background_jobs import enqueue
-from frappe.utils import cint, getdate, get_fullname, get_url_to_form,now_datetime,validate_email_address
+from frappe.utils import cint, getdate, get_fullname, get_url_to_form,now_datetime,validate_email_address,now
+
 from frappe.utils.pdf import get_pdf
 from frappe.utils.file_manager import save_file
 from frappe import _
 from frappe.model.mapper import get_mapped_doc
 from frappe.model.meta import get_field_precision
 from erpnext.accounts.utils import get_stock_accounts,get_stock_and_account_balance
+
+from frappe.utils.data import (nowdate,add_to_date,get_first_day_of_week,get_last_day_of_week,get_first_day,get_last_day,
+		get_quarter_start,get_quarter_ending,get_year_start,get_year_ending)
 
 import json
 import os
@@ -313,22 +317,36 @@ def daily_transaction_summary_mail():
 
 
 def stock_entry_validate(self, method):
-	if self._action == "submit":
+	pass
 		
-		validate_additional_cost(self)
+def stock_entry_on_submit(self,method):
+	validate_additional_cost(self)
 
 def validate_additional_cost(self):
-	if self.purpose in ['Repack','Manufacture'] and self._action == "submit":
+	if self.purpose in ['Repack','Manufacture']:
 		diff = abs(round(flt(self.value_difference,1)) - (round(flt(self.total_additional_costs,1))))
-		if diff > 3:
+		if diff > 5:
 			frappe.throw("ValuationError: Value difference between incoming and outgoing amount is higher than additional cost")
 
-def validate_user_mobile_no(self,method):
+def validate_user(self,method):
+	validate_user_mobile_no(self)
+	check_system_manager_role(self)
+
+def validate_user_mobile_no(self):
 	if self.mobile_no:
 		if not self.mobile_no.isdigit():
 			frappe.throw("Please Enter Digits Only in Mobile Number.")
 		elif len(self.mobile_no) != 10:
 			frappe.throw("Please Enter 10 digit Mobile Number.")
+
+def check_system_manager_role(self):
+	if self.name not in ["info@finbyz.com", "Administrator","mukesh@finbyz.tech"]:
+		remove_roles = []
+		for role in self.roles:
+			if role.role == "System Manager":
+				remove_roles.append(role)
+		
+		[self.roles.remove(d) for d in remove_roles]
 
 from frappe.core.doctype.report.report import Report
 
@@ -499,6 +517,19 @@ def get_doc_files(files, start_path):
 					if os.path.exists(doc_path):
 						if not doc_path in files:
 							files.append(doc_path)
+							
+def finbyz_future_sle_exists(args):
+	return frappe.db.sql("""
+		select name
+		from `tabStock Ledger Entry`
+		where
+			warehouse = '{}' and item_code = '{}'
+			and timestamp(posting_date, posting_time)
+				>= timestamp('{}','{}')
+			and voucher_no != '{}'
+			and is_cancelled = 0
+		limit 1
+		""".format(args.warehouse,args.item_code,args.posting_date,args.posting_time,args.voucher_no))
 
 def check_if_stock_and_account_balance_synced(posting_date, company, voucher_type=None, voucher_no=None):
 	if not cint(erpnext.is_perpetual_inventory_enabled(company)):
@@ -531,3 +562,109 @@ def check_if_stock_and_account_balance_synced(posting_date, company, voucher_typ
 					'client_action': 'erpnext.route_to_adjustment_jv',
 					'args': get_journal_entry(account, stock_adjustment_account, diff)
 				})
+
+
+def get_timespan_date_range(timespan):
+	today = nowdate()
+	date_range_map = {
+		"last week": lambda: (get_first_day_of_week(add_to_date(today, days=-7)), get_last_day_of_week(add_to_date(today, days=-7))),
+		"last month": lambda: (get_first_day(add_to_date(today, months=-1)), get_last_day(add_to_date(today, months=-1))),
+		"last quarter": lambda: (get_quarter_start(add_to_date(today, months=-3)), get_quarter_ending(add_to_date(today, months=-3))),
+		"last 6 months": lambda: (get_quarter_start(add_to_date(today, months=-6)), get_quarter_ending(add_to_date(today, months=-3))),
+		"last year": lambda: (get_year_start(add_to_date(today, years=-1)), get_year_ending(add_to_date(today, years=-1))),
+		"yesterday": lambda: (add_to_date(today, days=-1),) * 2,
+		"today": lambda: (today, today),
+		"tomorrow": lambda: (add_to_date(today, days=1),) * 2,
+		# "this week": lambda: (get_first_day_of_week(today), today),
+		"this week": lambda: (get_first_day_of_week(today), get_last_day_of_week(get_first_day_of_week(today))),
+		# "this month": lambda: (get_first_day(today), today),
+		"this month": lambda: (get_first_day(today), get_last_day(get_first_day(today))),
+		# "this quarter": lambda: (get_quarter_start(today), today),
+		"this quarter": lambda: (get_quarter_start(today), get_quarter_ending(get_quarter_start(today))),
+		# "this year": lambda: (get_year_start(today), today),
+		"this year": lambda: (get_year_start(today), get_year_ending(get_year_start(today))),
+		"next week": lambda: (get_first_day_of_week(add_to_date(today, days=7)), get_last_day_of_week(add_to_date(today, days=7))),
+		"next month": lambda: (get_first_day(add_to_date(today, months=1)), get_last_day(add_to_date(today, months=1))),
+		"next quarter": lambda: (get_quarter_start(add_to_date(today, months=3)), get_quarter_ending(add_to_date(today, months=3))),
+		"next 6 months": lambda: (get_quarter_start(add_to_date(today, months=3)), get_quarter_ending(add_to_date(today, months=6))),
+		"next year": lambda: (get_year_start(add_to_date(today, years=1)), get_year_ending(add_to_date(today, years=1))),
+	}
+
+	if timespan in date_range_map:
+		return date_range_map[timespan]()
+
+
+def get_date_range(operator, value):
+	timespan_map = {
+		'1 week': 'week',
+		'1 month': 'month',
+		'3 months': 'quarter',
+		'6 months': '6 months',
+		'1 year': 'year',
+	}
+	period_map = {
+		'previous': 'last',
+		'next': 'next',
+	}
+
+	timespan = period_map[operator] + ' ' + timespan_map[value] if operator != 'timespan' else value
+
+	return get_timespan_date_range(timespan)
+
+
+def po_so_before_cancel(self,method):
+	frappe.db.sql("""update `tabGL Entry`
+		set against_voucher_type=null, against_voucher=null,
+		modified=%s, modified_by=%s
+		where against_voucher_type=%s and against_voucher=%s
+		and voucher_no != ifnull(against_voucher, '') and is_cancelled = 1""",
+		(now(), frappe.session.user, self.doctype, self.name))
+	# from frappe.model.dynamic_links import get_dynamic_link_map
+	# from frappe.model.delete_doc import raise_link_exists_exception
+	# doctypes_to_skip = ("Communication", "ToDo", "DocShare", "Email Unsubscribe", "Activity Log", "File",
+	# 	"Version", "Document Follow", "Comment" , "View Log", "Tag Link", "Notification Log", "Email Queue")
+	# doc = frappe.get_doc(self.doctype,self.name)
+	# method = "Cancel"
+	# for df in get_dynamic_link_map().get(doc.doctype, []):
+
+	# 	ignore_linked_doctypes = doc.get('ignore_linked_doctypes') or []
+
+	# 	if df.parent in doctypes_to_skip or (df.parent in ignore_linked_doctypes and method == 'Cancel'):
+	# 		# don't check for communication and todo!
+	# 		continue
+
+	# 	meta = frappe.get_meta(df.parent)
+	# 	if meta.issingle:
+	# 		# dynamic link in single doc
+	# 		refdoc = frappe.db.get_singles_dict(df.parent)
+	# 		if (refdoc.get(df.options)==doc.doctype
+	# 			and refdoc.get(df.fieldname)==doc.name
+	# 			and ((method=="Delete" and refdoc.docstatus < 2)
+	# 				or (method=="Cancel" and refdoc.docstatus==1))
+	# 			):
+	# 			# raise exception only if
+	# 			# linked to an non-cancelled doc when deleting
+	# 			# or linked to a submitted doc when cancelling
+	# 			raise_link_exists_exception(doc, df.parent, df.parent)
+	# 	else:
+	# 		# dynamic link in table
+	# 		df["table"] = ", `parent`, `parenttype`, `idx`" if meta.istable else ""
+	# 		for refdoc in frappe.db.sql("""select `name`, `docstatus` {table} from `tab{parent}` where
+	# 			{options}=%s and {fieldname}=%s""".format(**df), (doc.doctype, doc.name), as_dict=True):
+
+	# 			if ((method=="Delete" and refdoc.docstatus < 2) or (method=="Cancel" and refdoc.docstatus==1)):
+	# 				# raise exception only if
+	# 				# linked to an non-cancelled doc when deleting
+	# 				# or linked to a submitted doc when cancelling
+
+	# 				reference_doctype = refdoc.parenttype if meta.istable else df.parent
+	# 				reference_docname = refdoc.parent if meta.istable else refdoc.name
+	# 				at_position = "at Row: {0}".format(refdoc.idx) if meta.istable else ""
+	# 				if reference_doctype in ["GL Entry","Stock Ledger Entry"]:
+	# 					if frappe.db.exists(reference_doctype,{"name":reference_docname,"voucher_no":("!=",doc.name)}):
+	# 						voucher_type,voucher_no = frappe.db.get_value(reference_doctype,{"name":reference_docname,"voucher_no":("!=",doc.name)},['voucher_type','voucher_no'])
+	# 						if frappe.db.get_value(voucher_type,voucher_no,"docstatus") == 2:
+	# 							frappe.db.sql("delete from `tabGL Entry` where voucher_type=%s and voucher_no=%s and is_cancelled = 1", (voucher_type, voucher_no))
+	# 							frappe.db.sql("delete from `tabStock Ledger Entry` where voucher_type=%s and voucher_no=%s and is_cancelled = 1", (voucher_type, voucher_no))
+
+	# 				# raise_link_exists_exception(doc, reference_doctype, reference_docname, at_position)

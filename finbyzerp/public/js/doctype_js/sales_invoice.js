@@ -16,8 +16,8 @@ frappe.ui.form.on('Sales Invoice', {
 					method: "finbyzerp.api.check_counter_series",
 					args: {
 						'name': frm.doc.naming_series,
-						'date': frm.doc.transaction_date,
 						'company_series': frm.doc.company_series || null,
+						'date': frm.doc.posting_date,
 					},
 					callback: function (e) {
 						// frm.doc.series_value = e.message;
@@ -34,4 +34,12 @@ frappe.ui.form.on('Sales Invoice', {
 	posting_date: function (frm) {
 		frm.trigger('naming_series');
 	},
+	validate:function(frm){
+		if(frm.doc.customer_address && !frm.doc.shipping_address_name){
+			frappe.model.set_value("Sales invoice",frm.doc.name,"shipping_address_name",frm.doc.customer_address)
+			frm.refresh();
+			
+		}
+	}
+
 });

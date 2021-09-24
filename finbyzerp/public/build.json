@@ -6,6 +6,7 @@
 		"public/js/finbyzerp/finbyz-theme.js",
 		"public/js/finbyzerp/ui/page.js",
 		"public/js/finbyzerp/views/workspace/workspace.js",
-		"public/js/finbyzerp/views/container.js"
+		"public/js/finbyzerp/views/container.js",
+		"public/js/frappe/request.js"
     ]
 }

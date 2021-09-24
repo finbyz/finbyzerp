@@ -9,6 +9,23 @@ frappe.ui.form.on('Purchase Invoice', {
 		frm.trigger('naming_series');
 		}
 	},
+	billing_address: function(frm) {
+		// frappe.msgprint("hello")
+		if(cur_frm.doc.billing_address) {
+			return frappe.call({
+				method: "frappe.contacts.doctype.address.address.get_address_display",
+				args: {
+					"address_dict": frm.doc.billing_address
+				},
+				callback: function(r) {
+					if(r.message){
+						frm.set_value("billing_address_display", r.message);
+					}
+				}
+			});
+		}
+	},
+
 	posting_date: function (frm) {
 		frm.trigger('naming_series');
 	},

@@ -2,7 +2,7 @@ import frappe
 import re
 import jwt
 from frappe import _
-from frappe.utils.data import cstr, cint, flt
+from frappe.utils import cstr, cint, flt, getdate
 from erpnext.regional.india.e_invoice.utils import (GSPConnector,raise_document_name_too_long_error,read_json,\
 	validate_mandatory_fields,get_doc_details,get_overseas_address_details,get_return_doc_reference,\
 	get_eway_bill_details,validate_totals,show_link_to_error_log,santize_einvoice_fields,safe_json_load,get_payment_details,\
@@ -10,6 +10,24 @@ from erpnext.regional.india.e_invoice.utils import (GSPConnector,raise_document_
 
 from erpnext.regional.india.utils import get_gst_accounts,get_place_of_supply
 import json
+
+
+GST_INVOICE_NUMBER_FORMAT = re.compile(r"^[a-zA-Z0-9\-/]+$")   #alphanumeric and - /
+def validate_document_name(doc, method=None):
+	"""Validate GST invoice number requirements."""
+
+	country = frappe.get_cached_value("Company", doc.company, "country")
+	einvoice_enable = frappe.db.get_single_value("E Invoice Settings",'enable')
+	# Date was chosen as start of next FY to avoid irritating current users.
+	if country != "India" or getdate(doc.posting_date) < getdate("2021-04-01"):
+		return
+
+	if einvoice_enable and len(doc.name) > 16:
+		frappe.throw(_("Maximum length of document number should be 16 characters as per GST rules. Please change the naming series."))
+
+	if not GST_INVOICE_NUMBER_FORMAT.match(doc.name):
+		frappe.throw(_("Document name should only contain alphanumeric values, dash(-) and slash(/) characters as per GST rules. Please change the naming series."))
+
 
 # def validate_einvoice_fields(doc):
 # 	invoice_eligible = validate_eligibility(doc)
@@ -374,8 +392,8 @@ def validate_einvoice_fields(doc):
 		return
 
 	# Finbyz Changes Start: dont change posting date after irn generated
-	if doc.irn and doc.docstatus == 0 and doc._action == 'save':
-		if doc.posting_date != frappe.db.get_value("Sales Invoice",doc.name,"posting_date"):
+	if doc.irn and doc.docstatus == 0:
+		if str(doc.posting_date) != str(frappe.db.get_value("Sales Invoice",doc.name,"posting_date")):
 			frappe.throw(_('You cannot edit the invoice after generating IRN'), title=_('Edit Not Allowed'))
 
 	# Finbyz Changes End

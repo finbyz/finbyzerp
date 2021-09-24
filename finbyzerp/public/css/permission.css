@@ -7,6 +7,8 @@ option[value="System Manager"]{
 tr:has([data-role="System Manager"]){
     display: none;
 }
- 
+div span[data-unit="System Manager"],div input[data-unit="System Manager"]{
+    display: none !important;
+}   
 
 

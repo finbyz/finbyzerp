@@ -1,0 +1,207 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2017-11-07 13:48:13.123185",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "bank_account",
+  "from_date",
+  "to_date",
+  "bank_settings",
+  "column_break_3",
+  "bank",
+  "receivable_account",
+  "payable_account",
+  "bank_statement",
+  "section_break_6",
+  "new_transaction_items",
+  "section_break_9",
+  "match_invoices",
+  "column_break_14",
+  "create_payments",
+  "column_break_16",
+  "submit_payments",
+  "section_break_18",
+  "payment_invoice_items",
+  "reconciled_transactions",
+  "reconciled_transaction_items",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "bank_account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Bank Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "From Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "To Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "bank_settings",
+   "fieldtype": "Link",
+   "label": "Bank Statement Settings",
+   "options": "Bank Statement Settings",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "bank",
+   "fieldtype": "Link",
+   "label": "Bank",
+   "options": "Bank"
+  },
+  {
+   "fieldname": "receivable_account",
+   "fieldtype": "Link",
+   "label": "Receivable Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "payable_account",
+   "fieldtype": "Link",
+   "label": "Payable Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "bank_statement",
+   "fieldtype": "Attach",
+   "label": "Bank Statement"
+  },
+  {
+   "fieldname": "section_break_6",
+   "fieldtype": "Section Break",
+   "label": "Bank Transaction Entries"
+  },
+  {
+   "fieldname": "new_transaction_items",
+   "fieldtype": "Table",
+   "label": "New Transactions",
+   "options": "Bank Statement Transaction Payment Item"
+  },
+  {
+   "depends_on": "eval:doc.new_transaction_items && doc.new_transaction_items.length",
+   "fieldname": "section_break_9",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "match_invoices",
+   "fieldtype": "Button",
+   "label": "Match Transaction to Invoices"
+  },
+  {
+   "fieldname": "column_break_14",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "create_payments",
+   "fieldtype": "Button",
+   "label": "Create New Payment/Journal Entry"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "submit_payments",
+   "fieldtype": "Button",
+   "label": "Submit/Reconcile Payments"
+  },
+  {
+   "depends_on": "eval:doc.new_transaction_items && doc.new_transaction_items.length",
+   "fieldname": "section_break_18",
+   "fieldtype": "Section Break",
+   "label": "Matching Invoices"
+  },
+  {
+   "fieldname": "payment_invoice_items",
+   "fieldtype": "Table",
+   "label": "Payment Invoice Items",
+   "options": "Bank Statement Transaction Invoice Item"
+  },
+  {
+   "fieldname": "reconciled_transactions",
+   "fieldtype": "Section Break",
+   "label": "Reconciled Transactions"
+  },
+  {
+   "fieldname": "reconciled_transaction_items",
+   "fieldtype": "Table",
+   "label": "Reconciled Transactions",
+   "options": "Bank Statement Transaction Payment Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Bank Statement Transaction Entry",
+   "print_hide": 1,
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2021-08-26 10:59:13.065958",
+ "modified_by": "Administrator",
+ "module": "Finbyzerp",
+ "name": "Bank Statement Transaction Entry",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

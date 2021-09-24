@@ -343,7 +343,7 @@
  ],
  "icon": "fa fa-handshake-o",
  "is_submittable": 1,
- "modified": "2021-04-15 15:07:55.274932",
+ "modified": "2021-07-09 10:21:43.224439",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting",
@@ -392,7 +392,6 @@
  "search_fields": "organization,contact_person",
  "sort_field": "modified",
  "sort_order": "DESC",
- "timeline_field": "lead",
  "title_field": "organization",
  "track_changes": 1
 }

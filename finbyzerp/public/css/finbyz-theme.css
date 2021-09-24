@@ -62,8 +62,11 @@ body{
 .control-input textarea.input-with-feedback.form-control,
 .frappe-control[data-fieldtype=Select] .control-input select,
 .frappe-control[data-fieldtype=Select] .control-input select, 
-.frappe-control[data-fieldtype=Select].form-group select {
-	background-color: #fff;
+.frappe-control[data-fieldtype=Select].form-group select,
+.frappe-control[data-fieldtype=SmallText].form-control,
+.multiselect-list.dropdown .form-control,
+.form-grid .grid-body .form-control {
+	background-color: #fff !important;
 	border: 1px solid rgb(104 113 120 / 25%);
 }
 .navbar .navbar-nav > li > a,
@@ -206,6 +209,14 @@ body{
 [data-theme="dark"] .list-row-container:focus{
 	background-color: var(--gray-600) !important;
 }
+.awesomplete>ul>li{
+	overflow: visible !important;
+}
+.awesomplete>ul>li{
+    white-space: normal;
+    overflow: visible;
+
+}
 /*---------- end dark theme ------------- */
 
 /* [data-theme="light"] .list-row-head:hover:not(.list-row-head),
@@ -291,13 +302,18 @@ body{
 	background: url(/assets/finbyzerp/images/manufacturing.svg);	
 }
 /*-------- custom icon ----------*/
-.Chemical-sidebar-icon,.Rohandyes-sidebar-icon{
+.Chemical-sidebar-icon,.Rohandyes-sidebar-icon,.RoopDyes-sidebar-icon,.Evergreen-sidebar-icon{
 	background: url(/assets/finbyzerp/images/chemical.svg);
 }
-.Elkins-sidebar-icon{	
+.Elkins-sidebar-icon,.Spinning-sidebar-icon{	
 	background: url(/assets/finbyzerp/images/yarn.svg);
 }
-
+.EIE-sidebar-icon,.Engineering-sidebar-icon{
+	background: url(/assets/finbyzerp/images/engineering.svg);
+}
+.Ceramic-sidebar-icon{
+	background: url(/assets/finbyzerp/images/ceramic.svg);
+}
 .desk-sidebar-item span{
 	background-repeat: no-repeat;
 }
@@ -307,5 +323,9 @@ body{
     .layout-side-section {
         display: block !important;
     }
+
+	.layout-main {
+		margin-top: 60px !important;
+	}
 }
 /*------- end media queries -------*/

@@ -10,8 +10,8 @@
   "scheduled_to",
   "party_type",
   "party",
+  "company",
   "organisation",
-  "service",
   "is_online",
   "column_break_7",
   "meeting_arranged_by",
@@ -71,12 +71,6 @@
    "reqd": 1
   },
   {
-   "fieldname": "service",
-   "fieldtype": "Select",
-   "label": "Service",
-   "options": "ERP Implementation\nTreasury Consulting"
-  },
-  {
    "default": "0",
    "fieldname": "is_online",
    "fieldtype": "Check",
@@ -129,7 +123,6 @@
    "label": "Description"
   },
   {
-   "default": "mukesh@finbyz.tech",
    "fieldname": "cc_to",
    "fieldtype": "Data",
    "label": "CC To"
@@ -174,9 +167,15 @@
    "hidden": 1,
    "label": "Opportunity",
    "options": "Opportunity"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   }
  ],
- "modified": "2021-04-06 14:14:52.282023",
+ "modified": "2021-07-08 15:31:58.150805",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting Schedule",

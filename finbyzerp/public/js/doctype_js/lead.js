@@ -16,7 +16,7 @@ frappe.ui.form.on('Lead', {
 						}
 					}
 				})
-			}, __("Make"));
+			}, __("Create"));
 			
 			frm.add_custom_button(__("Meeting"), function() {
 				return frappe.call({
@@ -33,7 +33,7 @@ frappe.ui.form.on('Lead', {
 						}
 					}
 				})
-			}, __("Make"));
+			}, __("Create"));
 		}
 	},
 	status: function(frm) {

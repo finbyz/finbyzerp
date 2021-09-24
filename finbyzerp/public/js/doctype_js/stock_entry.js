@@ -3,7 +3,29 @@ frappe.ui.form.on('Stock Entry', {
 		if (frm.doc.__islocal){
 		frm.set_df_property("company", "read_only", (!frm.doc.__islocal || frm.doc.amended_from) ? 1 : 0);
 	
-		}
+		};
+		// uncomment below code for display valuation rate diff between current entry and ledger entry
+		// below function will work only if s_warehouse is exists in item table.
+
+		// if(frm.doc.docstatus == 1){
+		// 	frm.add_custom_button(__("Rate Diff"), function(){
+		// 		frappe.call({
+		// 			method:"finbyzerp.finbyzerp.doc_events.stock_entry.check_rate_diff",
+		// 			args:{
+		// 				"doctype":frm.doc.doctype,
+		// 				"docname":frm.doc.name
+		// 			},
+		// 			callback: function(r){
+		// 				if (r.message){
+		// 					frappe.msgprint({
+		// 						title:"Items Rate Difference",
+		// 						message: r.message,
+		// 						wide : true})
+		// 				}
+		// 			}
+		// 		})
+		// 	})
+		// }
 	},
 	onload: (frm) => {
 		if (frm.doc.__islocal){

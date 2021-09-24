@@ -42,17 +42,20 @@ from frappe.utils import dashboard
 from finbyzerp.finbyzerp.override.dashboard_override import make_records
 dashboard.make_records = make_records
 # e_invoice overrides
-# import erpnext
+import erpnext
 # from finbyzerp.e_invoice_override import validate_einvoice_fields,get_transaction_details,get_item_list,make_einvoice,get_invoice_value_details,update_invoice_taxes
-
-# erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
-# erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
+from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name
+erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
+erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
 # erpnext.regional.india.e_invoice.utils.get_transaction_details = get_transaction_details
 # erpnext.regional.india.e_invoice.utils.make_einvoice = make_einvoice
 # erpnext.regional.india.e_invoice.utils.get_invoice_value_details=get_invoice_value_details
 # erpnext.regional.india.e_invoice.utils.update_invoice_taxes = update_invoice_taxes
 #erpnext.regional.india.e_invoice.utils.update_item_taxes = update_item_taxes
 #erpnext.regional.india.e_invoice.utils.get_party_details = get_party_details
+
+from erpnext.regional.india import utils
+utils.validate_document_name = validate_document_name
 
 #from erpnext.regional.india.e_invoice.utils import GSPConnector
 #GSPConnector.set_einvoice_data = set_einvoice_data
@@ -73,6 +76,9 @@ from frappe.model import sync
 from finbyzerp.api import get_doc_files
 sync.get_doc_files = get_doc_files
 
+from erpnext.hr.doctype.expense_claim.expense_claim import ExpenseClaim
+from finbyzerp.finbyzerp.doc_events.expense_claim import set_status
+ExpenseClaim.set_status = set_status
 
 app_include_css = ["/assets/finbyzerp/css/permission.css","/assets/finbyzerp/css/finbyz-theme.css"]
 app_include_js = [
@@ -102,6 +108,7 @@ doctype_js = {
 	"Customer":"public/js/doctype_js/customer.js",
 	"Opportunity":"public/js/doctype_js/opportunity.js",
 	"Opening Invoice Creation Tool":"public/js/doctype_js/opening_invoice_creation_tool.js",
+	"Payment Reconciliation":"public/js/doctype_js/payment_reconciliation.js",
 }
 website_context = {
 	"favicon": 	"/assets/finbyzerp/images/favicon.ico",
@@ -124,6 +131,11 @@ override_whitelisted_methods = {
 	#"frappe.utils.print_format.download_pdf": "finbyzerp.print_format.download_pdf",
 }
 
+# override for download backup
+from frappe.utils import response
+from finbyzerp.permission import download_backup
+response.download_backup = download_backup
+
 override_doctype_dashboards = {
 	"Lead": "finbyzerp.finbyzerp.dashboard.lead.get_data",
 	"Customer":"finbyzerp.finbyzerp.dashboard.customer.get_data",
@@ -144,27 +156,41 @@ doc_events = {
 		"validate":"finbyzerp.finbyzerp.doc_events.item.validate"
 	},
 	"User": {
-		"validate":"finbyzerp.api.validate_user_mobile_no"
+		"validate":"finbyzerp.api.validate_user"
 	},
 	"Sales Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
+		"before_save":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_save",
 		"validate":[
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
 			"finbyzerp.api.si_validate"
 		],
-		'on_submit': "finbyzerp.api.sales_invoice_on_submit"
+		"before_submit":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_submit",
+		'on_submit': "finbyzerp.api.sales_invoice_on_submit",
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate"
+		"validate": "finbyzerp.api.pi_validate",
+		"before_submit":"finbyzerp.finbyzerp.doc_events.purchase_invoice.before_submit"
 	},
 		"Purchase Receipt": {
 		"validate": "finbyzerp.api.pr_validate"
 	},
 	"Stock Entry": {
-		"validate": "finbyzerp.api.stock_entry_validate"
+		"validate": [
+			"finbyzerp.api.stock_entry_validate",
+			"finbyzerp.finbyzerp.doc_events.stock_entry.validate",
+		],
+		"on_submit": "finbyzerp.api.stock_entry_on_submit",
+		"before_insert": "finbyzerp.api.before_insert",
 	},
-	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample"): {
+	"Journal Entry":{
+		"before_insert": "finbyzerp.api.before_insert",
+	},
+	"Payment Entry":{
+		"validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
+	},
+	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note"): {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
 }
@@ -206,3 +232,13 @@ gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
 from erpnext.accounts import utils
 from finbyzerp.api import check_if_stock_and_account_balance_synced
 utils.check_if_stock_and_account_balance_synced = check_if_stock_and_account_balance_synced
+
+from frappe import utils
+from finbyzerp.api import get_timespan_date_range
+utils.get_timespan_date_range = get_timespan_date_range
+
+from frappe.model import db_query
+from finbyzerp.api import get_date_range
+db_query.get_date_range = get_date_range
+
+

@@ -5,10 +5,12 @@ from frappe.utils import scrub_urls
 from frappe import _
 from PyPDF2 import PdfFileReader, PdfFileWriter
 from distutils.version import LooseVersion
-from frappe.utils.pdf import get_wkhtmltopdf_version,get_file_data_from_writer
+from frappe.utils.pdf import get_wkhtmltopdf_version,get_file_data_from_writer,get_cookie_options,cleanup, read_options_from_html
 
 
-from frappe.utils.pdf import cleanup, read_options_from_html
+PDF_CONTENT_ERRORS = ["ContentNotFoundError", "ContentOperationNotPermittedError",
+	"UnknownContentError", "RemoteHostClosedError"]
+
 @frappe.whitelist()
 def download_pdf(doctype, name, format=None, doc=None, no_letterhead=0):
 	html = frappe.get_print(doctype, name, format, doc=doc, no_letterhead=no_letterhead)
@@ -46,6 +48,8 @@ def get_pdf(html, options=None, output=None):
 				output.appendPagesFromReader(reader)
 		else:
 			raise
+	finally:
+		cleanup(options)
 
 	if "password" in options:
 		password = options["password"]
@@ -89,9 +93,11 @@ def prepare_options(html, options):
 	html, html_options = read_options_from_html(html)
 	options.update(html_options or {})
 
-	# cookies
-	if frappe.session and frappe.session.sid:
-		options['cookie'] = [('sid', '{0}'.format(frappe.session.sid))]
+	# # cookies
+	# if frappe.session and frappe.session.sid:
+	# 	options['cookie'] = [('sid', '{0}'.format(frappe.session.sid))]
+
+	options.update(get_cookie_options())
 
 	# page size
 	if not options.get("page-size"):
