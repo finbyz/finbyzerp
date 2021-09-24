@@ -143,9 +143,6 @@ override_doctype_dashboards = {
 }
 
 doc_events = {
-	'Account':{
-		"after_insert":"finbyzerp.finbyzerp.doc_events.account.after_insert"
-	},
 	"Customer": {
 		"validate":"finbyzerp.api.customer_validate"
 	},

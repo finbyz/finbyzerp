@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import frappe
 #import re
 from frappe import _
-from frappe.utils import getdate, cstr, flt, date_diff
+from frappe.utils import getdate, cstr, flt, date_diff, cint, get_link_to_form
 
 @frappe.whitelist()
 def get_gl_data(from_date,to_date,company,account):
@@ -45,25 +45,40 @@ def get_gl_data(from_date,to_date,company,account):
             
     return date_wise_balance
 
-def after_insert(self,method):
-    create_item(self)
-
-def create_item(self):
-    if self.account_type == "Expense Account":
+@frappe.whitelist()
+def create_item(doc_name):
+    if not cint(frappe.db.get_value("Accounts Settings","Accounts Settings","enable_expense_item_creation")) == 1:
+        frappe.throw("Please Enable 'Create Item on Creation of Expense Account' in 'Accounts Settings'")
+    self = frappe.get_doc("Account",doc_name)
+    if self.account_type == "Expense Account" and cint(frappe.db.get_value("Accounts Settings","Accounts Settings","enable_expense_item_creation")) == 1:
         if not frappe.db.exists("Item Group","Expense Accounts"):
-            frappe.throw("Please Create Item group 'Expense Accounts' for creating Item")
-        item = frappe.new_doc('Item')    
-        final_name = self.name.split("-")[0].strip()
-        item.item_name = final_name
-        item.item_code = final_name
-        item.item_group = 'Expense Accounts'
-        item.append('item_defaults',{
-            "company":self.company,
-            "expense_account":self.name
-        })
-        item.is_sales_item = 0
-        item.save(ignore_permissions=True)
-   
+            item_group = frappe.new_doc("Item Group")
+            item_group.item_group_name = "Expense Accounts"
+            item_group.parent_item_group = "All Item Groups"
+            item_group.is_group = 1
+            item_group.save(ignore_permissions=True)
+  
+        if not frappe.db.exists("Item",self.account_name):
+            item = frappe.new_doc('Item')    
+            item.item_name = self.account_name
+            item.item_code = self.account_name
+            item.item_group = 'Expense Accounts'
+            item.is_sales_item = 0
+            item.is_purchase_item = 1
+            item.has_batch_no = 0
+            item.has_serial_no = 0
+            item.is_stock_item = 0
+            item.maintain_as_is_stock = 0
+            item.include_item_in_manufacturing = 0
+            item.append('item_defaults',{
+                "company":self.company,
+                "expense_account":self.name
+            })
+            item.save(ignore_permissions=True)
+
+            item_doc_name = frappe.bold(get_link_to_form(item.doctype, item.name))
+
+            return "Item {} Has been Created".format(item_doc_name)
 
     
 
