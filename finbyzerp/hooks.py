@@ -108,6 +108,7 @@ doctype_js = {
 	"Customer":"public/js/doctype_js/customer.js",
 	"Opportunity":"public/js/doctype_js/opportunity.js",
 	"Opening Invoice Creation Tool":"public/js/doctype_js/opening_invoice_creation_tool.js",
+	"Payment Reconciliation":"public/js/doctype_js/payment_reconciliation.js",
 }
 website_context = {
 	"favicon": 	"/assets/finbyzerp/images/favicon.ico",

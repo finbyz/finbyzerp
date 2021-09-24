@@ -92,6 +92,13 @@ frappe.ui.form.on("Credit and Debit Note Item",{
 });
 
 frappe.ui.form.on("Credit and Debit Note", {
+	refresh: function(frm){
+		frm.add_custom_button(__("Reconcile"), function() {
+			frm.reload_doc()
+			frappe.set_route("Form","Payment Reconciliation")
+			// window.open(window.location.href.split('app')[0] + "app/payment-reconciliation/Payment Reconciliation" + "/?" +"company="+frm.doc.company +"&" + "party_type="+frm.doc.party_type +"&"+ "party="+frm.doc.party,"_blank")	
+		});
+	},
 	setup_queries(doc, cdt, cdn) {
 
 
