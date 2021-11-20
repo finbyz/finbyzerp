@@ -17,6 +17,8 @@
   "bank_statement",
   "section_break_6",
   "new_transaction_items",
+  "section_break_12",
+  "total_amount",
   "section_break_9",
   "match_invoices",
   "column_break_14",
@@ -159,12 +161,21 @@
    "options": "Bank Statement Transaction Entry",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_12",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Currency",
+   "label": "Total Amount"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-08-26 10:59:13.065958",
+ "modified": "2021-11-13 09:54:06.365907",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Bank Statement Transaction Entry",

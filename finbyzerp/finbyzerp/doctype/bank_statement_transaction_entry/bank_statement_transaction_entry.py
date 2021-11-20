@@ -42,7 +42,14 @@ class BankStatementTransactionEntry(Document):
 		else:
 			self.match_invoice_to_payment()
 
+	def calculte_totals(self):
+		total_amount = 0
+		for row in self.new_transaction_items:
+			total_amount += row.amount
+		self.total_amount = total_amount
+
 	def validate(self):
+		self.calculte_totals()
 		if not self.new_transaction_items:
 			self.populate_payment_entries()
 
