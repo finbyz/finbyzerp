@@ -13,6 +13,7 @@
   "party",
   "is_return",
   "section_break_3",
+  "series_value",
   "posting_date",
   "posting_time",
   "set_posting_time",
@@ -617,12 +618,17 @@
    "fieldname": "more_information_section",
    "fieldtype": "Section Break",
    "label": "More Information"
+  },
+  {
+   "fieldname": "series_value",
+   "fieldtype": "Int",
+   "label": "Series Value"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-08-17 14:03:13.165465",
+ "modified": "2021-09-18 17:40:51.929813",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Credit and Debit Note",

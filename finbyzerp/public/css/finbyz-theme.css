@@ -64,8 +64,9 @@ body{
 .frappe-control[data-fieldtype=Select] .control-input select, 
 .frappe-control[data-fieldtype=Select].form-group select,
 .frappe-control[data-fieldtype=SmallText].form-control,
+.multiselect-list.dropdown .form-control,
 .form-grid .grid-body .form-control {
-	background-color: #fff;
+	background-color: #fff !important;
 	border: 1px solid rgb(104 113 120 / 25%);
 }
 .navbar .navbar-nav > li > a,

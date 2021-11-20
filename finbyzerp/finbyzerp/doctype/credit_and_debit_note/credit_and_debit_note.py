@@ -131,6 +131,7 @@ class CreditandDebitNote(Document):
 				else:
 					target.supplier = source.party
 					target.naming_series=' PI-DR-.fiscal.-' if source.type=="Debit Note" else "PI-CR-.fiscal.-"
+				target.series_value = source.series_value
 				target.run_method("set_missing_values")
 				target.run_method("calculate_taxes_and_totals")
 				for row in source.items:

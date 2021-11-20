@@ -391,11 +391,12 @@ def validate_einvoice_fields(doc):
 	if not invoice_eligible:
 		return
 
-	# Finbyz Changes Start: dont change posting date after irn generated
+	# Finbyz Changes Start: dont change posting date and sales taxes and charges table after irn generated
 	if doc.irn and doc.docstatus == 0:
 		if str(doc.posting_date) != str(frappe.db.get_value("Sales Invoice",doc.name,"posting_date")):
 			frappe.throw(_('You cannot edit the invoice after generating IRN'), title=_('Edit Not Allowed'))
-
+		if str(len(doc.taxes)) != str(len(frappe.db.get_all("Sales Taxes and Charges",{'parent':doc.name,'parenttype':doc.doctype}))):
+			frappe.throw(_('You cannot edit the invoice after generating IRN'), title=_('Edit Not Allowed'))
 	# Finbyz Changes End
 	if doc.docstatus == 0 and doc._action == 'save':
 		if doc.irn and not doc.eway_bill_cancelled and doc.grand_total != frappe.db.get_value("Sales Invoice",doc.name,"grand_total"):# Finbyz Changes:
