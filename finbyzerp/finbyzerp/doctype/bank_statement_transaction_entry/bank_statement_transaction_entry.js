@@ -72,13 +72,6 @@ frappe.ui.form.on('Bank Statement Transaction Entry', {
 	submit_payments: function(frm) {
 		frm.events.invoke_doc_function(frm, "submit_payment_entries");
 	},
-	validate: function(frm){
-		let total_amount = 0;
-		frm.doc.new_transaction_items.forEach(function(r){
-			total_amount += r.amount;
-		})
-		frm.set_value('total_amount',total_amount)
-	}
 });
 
 
