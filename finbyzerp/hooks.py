@@ -193,6 +193,11 @@ doc_events = {
 }
 
 scheduler_events = {
+	"cron":{
+		"*/5 * * * *":[
+			"finbyzerp.api.repost_transaction_entries"
+		],
+	},
 	"daily":[
 		"finbyzerp.api.daily_entry_summary_mail",
 		"finbyzerp.api.daily_transaction_summary_mail"

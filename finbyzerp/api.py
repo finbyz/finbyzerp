@@ -20,6 +20,7 @@ import os
 import sys
 import time
 
+from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_entries
 
 def before_insert(self, method):
 	opening_naming_series(self)
@@ -668,3 +669,7 @@ def po_so_before_cancel(self,method):
 	# 							frappe.db.sql("delete from `tabStock Ledger Entry` where voucher_type=%s and voucher_no=%s and is_cancelled = 1", (voucher_type, voucher_no))
 
 	# 				# raise_link_exists_exception(doc, reference_doctype, reference_docname, at_position)
+
+
+def repost_transaction_entries():
+	repost_entries()
