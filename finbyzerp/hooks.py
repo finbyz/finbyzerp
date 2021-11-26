@@ -88,7 +88,8 @@ app_include_js = [
 
 doctype_list_js = {
 	"Batch" : "public/js/doctype_js/batch_list.js",
-	"Fiscal Year" : "public/js/doctype_js/fiscal_year.js"
+	"Fiscal Year" : "public/js/doctype_js/fiscal_year.js",
+	"Repost Item Valuation":"public/js/doctype_js/repost_item_valuation_list.js"
 }
 
 before_install = "finbyzerp.install.before_install"

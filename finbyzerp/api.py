@@ -671,5 +671,6 @@ def po_so_before_cancel(self,method):
 	# 				# raise_link_exists_exception(doc, reference_doctype, reference_docname, at_position)
 
 
+@frappe.whitelist()
 def repost_transaction_entries():
 	repost_entries()
