@@ -74,6 +74,7 @@ def check_bin_multiple_items_with_warehouse():
 # Patch End
 def patch():
 	data = get_data()
+	print(data)
 	for row in data:
 		if row['voucher_type'] in ["Stock Entry","Stock Reconciliation"]:
 			se_doc = frappe.get_doc(row['voucher_type'],row['voucher_no'])
@@ -129,7 +130,7 @@ def get_sle_value():
 				sum(sle.stock_value_difference) as sle_value, sle.posting_date, sle.voucher_type, sle.voucher_no, sle.company
 			from
 				`tabStock Ledger Entry` sle
-			where sle.docstatus < 2 and sle.is_cancelled = 0 and sle.stock_value_difference<>0 and sle.company = 'Vindish Instruments Pvt. Ltd.' and sle.posting_date >= '2020-04-01'
+			where sle.docstatus < 2 and sle.is_cancelled = 0 and sle.stock_value_difference<>0
 			group by sle.voucher_no
 			order by sle.posting_date""" , as_dict=1)
 
@@ -140,7 +141,7 @@ def get_gl_value():
 				sum(gl.debit_in_account_currency - gl.credit_in_account_currency) as gl_value, gl.voucher_no
 			from
 				`tabGL Entry` gl JOIN `tabAccount` ac ON gl.account = ac.name
-			where gl.docstatus < 2 and gl.is_cancelled = 0 and ac.account_type in ("Stock","Capital Work in Progress","Fixed Asset") and gl.company = 'Vindish Instruments Pvt. Ltd.' and gl.posting_date >= '2020-04-01'
+			where gl.docstatus < 2 and gl.is_cancelled = 0 and ac.account_type in ("Stock","Capital Work in Progress","Fixed Asset")
 			group by gl.voucher_no
 			order by gl.posting_date""", as_dict=1)
 

@@ -26,6 +26,20 @@ frappe.query_reports["Item Groupwise Stock Summary"] = {
 			"r,eqd": 1
 		},
 		{
+			"fieldname":"cost_center",
+			"label": __("Cost Center"),
+			"fieldtype": "Link",
+			"options": "Cost Center",
+			get_query: () => {
+				var company = frappe.query_report.get_filter_value('company');
+				return {
+					filters: {
+						'company': company
+					}
+				}
+			}
+		},
+		{
 			"fieldname":"purchase",
 			"label": __("Purchase"),
 			"fieldtype": "Check",
@@ -34,7 +48,8 @@ frappe.query_reports["Item Groupwise Stock Summary"] = {
 			"fieldname":"sales",
 			"label": __("Sales"),
 			"fieldtype": "Check",
-		}
+		},
+
 	],
 	"tree": true,
 	"name_field": "item_group",

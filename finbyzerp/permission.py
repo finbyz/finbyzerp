@@ -114,3 +114,14 @@ def get_standard_permissions(doctype):
 	doc = frappe.get_doc('DocType', doctype)
 	return [p.as_dict() for p in doc.permissions]
 	
+from frappe.utils.response import send_private_file
+from frappe.core.doctype.access_log.access_log import make_access_log
+
+def download_backup(path):
+	try:
+		frappe.only_for(("System Manager", "Administrator","Local Admin"))
+		make_access_log(report_name='Backup')
+	except frappe.PermissionError:
+		raise Forbidden(_("You need to be logged in and have System Manager Role to be able to access backups."))
+
+	return send_private_file(path)

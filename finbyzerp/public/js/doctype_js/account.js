@@ -1,5 +1,20 @@
 frappe.ui.form.on('Account',{
     refresh: function(frm){
+        if (frm.doc.name && frm.doc.account_type=='Expense Account'){
+            frm.add_custom_button(__("Create Item"), function(frm){
+                frappe.call({
+                    method:"finbyzerp.finbyzerp.doc_events.account.create_item",
+                    args:{
+                        "doc_name":cur_frm.doc.name
+                    },
+                    callback: function(r){
+                        if (r.message){
+                            frappe.msgprint(r.message)
+                        }
+                    }
+                })
+            });
+        };
         frm.add_custom_button(__("Calculate Interest"), function() {
             var d = new frappe.ui.Dialog({
                 title: "Calculate Interest",

@@ -59,9 +59,9 @@ frappe.ui.form.on('Meeting', {
 		// frm.trigger('calculate_km_wise_expense');
 	},
 	party: function(frm){
-		if(frm.doc.party_type == "Customer" && frm.doc.party)
+		// if(frm.doc.party_type == "Customer" && frm.doc.party)
 		frappe.call({
-			method:"erpnext.accounts.party.get_party_details",
+			method:"finbyzerp.finbyzerp.doctype.meeting_schedule.meeting_schedule.get_party_details",
 			args:{
 				party: frm.doc.party,
 				party_type: frm.doc.party_type
@@ -74,6 +74,7 @@ frappe.ui.form.on('Meeting', {
 					frm.set_value('contact', r.message.contact_dispaly)
 					frm.set_value('address', r.message.customer_address)
 					frm.set_value('address_display', r.message.address_display)
+					frm.set_value('organization', r.message.organisation);
 				}
 			}
 		})

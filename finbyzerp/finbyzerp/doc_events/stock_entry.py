@@ -16,7 +16,7 @@ def check_rate_diff(doctype,docname):
 	doc = frappe.get_doc(doctype,docname)
 	for item in doc.items:
 		if item.s_warehouse:
-			sle_val_diff,actual_qty = frappe.db.get_value("Stock Ledger Entry",{"voucher_type":doc.doctype,"voucher_no":doc.name,"voucher_detail_no":item.name,"actual_qty":("<",0)},["stock_value_difference","actual_qty"])
+			sle_val_diff,actual_qty = frappe.db.get_value("Stock Ledger Entry",{"voucher_type":doc.doctype,"voucher_no":doc.name,"voucher_detail_no":item.name,"actual_qty":("<",0),"is_cancelled":0},["stock_value_difference","actual_qty"])
 			sle_valuation_rate = flt(sle_val_diff) / flt(actual_qty)
 			if flt(item.valuation_rate,2) != flt(sle_valuation_rate,2):
 				diff_list.append(frappe._dict({"idx":item.idx,"item_code":item.item_code,"entry_rate":flt(item.valuation_rate),"ledger_rate":flt(sle_valuation_rate),"rate_diff":flt(item.valuation_rate) - flt(sle_valuation_rate)}))

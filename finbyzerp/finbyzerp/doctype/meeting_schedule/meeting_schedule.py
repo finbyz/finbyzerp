@@ -51,13 +51,12 @@ class MeetingSchedule(Document):
 		ical+="METHOD:REQUEST"+CRLF+"BEGIN:VEVENT"+CRLF+"DTSTART:"+dtstart+CRLF+"DTEND:"+dtend+CRLF+"DTSTAMP:"+dtstamp+CRLF+organizer+CRLF
 		ical+= "UID:FIXMEUID"+dtstamp+CRLF
 		ical+= attendee+"CREATED:"+dtstamp+CRLF
-		if self.invitation_message:
-			ical+= "DESCRIPTION:"+re.sub(cleanr, '', self.invitation_message) +CRLF
+		# if self.invitation_message:
+		# 	ical+= "DESCRIPTION:"+re.sub(cleanr, '', self.invitation_message) +CRLF
 		ical+="LAST-MODIFIED:"+dtstamp+CRLF+"LOCATION:"+CRLF+"SEQUENCE:0"+CRLF+"STATUS:CONFIRMED"+CRLF
 		ical+= "SUMMARY:"+subject+CRLF
 		ical+="TRANSP:OPAQUE"+CRLF+"END:VEVENT"+CRLF+"END:VCALENDAR"+CRLF
 
-		eml_body = ""
 		msg = MIMEMultipart('alternative')
 		msg['Reply-To']=self.email_id
 		msg['Date'] = formatdate(localtime=True)
@@ -66,8 +65,12 @@ class MeetingSchedule(Document):
 		msg['To'] = ",".join(attendees)
 		msg.add_header('Content-class', 'urn:content-classes:calendarmessage')
 
+		email_body = ""
 		# part_email = MIMEText(ical,'calendar;method=REQUEST')
+		if self.invitation_message:
+			email_body = MIMEText(self.invitation_message, 'html')
 
+		msg.attach(email_body)
 		msgAlternative = MIMEMultipart('alternative')
 
 		# ical_atch = MIMEBase('text/calendar',' ;name="%s"'%"invite.ics")
@@ -80,6 +83,8 @@ class MeetingSchedule(Document):
 		# msgAlternative.attach(part_email)
 		msgAlternative.attach(ical_atch)
 		msg.attach(msgAlternative)
+
+
 		smtpserver = SMTPServer()
 		smtpserver.setup_email_account(self.doctype, sender=self.email_id)
 		smtpserver.sess.sendmail(default_sender, attendees, msg.as_string())

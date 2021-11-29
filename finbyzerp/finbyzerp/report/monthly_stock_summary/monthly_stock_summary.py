@@ -126,7 +126,7 @@ def get_data(filters):
 			SELECT sum(sle.actual_qty) as closing_qty, sum(sle.stock_value_difference) as closing_value
 			FROM `tabStock Ledger Entry` as sle
 			LEFT JOIN `tabItem` as i ON i.name = sle.item_code
-			where sle.posting_date < '{}' {}
+			where sle.is_cancelled = 0 and sle.posting_date < '{}' {}
 		""".format(filters.get('from_date'),conditions),as_dict=True)
 
 	for month, date in result.items():		
@@ -135,7 +135,7 @@ def get_data(filters):
 			FROM `tabStock Ledger Entry` as sle
 			LEFT JOIN `tabStock Entry Detail` as se ON se.name = sle.voucher_detail_no
 			LEFT JOIN `tabItem` as i ON i.name = sle.item_code
-			WHERE sle.actual_qty > 0 and sle.posting_date BETWEEN '{}' AND '{}' and (se.t_warehouse IS NULL or se.s_warehouse IS NULL) {}
+			WHERE sle.is_cancelled = 0 and sle.actual_qty > 0 and sle.posting_date BETWEEN '{}' AND '{}' and (se.t_warehouse IS NULL or se.s_warehouse IS NULL) {}
 			group by {}
 		""".format(month,date[0],date[1],conditions,group_by_cond),as_dict=True))
 
@@ -151,7 +151,7 @@ def get_data(filters):
 			LEFT JOIN `tabDelivery Note Item` as dn ON dn.name = sle.voucher_detail_no
 			LEFT JOIN `tabStock Entry Detail` as se ON se.name = sle.voucher_detail_no
 			LEFT JOIN `tabItem` as i ON i.name = sle.item_code
-			WHERE sle.actual_qty < 0  and sle.posting_date BETWEEN '{}' AND '{}' and (se.t_warehouse IS NULL or se.s_warehouse IS NULL) {}
+			WHERE sle.is_cancelled = 0 and sle.actual_qty < 0  and sle.posting_date BETWEEN '{}' AND '{}' and (se.t_warehouse IS NULL or se.s_warehouse IS NULL) {}
 			group by {}
 		""".format(month,date[0],date[1],conditions,group_by_cond),as_dict=True))
 
@@ -159,7 +159,7 @@ def get_data(filters):
 			SELECT sum(sle.actual_qty) as closing_qty, sum(sle.stock_value_difference) as closing_value, '{}' as month
 			FROM `tabStock Ledger Entry` as sle
 			LEFT JOIN `tabItem` as i ON i.name = sle.item_code
-			where sle.posting_date <= '{}' {}
+			where sle.is_cancelled = 0 and sle.posting_date <= '{}' {}
 		""".format(month,date[1],conditions),as_dict=True))
 
 	

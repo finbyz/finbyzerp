@@ -3,12 +3,24 @@ import frappe
 from frappe import _
 from frappe.utils import getdate, cstr, flt, date_diff
 from erpnext.accounts.utils import get_fiscal_year
-
+from erpnext.accounts.utils import unlink_ref_doc_from_payment_entries
 
 
 def validate(self, method):
     tcs_deduction(self)
     calculate_gst_taxable_value(self)
+
+def before_save(self, method):
+    set_shipping_address(self)
+
+def set_shipping_address(self):
+    if self.customer_address and not self.shipping_address_name:
+        self.shipping_address_name=self.customer_address
+        self.customer_gstin=self.billing_address_gstin
+        self.shipping_address=self.address_display
+
+def before_submit(self, method):
+    unlink_credit_note_entries(self)
 
 def calculate_gst_taxable_value(self):
 	self.gst_taxable_value = abs(sum([flt(i.get('taxable_value')) for i in self.get('items')]))
@@ -66,3 +78,7 @@ def get_fiscal(date):
     from erpnext.accounts.utils import get_fiscal_year
     fiscal_year = get_fiscal_year(date)
     return str(fiscal_year[0]),str(fiscal_year[1]),str(fiscal_year[2])
+
+def unlink_credit_note_entries(self):
+    if self.is_return and self.return_against:
+        unlink_ref_doc_from_payment_entries(frappe.get_doc("Sales Invoice",self.return_against))

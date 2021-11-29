@@ -40,7 +40,9 @@ frappe.ui.form.on('Stock Entry', {
 					  fieldname: ['company_series']
 					},
 					callback: function (r) {
+						if (r.message.company_series){
 						frm.set_value('company_series',r.message.company_series)
+						}
 					}
 			})
 			frm.trigger('change_series_value');

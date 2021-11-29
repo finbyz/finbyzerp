@@ -3,8 +3,8 @@ frappe.views.calendar["Meeting"] = {
 		"start": "meeting_from",
 		"end": "meeting_to",
 		"id": "name",
-		"title": "organization"
+		"title": "party",
+		"allDay": "allDay"
 	},
-	gantt: true,
 	get_events_method: "finbyzerp.finbyzerp.doctype.meeting.meeting.get_events"
 };

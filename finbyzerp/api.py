@@ -20,6 +20,7 @@ import os
 import sys
 import time
 
+from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_entries
 
 def before_insert(self, method):
 	opening_naming_series(self)
@@ -317,14 +318,15 @@ def daily_transaction_summary_mail():
 
 
 def stock_entry_validate(self, method):
-	if self._action == "submit":
+	pass
 		
-		validate_additional_cost(self)
+def stock_entry_on_submit(self,method):
+	validate_additional_cost(self)
 
 def validate_additional_cost(self):
-	if self.purpose in ['Material Transfer','Material Transfer for Manufacture','Repack','Manufacture'] and self._action == "submit":
+	if self.purpose in ['Repack','Manufacture']:
 		diff = abs(round(flt(self.value_difference,1)) - (round(flt(self.total_additional_costs,1))))
-		if diff > 3:
+		if diff > 5:
 			frappe.throw("ValuationError: Value difference between incoming and outgoing amount is higher than additional cost")
 
 def validate_user(self,method):
@@ -339,7 +341,7 @@ def validate_user_mobile_no(self):
 			frappe.throw("Please Enter 10 digit Mobile Number.")
 
 def check_system_manager_role(self):
-	if self.name not in ["info@finbyz.com", "Administrator"]:
+	if self.name not in ["info@finbyz.com", "Administrator","mukesh@finbyz.tech"]:
 		remove_roles = []
 		for role in self.roles:
 			if role.role == "System Manager":
@@ -667,3 +669,8 @@ def po_so_before_cancel(self,method):
 	# 							frappe.db.sql("delete from `tabStock Ledger Entry` where voucher_type=%s and voucher_no=%s and is_cancelled = 1", (voucher_type, voucher_no))
 
 	# 				# raise_link_exists_exception(doc, reference_doctype, reference_docname, at_position)
+
+
+@frappe.whitelist()
+def repost_transaction_entries():
+	repost_entries()
