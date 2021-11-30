@@ -341,7 +341,7 @@ def validate_user_mobile_no(self):
 			frappe.throw("Please Enter 10 digit Mobile Number.")
 
 def check_system_manager_role(self):
-	if self.name not in ["info@finbyz.com", "Administrator","mukesh@finbyz.tech"]:
+	if self.name not in ["info@finbyz.com", "Administrator","mukesh@finbyz.tech","info@finbyz.tech"]:
 		remove_roles = []
 		for role in self.roles:
 			if role.role == "System Manager":
