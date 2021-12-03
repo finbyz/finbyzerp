@@ -33,7 +33,18 @@ class CreditandDebitNote(Document):
 	def validate(self):
 		self.check_is_return()
 		self.set_return_qty()
+		self.get_item_code()
 		self.calculate_debit_credit_taxes()
+	
+	def get_item_code(self):
+		for row in self.items:
+			row.item_name = "Credit Note" if self.type == "Credit Note" else "Debit Note"
+			if not frappe.db.exists("Item",row.item_name):
+				doc=frappe.new_doc("Item")
+				doc.item_code=row.item_name
+				doc.item_group="All Item Groups"
+				doc.save()
+			row.item_code=frappe.db.get_value("Item",row.item_name,"item_code")
 
 	def on_submit(self):
 		self.create_debit_credit_entry()
@@ -120,10 +131,19 @@ class CreditandDebitNote(Document):
 				else:
 					target.supplier = source.party
 					target.naming_series=' PI-DR-.fiscal.-' if source.type=="Debit Note" else "PI-CR-.fiscal.-"
+				target.series_value = source.series_value
 				target.run_method("set_missing_values")
 				target.run_method("calculate_taxes_and_totals")
-
+				for row in source.items:
+					row.item_code=frappe.db.get_value("Item",row.item_name,"item_code")
+				
 			def update_item(source,target,source_parent):
+				if not frappe.db.exists("Item",target.item_name):
+					doc=frappe.new_doc("Item")
+					doc.item_code=target.item_name
+					doc.item_group="All Item Groups"
+					doc.save()
+				target.item_code=frappe.db.get_value("Item",target.item_name,"item_code")
 				target.uom = frappe.db.get_value("Stock Settings",None,"stock_uom")
 				target.description = source.item_name
 				target.concentration = 100

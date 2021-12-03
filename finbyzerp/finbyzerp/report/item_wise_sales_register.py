@@ -58,8 +58,8 @@ def _execute(filters=None, additional_table_columns=None, additional_query_colum
 			'invoice': d.parent,
 			'posting_date': d.posting_date,
 			'customer': d.customer,
-			'customer_name': customer_record.customer_name,
-			'customer_group': customer_record.customer_group,
+			'customer_name': customer_record.customer_name if customer_record else '',
+			'customer_group': customer_record.customer_group if customer_record else '',
 		}
 
 		if additional_query_columns:

@@ -34,4 +34,12 @@ frappe.ui.form.on('Sales Invoice', {
 	posting_date: function (frm) {
 		frm.trigger('naming_series');
 	},
+	validate:function(frm){
+		if(frm.doc.customer_address && !frm.doc.shipping_address_name){
+			frappe.model.set_value("Sales invoice",frm.doc.name,"shipping_address_name",frm.doc.customer_address)
+			frm.refresh();
+			
+		}
+	}
+
 });

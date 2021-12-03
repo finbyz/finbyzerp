@@ -6,7 +6,9 @@ def get_data(data):
 		'fieldname': 'lead',
 		'non_standard_fieldnames': {
 			'Quotation': 'party_name',
-			'Opportunity': 'party_name'
+			'Opportunity': 'party_name',
+			"Meeting": "party",
+			"Meeting Schedule": "party"
 		},
 		'dynamic_links': {
 			'party_name': ['Lead', 'quotation_to']

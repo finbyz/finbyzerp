@@ -76,6 +76,9 @@ from frappe.model import sync
 from finbyzerp.api import get_doc_files
 sync.get_doc_files = get_doc_files
 
+from erpnext.hr.doctype.expense_claim.expense_claim import ExpenseClaim
+from finbyzerp.finbyzerp.doc_events.expense_claim import set_status
+ExpenseClaim.set_status = set_status
 
 app_include_css = ["/assets/finbyzerp/css/permission.css","/assets/finbyzerp/css/finbyz-theme.css"]
 app_include_js = [
@@ -85,7 +88,8 @@ app_include_js = [
 
 doctype_list_js = {
 	"Batch" : "public/js/doctype_js/batch_list.js",
-	"Fiscal Year" : "public/js/doctype_js/fiscal_year.js"
+	"Fiscal Year" : "public/js/doctype_js/fiscal_year.js",
+	"Repost Item Valuation":"public/js/doctype_js/repost_item_valuation_list.js"
 }
 
 before_install = "finbyzerp.install.before_install"
@@ -105,6 +109,7 @@ doctype_js = {
 	"Customer":"public/js/doctype_js/customer.js",
 	"Opportunity":"public/js/doctype_js/opportunity.js",
 	"Opening Invoice Creation Tool":"public/js/doctype_js/opening_invoice_creation_tool.js",
+	"Payment Reconciliation":"public/js/doctype_js/payment_reconciliation.js",
 }
 website_context = {
 	"favicon": 	"/assets/finbyzerp/images/favicon.ico",
@@ -153,15 +158,18 @@ doc_events = {
 	},
 	"Sales Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
+		"before_save":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_save",
 		"validate":[
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
 			"finbyzerp.api.si_validate"
 		],
-		'on_submit': "finbyzerp.api.sales_invoice_on_submit"
+		"before_submit":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_submit",
+		'on_submit': "finbyzerp.api.sales_invoice_on_submit",
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate"
+		"validate": "finbyzerp.api.pi_validate",
+		"before_submit":"finbyzerp.finbyzerp.doc_events.purchase_invoice.before_submit"
 	},
 		"Purchase Receipt": {
 		"validate": "finbyzerp.api.pr_validate"
@@ -180,12 +188,20 @@ doc_events = {
 	"Payment Entry":{
 		"validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
 	},
+	("Purchase Order","Sales Order"):{
+		"before_cancel":"finbyzerp.api.po_so_before_cancel",
+	},
 	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note"): {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
 }
 
 scheduler_events = {
+	"cron":{
+		"*/5 * * * *":[
+			"finbyzerp.api.repost_transaction_entries"
+		],
+	},
 	"daily":[
 		"finbyzerp.api.daily_entry_summary_mail",
 		"finbyzerp.api.daily_transaction_summary_mail"
@@ -230,3 +246,5 @@ utils.get_timespan_date_range = get_timespan_date_range
 from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
+
+

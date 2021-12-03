@@ -11,7 +11,9 @@ def get_data(data):
 		'non_standard_fieldnames': {
 			'Payment Entry': 'party',
 			'Quotation': 'party_name',
-			'Opportunity': 'party_name'
+			'Opportunity': 'party_name',
+			"Meeting": "party",
+			"Meeting Schedule": "party"
 		},
 		'dynamic_links': {
 			'party_name': ['Customer', 'quotation_to']

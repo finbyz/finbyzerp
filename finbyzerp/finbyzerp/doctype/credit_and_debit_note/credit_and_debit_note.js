@@ -35,6 +35,15 @@ cur_frm.set_query("customer_address", function () {
         }
     };
 });
+cur_frm.set_query("supplier_address", function () {
+    return {
+        query: "frappe.contacts.doctype.address.address.address_query",
+        filters: {
+            link_doctype: "Supplier",
+            link_name: cur_frm.doc.party
+        }
+    };
+});
 // Shipping Address Filter
 cur_frm.set_query("shipping_address_name", function () {
     return {
@@ -46,7 +55,7 @@ cur_frm.set_query("shipping_address_name", function () {
 cur_frm.set_query("contact_person", function () {
     return {
         query: "frappe.contacts.doctype.contact.contact.contact_query",
-        filters: { link_doctype: "Customer", link_name: cur_frm.doc.party }
+        filters: { link_doctype: cur_frm.doc.party_type, link_name: cur_frm.doc.party }
     };
 });
 
@@ -59,6 +68,7 @@ frappe.ui.form.on("Credit and Debit Note Item",{
 		frappe.model.set_value(d.doctype,d.name,"base_net_amount",d.amount)
 		frappe.model.set_value(d.doctype,d.name,"price_list_rate",d.amount)
 		frappe.model.set_value(d.doctype,d.name,"base_price_list_rate",d.amount)
+		frappe.model.set_value(d.doctype,d.name,"item_name",frm.doc.type)
 		if (frm.doc.sales_taxes_and_charges || frm.doc.purchase_taxes_and_charges){
 			Calculate_taxes_and_totals(frm);
 		}
@@ -82,6 +92,57 @@ frappe.ui.form.on("Credit and Debit Note Item",{
 });
 
 frappe.ui.form.on("Credit and Debit Note", {
+	refresh: function(frm){
+		frm.add_custom_button(__("Reconcile"), function() {
+			frm.reload_doc()
+			frappe.set_route("Form","Payment Reconciliation")
+			// window.open(window.location.href.split('app')[0] + "app/payment-reconciliation/Payment Reconciliation" + "/?" +"company="+frm.doc.company +"&" + "party_type="+frm.doc.party_type +"&"+ "party="+frm.doc.party,"_blank")	
+		});
+	},
+	setup_queries(doc, cdt, cdn) {
+
+
+		frm.set_query('supplier', erpnext.queries.supplier);
+		frm.set_query('contact_person', erpnext.queries.contact_query);
+		frm.set_query('supplier_address', erpnext.queries.address_query);
+
+		frm.set_query('billing_address', erpnext.queries.company_address_query);
+
+		if(frm.fields_dict.supplier) {
+			frm.set_query("supplier", function() {
+				return{	query: "erpnext.controllers.queries.supplier_query" }});
+		}
+
+		frm.set_query("item_code", "items", function() {
+			if (frm.doc.is_subcontracted == "Yes") {
+				return{
+					query: "erpnext.controllers.queries.item_query",
+					filters:{ 'supplier': frm.doc.supplier, 'is_sub_contracted_item': 1 }
+				}
+			}
+			else {
+				return{
+					query: "erpnext.controllers.queries.item_query",
+					filters: { 'supplier': frm.doc.supplier, 'is_purchase_item': 1 }
+				}
+			}
+		});
+
+
+		frm.set_query("manufacturer", "items", function(doc, cdt, cdn) {
+			const row = locals[cdt][cdn];
+			return {
+				query: "erpnext.controllers.queries.item_manufacturer_query",
+				filters:{ 'item_code': row.item_code }
+			}
+		});
+
+		if(frm.fields_dict["items"].grid.get_field('item_code')) {
+			frm.set_query("item_tax_template", "items", function(doc, cdt, cdn) {
+				return set_query_for_item_tax_template(doc, cdt, cdn)
+			});
+		}
+	},
 	set_posting_time:function(frm){
 		frm.set_df_property("posting_date",'read_only',!frm.doc.set_posting_time);
 		frm.set_df_property("posting_time",'read_only',!frm.doc.set_posting_time);
@@ -120,7 +181,6 @@ frappe.ui.form.on("Credit and Debit Note", {
 	billing_address: function(frm) {
 		erpnext.utils.get_address_display(frm, "billing_address", "billing_address_display");
 	},
-	
 	shipping_address_name: function(frm) {
 		erpnext.utils.get_address_display(frm, "shipping_address_name", "shipping_address");
 	},

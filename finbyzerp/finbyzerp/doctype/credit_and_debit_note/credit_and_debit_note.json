@@ -13,6 +13,7 @@
   "party",
   "is_return",
   "section_break_3",
+  "series_value",
   "posting_date",
   "posting_time",
   "set_posting_time",
@@ -78,6 +79,9 @@
   "total_taxes_and_charges",
   "column_break_39",
   "grand_total",
+  "gst_details_section",
+  "gst_category",
+  "more_information_section",
   "si_ref",
   "pi_ref",
   "fiscal",
@@ -597,12 +601,34 @@
    "fieldtype": "Small Text",
    "label": "Billing Address",
    "read_only": 1
+  },
+  {
+   "fieldname": "gst_details_section",
+   "fieldtype": "Section Break",
+   "label": "GST Details"
+  },
+  {
+   "default": "Registered Regular",
+   "fieldname": "gst_category",
+   "fieldtype": "Select",
+   "label": "GST Category",
+   "options": "\nRegistered Regular\nRegistered Composition\nUnregistered\nSEZ\nOverseas\nConsumer\nDeemed Export\nUIN Holders"
+  },
+  {
+   "fieldname": "more_information_section",
+   "fieldtype": "Section Break",
+   "label": "More Information"
+  },
+  {
+   "fieldname": "series_value",
+   "fieldtype": "Int",
+   "label": "Series Value"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-08-11 15:01:42.125940",
+ "modified": "2021-09-18 17:40:51.929813",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Credit and Debit Note",
@@ -617,7 +643,37 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
    "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "select": 1,
+   "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],

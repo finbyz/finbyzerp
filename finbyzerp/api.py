@@ -20,6 +20,7 @@ import os
 import sys
 import time
 
+from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_entries
 
 def before_insert(self, method):
 	opening_naming_series(self)
@@ -340,7 +341,7 @@ def validate_user_mobile_no(self):
 			frappe.throw("Please Enter 10 digit Mobile Number.")
 
 def check_system_manager_role(self):
-	if self.name not in ["info@finbyz.com", "Administrator","info@finbyz.tech"]:
+	if self.name not in ["info@finbyz.com", "Administrator","mukesh@finbyz.tech","info@finbyz.tech"]:
 		remove_roles = []
 		for role in self.roles:
 			if role.role == "System Manager":
@@ -668,3 +669,8 @@ def po_so_before_cancel(self,method):
 	# 							frappe.db.sql("delete from `tabStock Ledger Entry` where voucher_type=%s and voucher_no=%s and is_cancelled = 1", (voucher_type, voucher_no))
 
 	# 				# raise_link_exists_exception(doc, reference_doctype, reference_docname, at_position)
+
+
+@frappe.whitelist()
+def repost_transaction_entries():
+	repost_entries()
