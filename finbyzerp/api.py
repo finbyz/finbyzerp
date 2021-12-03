@@ -70,6 +70,7 @@ def before_naming(self, method):
 		self.fiscal = fiscal
 		if not self.get('company_series'):
 			self.company_series = None
+		
 		if self.get('series_value'):
 			if self.series_value > 0:
 				name = naming_series_name(self.naming_series, fiscal, self.company_series)
@@ -86,7 +87,6 @@ def naming_series_name(name, fiscal = None, company_series=None):
 		fiscal = ''
 	if company_series:
 		name = name.replace('company_series', str(company_series))
-	
 	name = name.replace('YYYY', str(datetime.date.today().year))
 	name = name.replace('YY', str(datetime.date.today().year)[2:])
 	name = name.replace('MM', '{0:0=2d}'.format(datetime.date.today().month))
@@ -94,7 +94,6 @@ def naming_series_name(name, fiscal = None, company_series=None):
 	name = name.replace('fiscal', str(fiscal))
 	name = name.replace('#', '')
 	name = name.replace('.', '')
-	
 	return name
 
 @frappe.whitelist()
@@ -120,7 +119,10 @@ def check_counter_series(name, company_series = None, date = None):
 
 def opening_naming_series(self):
 	if not self.name and self.is_opening == "Yes":
-		self.naming_series = 'O' + self.naming_series
+		if self.naming_series[0] != ".":
+			self.naming_series = "O" + "." + self.naming_series
+		else:
+			self.naming_series = "O" + self.naming_series
 
 @frappe.whitelist()
 def get_desktop_settings():
@@ -187,7 +189,6 @@ def get_desktop_settings():
 
 @frappe.whitelist()
 def get_options_for_global_modules():
-	# frappe.msgprint('call')
 	from frappe.config import get_modules_from_all_apps
 	all_modules = get_modules_from_all_apps()
 
