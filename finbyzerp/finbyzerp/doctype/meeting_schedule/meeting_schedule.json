@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "autoname": "naming_series:",
  "creation": "2017-12-27 10:31:55.073354",
  "doctype": "DocType",
@@ -54,7 +55,7 @@
    "fieldname": "party_type",
    "fieldtype": "Select",
    "label": "Party Type",
-   "options": "\nLead\nCustomer\nOpportunity\nSupplier\nSales Partner"
+   "options": "\nLead\nCustomer\nSupplier\nSales Partner"
   },
   {
    "fieldname": "party",
@@ -95,16 +96,16 @@
    "options": "Contact"
   },
   {
+   "fetch_from": "contact.first_name",
    "fieldname": "contact_person_name",
    "fieldtype": "Data",
-   "label": "Contact Person Name",
-   "options": "contact.first_name"
+   "label": "Contact Person Name"
   },
   {
+   "fetch_from": "contact.mobile_no",
    "fieldname": "mobile_no",
    "fieldtype": "Data",
-   "label": "Mobile No",
-   "options": "contact.mobile_no"
+   "label": "Mobile No"
   },
   {
    "fieldname": "email_id",
@@ -175,7 +176,8 @@
    "options": "Company"
   }
  ],
- "modified": "2021-07-08 15:31:58.150805",
+ "links": [],
+ "modified": "2022-01-17 15:41:57.599504",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting Schedule",

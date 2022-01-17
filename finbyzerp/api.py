@@ -20,7 +20,6 @@ import os
 import sys
 import time
 
-from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_entries
 
 def before_insert(self, method):
 	opening_naming_series(self)
@@ -119,9 +118,6 @@ def check_counter_series(name, company_series = None, date = None):
 
 def opening_naming_series(self):
 	if not self.name and self.is_opening == "Yes":
-		if self.naming_series[0] != ".":
-			self.naming_series = "O" + "." + self.naming_series
-		else:
 			self.naming_series = "O" + self.naming_series
 
 @frappe.whitelist()
@@ -464,6 +460,7 @@ def set_account_in_transaction(self):
 def make_meetings(source_name, doctype, ref_doctype, target_doc=None):
 	def set_missing_values(source, target):
 		target.party_type = doctype
+		target.party = source_name
 		now = now_datetime()
 		if ref_doctype == "Meeting Schedule":
 			target.scheduled_from = target.scheduled_to = now
