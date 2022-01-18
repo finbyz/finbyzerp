@@ -11,7 +11,7 @@ def get_data(data):
 			"Meeting Schedule": "party"
 		},
 		'dynamic_links': {
-			'party_name': ['Lead', 'quotation_to']
+			'party_name': ['Lead', 'quotation_to'],
 		},
 		'transactions': [
 			{
