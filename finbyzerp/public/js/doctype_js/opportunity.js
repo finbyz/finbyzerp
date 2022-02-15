@@ -41,6 +41,5 @@ frappe.ui.form.on('Opportunity', {
 			frm.set_value("contact_by", "");
 			frm.set_value("contact_date", "");
 		}
-	},
-
+	}
 });
