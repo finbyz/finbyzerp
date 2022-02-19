@@ -80,9 +80,6 @@ from erpnext.hr.doctype.expense_claim.expense_claim import ExpenseClaim
 from finbyzerp.finbyzerp.doc_events.expense_claim import set_status
 ExpenseClaim.set_status = set_status
 
-from erpnext.stock.doctype.material_request import material_request
-from finbyzerp.finbyzerp.doc_events.material_request import get_default_supplier_query
-material_request.get_default_supplier_query = get_default_supplier_query
 
 app_include_css = ["/assets/finbyzerp/css/permission.css","/assets/finbyzerp/css/finbyz-theme.css"]
 app_include_js = [
