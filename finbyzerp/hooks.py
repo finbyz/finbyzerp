@@ -61,10 +61,10 @@ utils.validate_document_name = validate_document_name
 #GSPConnector.set_einvoice_data = set_einvoice_data
 
 
-import erpnext
-from finbyzerp.e_invoice_override import get_item_list,validate_einvoice_fields
-erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
-erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
+# import erpnext
+# from finbyzerp.e_invoice_override import get_item_list,validate_einvoice_fields
+# erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
+# erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
 
 # email Campaign override
 from finbyzerp.finbyzerp.doc_events.email_campaign import send_email_to_leads_or_contacts
