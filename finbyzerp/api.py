@@ -19,7 +19,7 @@ import json
 import os
 import sys
 import time
-
+from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_entries
 
 def before_insert(self, method):
 	opening_naming_series(self)
