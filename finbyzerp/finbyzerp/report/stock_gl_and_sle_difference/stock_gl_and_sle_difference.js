@@ -27,6 +27,38 @@ frappe.query_reports["Stock GL and SLE Difference"] = {
 			"width": "80",
 			"reqd": 1,
 			"default": frappe.datetime.get_today()
-		}
+		},
+		// {
+		// 	"fieldname": "warehouse",
+		// 	"label": __("Warehouse"),
+		// 	"fieldtype": "Link",
+		// 	"width": "80",
+		// 	"options": "Warehouse",
+		// 	"get_query": function() {
+		// 		var company = frappe.query_report.get_filter_value('company');
+		// 		return {
+		// 			"doctype": "Warehouse",
+		// 			"filters": {
+		// 				"company": company,
+		// 			}
+		// 		}
+		// 	}
+		// },
+		{
+			"fieldname": "account",
+			"label": __("Account"),
+			"fieldtype": "Link",
+			"width": "80",
+			"options": "Account",
+			"get_query": function() {
+				var company = frappe.query_report.get_filter_value('company');
+				return {
+					"doctype": "Account",
+					"filters": {
+						"company": company,
+					}
+				}
+			}
+		},
 	]
 };
