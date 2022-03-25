@@ -54,7 +54,7 @@ frappe.ui.form.on('Meeting', {
 	meeting_from(frm) {
 		if (frm.doc.meeting_from && !frm.doc.meeting_to){
 		    // frm.set_value('scheduled_to',frm.doc.scheduled_from)
-			frm.set_value('meeting_to',frappe.datetime.get_datetime_as_string(frappe.datetime.str_to_obj(frm.doc.scheduled_from).setHours(frappe.datetime.str_to_obj(frm.doc.scheduled_from).getHours() + 1)))
+			frm.set_value('meeting_to',frappe.datetime.get_datetime_as_string(frappe.datetime.str_to_obj(frm.doc.meeting_from).setHours(frappe.datetime.str_to_obj(frm.doc.meeting_from).getHours() + 1)))
 		}
 	},
 	validate: function(frm){
