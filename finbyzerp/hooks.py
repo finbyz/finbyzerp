@@ -248,4 +248,6 @@ from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
 
-
+from frappe.workflow.doctype.workflow_action import workflow_action
+from finbyzerp.api import process_workflow_actions
+workflow_action.process_workflow_actions = process_workflow_actions
