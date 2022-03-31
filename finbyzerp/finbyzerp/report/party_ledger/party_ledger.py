@@ -138,7 +138,7 @@ def get_gl_entries(filters):
 			GROUP_CONCAT(debit_in_account_currency SEPARATOR '<br>') as debit_list,
 			GROUP_CONCAT(credit_in_account_currency SEPARATOR '<br>') as credit_list {select_fields}
 		from `tabGL Entry`
-		where company=%(company)s {conditions}
+		where is_cancelled = 0 and company=%(company)s {conditions}
 		Group by voucher_no
 		{order_by_statement}
 		""".format(

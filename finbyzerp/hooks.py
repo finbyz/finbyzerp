@@ -61,10 +61,10 @@ utils.validate_document_name = validate_document_name
 #GSPConnector.set_einvoice_data = set_einvoice_data
 
 
-import erpnext
-from finbyzerp.e_invoice_override import get_item_list,validate_einvoice_fields
-erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
-erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
+# import erpnext
+# from finbyzerp.e_invoice_override import get_item_list,validate_einvoice_fields
+# erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
+# erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
 
 # email Campaign override
 from finbyzerp.finbyzerp.doc_events.email_campaign import send_email_to_leads_or_contacts
@@ -79,6 +79,7 @@ sync.get_doc_files = get_doc_files
 from erpnext.hr.doctype.expense_claim.expense_claim import ExpenseClaim
 from finbyzerp.finbyzerp.doc_events.expense_claim import set_status
 ExpenseClaim.set_status = set_status
+
 
 app_include_css = ["/assets/finbyzerp/css/permission.css","/assets/finbyzerp/css/finbyz-theme.css"]
 app_include_js = [
@@ -128,7 +129,7 @@ override_whitelisted_methods = {
 	"erpnext.setup.doctype.company.delete_company_transactions.delete_company_transactions": "finbyzerp.finbyzerp.override.delete_company_transactions.delete_company_transactions",
 	"frappe.desk.moduleview.get_desktop_settings": "finbyzerp.api.get_desktop_settings",
 	"frappe.desk.moduleview.get_options_for_global_modules": "finbyzerp.api.get_options_for_global_modules",
-	"erpnext.regional.india.e_invoice.utils.cancel_eway_bill": "finbyzerp.e_invoice_override.cancel_eway_bill" # cancel eway bill override for enable cancel_eway_bill api
+	"erpnext.regional.india.e_invoice.utils.cancel_eway_bill": "finbyzerp.e_invoice_override.cancel_eway_bill", # cancel eway bill override for enable cancel_eway_bill api
 	#"frappe.utils.print_format.download_pdf": "finbyzerp.print_format.download_pdf",
 }
 
@@ -191,7 +192,7 @@ doc_events = {
 	("Purchase Order","Sales Order"):{
 		"before_cancel":"finbyzerp.api.po_so_before_cancel",
 	},
-	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking"): {
+	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement"): {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
 }
@@ -247,4 +248,6 @@ from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
 
-
+from frappe.workflow.doctype.workflow_action import workflow_action
+from finbyzerp.api import process_workflow_actions
+workflow_action.process_workflow_actions = process_workflow_actions

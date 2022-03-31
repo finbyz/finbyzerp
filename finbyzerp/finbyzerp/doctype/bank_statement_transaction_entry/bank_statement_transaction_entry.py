@@ -7,7 +7,7 @@ import frappe
 from frappe import _
 from frappe.model.document import Document
 from erpnext.accounts.utils import get_outstanding_invoices
-from frappe.utils import nowdate
+from frappe.utils import nowdate, flt
 from datetime import datetime
 import csv, os, re, io
 import difflib
@@ -130,7 +130,8 @@ class BankStatementTransactionEntry(Document):
 				ent.party = entry.party
 				ent.invoice = e.get('voucher_no')
 				added_invoices += [ent.invoice]
-				ent.invoice_type = "Sales Invoice" if entry.party_type == "Customer" else "Purchase Invoice"
+				invoice_type="Journal Entry" if frappe.db.exists("Journal Entry",e.get('voucher_no')) else "Purchase Invoice"
+				ent.invoice_type = "Sales Invoice" if entry.party_type == "Customer" else invoice_type
 				ent.invoice_date = e.get('posting_date')
 				ent.outstanding_amount = e.get('outstanding_amount')
 				ent.allocated_amount = min(float(e.get('outstanding_amount')), amount)
@@ -154,9 +155,11 @@ class BankStatementTransactionEntry(Document):
 				payment = get_payments_matching_invoice(inv_entry.invoice, entry.amount, entry.transaction_date)
 				doc = frappe.get_doc(inv_entry.invoice_type, inv_entry.invoice)
 				inv_entry.invoice_date = doc.posting_date
-				inv_entry.outstanding_amount = doc.outstanding_amount
-				inv_entry.allocated_amount = min(float(doc.outstanding_amount), amount)
-				amount -= inv_entry.allocated_amount
+				if inv_entry.invoice_type != "Journal Entry":
+					inv_entry.outstanding_amount = doc.outstanding_amount
+					inv_entry.allocated_amount = min(float(doc.outstanding_amount), amount)
+
+				amount -= inv_entry.get('allocated_amount')
 				if (amount < 0): break
 
 			amount = abs(entry.amount)
@@ -367,9 +370,10 @@ class BankStatementTransactionEntry(Document):
 
 def get_matching_journal_entries(from_date, to_date, account, against, amount):
 	query = """select voucher_no, posting_date, account, against, debit_in_account_currency as debit, credit_in_account_currency as credit
-							      from `tabGL Entry`
+								  from `tabGL Entry`
 								  where posting_date between '{0}' and '{1}' and account = '{2}' and against = '{3}' and debit = '{4}'
 								  """.format(from_date, to_date, account, against, amount)
+
 	jv_entries = frappe.db.sql(query, as_dict=True)
 	#print("voucher query:{0}\n Returned {1} entries".format(query, len(jv_entries)))
 	return jv_entries

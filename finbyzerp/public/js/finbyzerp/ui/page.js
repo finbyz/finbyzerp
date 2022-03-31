@@ -185,7 +185,6 @@ frappe.ui.Page = Class.extend({
 				} else {
 					sidebar_wrapper.toggle();
                     icon_wrapper.toggleClass('d__none');
-                    console.log(window.page_name)
 				}
 				$(document.body).trigger('toggleSidebar');
 				this.update_sidebar_icon();
@@ -423,6 +422,9 @@ frappe.ui.Page = Class.extend({
 			parent.parent().removeClass("hide");
 		}
 
+		let $link = this.is_in_group_button_dropdown(parent, 'li > a.grey-link', label);
+		if ($link) return $link;
+
 		let $li;
 		let $icon = ``;
 
@@ -454,9 +456,8 @@ frappe.ui.Page = Class.extend({
 				</li>
 			`);
 		}
-		var $link = $li.find("a").on("click", click);
 
-		if (this.is_in_group_button_dropdown(parent, 'li > a.grey-link', label)) return;
+		$link = $li.find("a").on("click", click);
 
 		if (standard) {
 			$li.appendTo(parent);
@@ -522,7 +523,7 @@ frappe.ui.Page = Class.extend({
 				let item = $(this).html();
 				return $(item).attr('data-label') === label;
 			});
-		return result.length > 0;
+		return result.length > 0 && result;
 	},
 
 	clear_btn_group: function(parent) {
@@ -629,6 +630,23 @@ frappe.ui.Page = Class.extend({
 		}
 	},
 
+	change_inner_button_type: function(label, group, type) {
+		let btn;
+
+		if (group) {
+			var $group = this.get_inner_group_button(__(group));
+			if ($group.length) {
+				btn = $group.find(`.dropdown-item[data-label="${encodeURIComponent(label)}"]`);
+			}
+		} else {
+			btn = this.inner_toolbar.find(`button[data-label="${encodeURIComponent(label)}"]`);
+		}
+
+		if (btn) {
+			btn.removeClass().addClass(`btn btn-${type} ellipsis`);
+		}
+	},
+
 	add_inner_message: function(message) {
 		let $message = $(`<span class='inner-page-message text-muted small'>${message}</div>`);
 		this.inner_toolbar.find('.inner-page-message').remove();
@@ -708,6 +726,10 @@ frappe.ui.Page = Class.extend({
 				${opts.icon ? frappe.utils.icon(opts.icon): ''}
 				${label}
 		</button>`);
+		// Add actions as menu item in Mobile View (similar to "add_custom_button" in forms.js)
+		let menu_item = this.add_menu_item(label, click, false);
+		menu_item.parent().addClass("hidden-xl");
+
 		button.appendTo(this.custom_actions);
 		button.on('click', click);
 		this.custom_actions.removeClass('hide');
