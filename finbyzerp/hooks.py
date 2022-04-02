@@ -61,10 +61,10 @@ utils.validate_document_name = validate_document_name
 #GSPConnector.set_einvoice_data = set_einvoice_data
 
 
-import erpnext
-from finbyzerp.e_invoice_override import get_item_list,validate_einvoice_fields
-erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
-erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
+# import erpnext
+# from finbyzerp.e_invoice_override import get_item_list,validate_einvoice_fields
+# erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
+# erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
 
 # email Campaign override
 from finbyzerp.finbyzerp.doc_events.email_campaign import send_email_to_leads_or_contacts
@@ -248,3 +248,7 @@ utils.get_timespan_date_range = get_timespan_date_range
 from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
+
+from frappe.workflow.doctype.workflow_action import workflow_action
+from finbyzerp.api import process_workflow_actions
+workflow_action.process_workflow_actions = process_workflow_actions

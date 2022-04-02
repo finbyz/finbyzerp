@@ -150,7 +150,7 @@ def get_events(start, end, filters=None):
 	from frappe.desk.calendar import get_event_conditions
 	conditions = get_event_conditions("Meeting Schedule", filters)
 
-	return frappe.db.sql("""
+	data = frappe.db.sql("""
 			select 
 				name, scheduled_from, scheduled_to, organisation
 			from 
@@ -162,7 +162,17 @@ def get_events(start, end, filters=None):
 					"start": start,
 					"end": end
 				}, as_dict=True, update={"allDay": 0})
-				
+
+	if not data:
+		return []
+		
+	data = [x.name for x in data]
+
+	return frappe.db.get_list("Meeting Schedule",
+		{ "name": ("in", data), "docstatus":1},
+		["name", "scheduled_from", "scheduled_to", "organization"]
+	)			
+
 @frappe.whitelist()
 def get_party_details(party=None, party_type="Customer", ignore_permissions=False):
 

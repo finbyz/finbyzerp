@@ -372,7 +372,9 @@ def get_item_list(invoice):
 			item.is_service_item = 'N'  
 		else:
 			item.is_service_item = 'Y'
-		#finbyz changes enditem.serial_no = ""
+		#finbyz changes end
+		
+		item.serial_no = ""
 
 		item = update_item_taxes(invoice, item)
 		
@@ -393,6 +395,7 @@ def validate_einvoice_fields(doc):
 
 	# Finbyz Changes Start: dont change posting date and sales taxes and charges table after irn generated
 	if doc.irn and doc.docstatus == 0:
+		doc.set_posting_time = 1
 		if str(doc.posting_date) != str(frappe.db.get_value("Sales Invoice",doc.name,"posting_date")):
 			frappe.throw(_('You cannot edit the invoice after generating IRN'), title=_('Edit Not Allowed'))
 		if str(len(doc.taxes)) != str(len(frappe.db.get_all("Sales Taxes and Charges",{'parent':doc.name,'parenttype':doc.doctype}))):
