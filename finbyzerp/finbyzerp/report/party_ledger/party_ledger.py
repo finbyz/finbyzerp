@@ -144,8 +144,12 @@ def get_gl_entries(filters):
 		""".format(
 			select_fields=select_fields, conditions=get_conditions(filters),
 			order_by_statement=order_by_statement
-		),
-		filters, as_dict=1)
+		), filters, as_dict=1)
+
+	if filters.get('party_type') and filters.party:
+		list_keys = [filters.get('party_type'), filters.party]
+		gl_entries = list(filter(lambda d: d.party_type == filters.get('party_type') and d.party in filters.get('party'),
+					gl_entries))
 
 	if filters.get('presentation_currency'):
 		return convert_to_presentation_currency(gl_entries, currency_map)
@@ -205,7 +209,6 @@ def get_conditions(filters):
 				conditions.append("{0} in (%({0})s)".format(dimension))
 
 	return "and {}".format(" and ".join(conditions)) if conditions else ""
-
 
 def get_data_with_opening_closing(filters, account_details, gl_entries):
 	data = []
