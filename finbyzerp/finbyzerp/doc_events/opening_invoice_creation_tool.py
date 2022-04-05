@@ -177,9 +177,12 @@ def get_invoice_dict(self, row=None):
 
 	if self.invoice_type == "Sales":
 		args["is_pos"] = 0
+		args['update_stock']=0
 		args['invoice_no'] = row.invoice_no
 	else:
 		args['bill_no'] = row.invoice_no
+	if self.invoice_type == "Purchase":
+		args['update_stock']=0
 
 	return args
 

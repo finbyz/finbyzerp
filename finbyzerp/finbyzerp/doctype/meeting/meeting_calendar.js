@@ -4,7 +4,6 @@ frappe.views.calendar["Meeting"] = {
 		"end": "meeting_to",
 		"id": "name",
 		"title": "organization",
-		"allDay": "allDay"
 	},
 	get_events_method: "finbyzerp.finbyzerp.doctype.meeting.meeting.get_events"
 };
