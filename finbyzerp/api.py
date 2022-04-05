@@ -15,6 +15,15 @@ from erpnext.accounts.utils import get_stock_accounts,get_stock_and_account_bala
 from frappe.utils.data import (nowdate,add_to_date,get_first_day_of_week,get_last_day_of_week,get_first_day,get_last_day,
 		get_quarter_start,get_quarter_ending,get_year_start,get_year_ending)
 
+from frappe.workflow.doctype.workflow_action.workflow_action import (
+	get_common_email_args, deduplicate_actions, clear_workflow_actions, get_next_possible_transitions, get_doc_workflow_state,
+	is_workflow_action_already_created, update_completed_workflow_actions, clear_old_workflow_actions, get_users_next_action_data,
+	create_workflow_actions_for_users)
+from frappe.desk.doctype.notification_log.notification_log import make_notification_logs
+from frappe.utils.background_jobs import enqueue
+from frappe.model.workflow import get_workflow_name, send_email_alert
+from frappe.desk.notifications import clear_doctype_notifications
+
 import json
 import os
 import sys
@@ -501,6 +510,9 @@ import os
 def get_doc_files(files, start_path):
 	"""walk and sync all doctypes and pages"""
 
+	if not files:
+		files = []
+
 	# load in sequence - warning for devs
 	document_types = ['doctype', 'page', 'report', 'dashboard_chart_source', 'print_format',
 		'website_theme', 'web_form', 'web_template', 'notification', 'print_style',
@@ -516,7 +528,9 @@ def get_doc_files(files, start_path):
 					if os.path.exists(doc_path):
 						if not doc_path in files:
 							files.append(doc_path)
-							
+
+	return files
+
 def finbyz_future_sle_exists(args):
 	return frappe.db.sql("""
 		select name
@@ -672,3 +686,59 @@ def po_so_before_cancel(self,method):
 @frappe.whitelist()
 def repost_transaction_entries():
 	repost_entries()
+
+def process_workflow_actions(doc, state):
+	workflow = get_workflow_name(doc.get('doctype'))
+	if not workflow: return
+
+	if state == "on_trash":
+		clear_workflow_actions(doc.get('doctype'), doc.get('name'))
+		return
+
+	if is_workflow_action_already_created(doc): return
+
+	clear_old_workflow_actions(doc)
+	update_completed_workflow_actions(doc)
+	clear_doctype_notifications('Workflow Action')
+
+	next_possible_transitions = get_next_possible_transitions(workflow, get_doc_workflow_state(doc), doc)
+
+	if not next_possible_transitions: return
+
+	user_data_map = get_users_next_action_data(next_possible_transitions, doc)
+
+	if not user_data_map: return
+
+	create_workflow_actions_for_users(user_data_map.keys(), doc)
+
+	if send_email_alert(workflow):
+		enqueue(send_workflow_action_email, queue='short', users_data=list(user_data_map.values()), doc=doc)
+
+
+def send_workflow_action_email(users_data, doc):
+	common_args = get_common_email_args(doc)
+	message = common_args.pop('message', None)
+	user_list = []
+	for d in users_data:
+		email_args = {
+			'recipients': [d.get('email')],
+			'args': {
+				'actions': list(deduplicate_actions(d.get('possible_actions'))),
+				'message': message
+			},
+			'reference_name': doc.name,
+			'reference_doctype': doc.doctype
+		}
+		email_args.update(common_args)
+		if frappe.db.exists("User",d.get("email")):
+			user_list.append(d.get("email"))
+		enqueue(method=frappe.sendmail, queue='short', **email_args)
+
+	notification_doc = frappe._dict({
+		'type': 'Workflow Alert',
+		'document_type': doc.doctype,
+		'document_name': doc.name,
+		'subject': f"{doc.name} Status Has been updated to {doc.workflow_state}",
+		'from_user': doc.owner
+	})
+	make_notification_logs(notification_doc, user_list)

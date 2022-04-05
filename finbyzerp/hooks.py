@@ -111,6 +111,7 @@ doctype_js = {
 	"Opportunity":"public/js/doctype_js/opportunity.js",
 	"Opening Invoice Creation Tool":"public/js/doctype_js/opening_invoice_creation_tool.js",
 	"Payment Reconciliation":"public/js/doctype_js/payment_reconciliation.js",
+	"BOM":"public/js/doctype_js/bom.js"
 }
 website_context = {
 	"favicon": 	"/assets/finbyzerp/images/favicon.ico",
@@ -192,7 +193,7 @@ doc_events = {
 	("Purchase Order","Sales Order"):{
 		"before_cancel":"finbyzerp.api.po_so_before_cancel",
 	},
-	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement"): {
+	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice"): {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
 }
@@ -248,4 +249,6 @@ from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
 
-
+from frappe.workflow.doctype.workflow_action import workflow_action
+from finbyzerp.api import process_workflow_actions
+workflow_action.process_workflow_actions = process_workflow_actions

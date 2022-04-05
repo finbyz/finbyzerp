@@ -88,14 +88,14 @@ def after_install():
 					box-shadow: 0px 0px 9px rgba(0,0,0,0.5);
 					max-width: 8.3in;
 					min-height: 11.69in;
-					padding: 12px!important;
-					margin: 12px!important;
+					padding: 0px!important;
+					margin: 0px!important;
 					}
 				}
 			@media print {
 				.print-format  {
-					padding: 7px!important;
-					margin: 7px!important;
+					padding: 0px!important;
+					margin: 0px!important;
 				}
 			}
 		"""

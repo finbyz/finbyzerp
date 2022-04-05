@@ -7,8 +7,10 @@ frappe.ui.misc.about = function() {
 		<p>"+__("At Finbyz Tech, we are passionate about revolutionizing businesses through the latest technology.")+"</p>  \
 		<p><i class='fa fa-globe fa-fw'></i>\
 			Website: <a href=' https://finbyz.tech' target='_blank'> https://finbyz.tech</a></p>\
-		<p><i class='fa fa-github fa-fw'></i>\
+		<p><i class='fa fa-solid fa-envelope fa-fw'></i>\
 			Support: <a href='support@finbyz.tech' target='_blank'>support@finbyz.tech</a></p>\
+		<p><i class='fa fa-phone fa-fw'></i>\
+			Phone:<a href='tel:079 48912428'> 079 48912428</a></p>\
 		<hr>\
 		<h4>Installed Apps</h4>\
 		<div id='about-app-versions'>Loading versions...</div>\
