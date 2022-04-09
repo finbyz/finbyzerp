@@ -104,4 +104,13 @@ def after_install():
 
 	print_setting = frappe.get_doc("Print Settings","Print Settings")
 	print_setting.db_set('print_style','FinByz')
+	update_website_settings()
 	frappe.db.commit()
+
+def update_website_settings():
+    doc = frappe.get_doc("Website Settings")
+    doc.home_page = "login"
+    doc.app_name = "FinbyzERP"
+    doc.disable_signup = 1
+    doc.save(ignore_permissions=True)
+    doc.save(ignore_permissions=True)
