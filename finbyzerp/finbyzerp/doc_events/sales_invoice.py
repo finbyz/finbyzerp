@@ -22,6 +22,14 @@ def set_shipping_address(self):
 def before_submit(self, method):
     unlink_credit_note_entries(self)
 
+def on_trash(self, method):
+    validate_irn_generated_invoice(self)
+
+def validate_irn_generated_invoice(self):
+    if self.get('irn') or self.get('ewaybill') or self.get('irn_cancelled') or self.get('eway_bill_cancelled'):
+        frappe.throw("Once the E-Invoice (IRN) is cancelled, the same invoice number cannot be re-used to generate another IRN",
+         title= "IRN or E-way Bill Generated Invoice Cannot be deleted""")
+
 def calculate_gst_taxable_value(self):
 	self.gst_taxable_value = abs(sum([flt(i.get('taxable_value')) for i in self.get('items')]))
 
