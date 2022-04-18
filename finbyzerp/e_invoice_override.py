@@ -1,8 +1,6 @@
-import frappe
-import re
-import jwt
+import frappe, json, re
 from frappe import _, bold
-from frappe.utils import cstr, cint, flt, getdate
+from frappe.utils import cstr, cint, flt, getdate, format_date
 from erpnext.regional.india.e_invoice.utils import (GSPConnector,raise_document_name_too_long_error,read_json,
 	validate_mandatory_fields,get_doc_details,get_return_doc_reference,
 	get_eway_bill_details,validate_totals,show_link_to_error_log,santize_einvoice_fields,safe_json_load,get_payment_details,
@@ -10,7 +8,6 @@ from erpnext.regional.india.e_invoice.utils import (GSPConnector,raise_document_
 	get_overseas_address_details, validate_address_fields, sanitize_for_json, log_error)
 
 from erpnext.regional.india.utils import get_gst_accounts,get_place_of_supply
-import json
 
 
 GST_INVOICE_NUMBER_FORMAT = re.compile(r"^[a-zA-Z0-9\-/]+$")   #alphanumeric and - /
