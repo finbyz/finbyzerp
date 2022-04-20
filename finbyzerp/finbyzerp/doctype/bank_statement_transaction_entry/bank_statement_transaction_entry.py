@@ -45,7 +45,7 @@ class BankStatementTransactionEntry(Document):
 	def calculte_totals(self):
 		total_amount = 0
 		for row in self.new_transaction_items:
-			total_amount += row.amount
+			total_amount += flt(row.amount)
 		self.total_amount = total_amount
 
 	def validate(self):
@@ -159,7 +159,7 @@ class BankStatementTransactionEntry(Document):
 					inv_entry.outstanding_amount = doc.outstanding_amount
 					inv_entry.allocated_amount = min(float(doc.outstanding_amount), amount)
 
-				amount -= inv_entry.get('allocated_amount')
+				amount -= flt(inv_entry.get('allocated_amount'))
 				if (amount < 0): break
 
 			amount = abs(entry.amount)
