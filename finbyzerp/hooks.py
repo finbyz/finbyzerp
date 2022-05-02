@@ -166,7 +166,8 @@ doc_events = {
 			"finbyzerp.api.si_validate"
 		],
 		"before_submit":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_submit",
-		'on_submit': "finbyzerp.api.sales_invoice_on_submit",
+		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
+		"on_submit": "finbyzerp.api.sales_invoice_on_submit",
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",

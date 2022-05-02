@@ -94,26 +94,31 @@ frappe.ui.form.on('Account',{
                             })
                             d.set_value('interest_amount',interest_amount)
                         }
-                        let btn = document.createElement('a');
-                        btn.innerText = 'Download';
-                        btn.className = 'grid-download btn btn-xs btn-default';
-                        d.fields_dict.date_wise_balance.grid.wrapper.find('.grid-download').removeClass('hide').parent().append(btn);
-                        btn.addEventListener("click", function(){
-                            var data = [];
-                            var docfields = ["date","balance","days"];
-                            data.push(["date","balance","days"])
-                            data.push([])
-                            val.date_wise_balance.forEach(function (v){
-                                var row = []
-                                docfields.forEach(function(df){
-                                    var value = v[df]
-                                    row.push(value || "")
-                                });
-                                data.push(row)
-                            })
+                        var numItems = $('.grid-download').length; 
+                        
+                        if(numItems == 1){
+                            let btn = document.createElement('a');
+                            btn.innerText = 'Download';
+                            btn.className = 'grid-download btn btn-xs btn-default';
                             
-                            frappe.tools.downloadify(data, null, "Interest_Calculation");
-                        });
+                            d.fields_dict.date_wise_balance.grid.wrapper.find('.grid-download').removeClass('hide').parent().append(btn);
+                            btn.addEventListener("click", function(){
+                                var data = [];
+                                var docfields = ["date","balance","days"];
+                                data.push(["date","balance","days"])
+                                data.push([])
+                                val.date_wise_balance.forEach(function (v){
+                                    var row = []
+                                    docfields.forEach(function(df){
+                                        var value = v[df]
+                                        row.push(value || "")
+                                    });
+                                    data.push(row)
+                                })
+                                
+                                frappe.tools.downloadify(data, null, "Interest_Calculation");
+                            });
+                        }
                     }
                 })
             }
