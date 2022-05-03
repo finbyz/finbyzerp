@@ -231,10 +231,10 @@ def get_data(filters):
 				docstatus < 2
 				{conditions}
 			GROUP BY
-				owner
+				{group_by_field}
 			ORDER BY
 				modified DESC
-		""".format(doc=doc, owner=owner, conditions=conditions), as_dict=1)
+		""".format(doc=doc, owner=owner, conditions=conditions,group_by_field="submitted_by" if doc == "Job Card" else 'owner'), as_dict=1)
 		
 		dt_map = {}
 		user_tuple = '('
