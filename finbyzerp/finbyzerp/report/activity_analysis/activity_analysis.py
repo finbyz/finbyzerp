@@ -62,9 +62,12 @@ def get_data_details(filters):
 	for idx,doc in enumerate(doctype):
 		if doc == "Payment Entry":
 			other_fields = "party_name as 'Item Name', paid_amount as 'Amount',"
+			owner = 'owner'
 		elif doc == "Job Card":
+			owner = "IF(submitted_by , submitted_by, modified_by)"
 			other_fields = "operation as 'Item Name', IF(total_completed_qty > 0, total_completed_qty, 0) as 'Amount',"
 		else:
+			owner = 'owner'
 			other_fields = ''
 		title_field = frappe.db.get_value("Property Setter",{"doc_type":doc,"property":'title_field'},'value')
 		if not title_field:
@@ -79,18 +82,18 @@ def get_data_details(filters):
 
 		if filters.from_date: conditions += " and {0} >= '{1}'".format(date, filters.from_date)
 		if filters.to_date: conditions += " and {0} <= '{1}'".format(date, filters.to_date)
-		if filters.user:conditions += " and owner = '{0}'".format(filters.user)
+		if filters.user:conditions += " and {0} = '{1}'".format(owner, filters.user)
 		
 		dt = frappe.db.sql("""
 			SELECT
-				name as 'ID', {date} as 'Date', owner as 'Created By',{other_fields} {title_field} as 'Title'
+				name as 'ID', {date} as 'Date', {owner} as 'Created By',{other_fields} {title_field} as 'Title'
 			FROM
 				`tab{doc}`
 			WHERE
 				docstatus < 2
 				{conditions}
 			ORDER BY
-				modified DESC""".format(date=date, title_field=title_field, other_fields=other_fields, doc=doc, conditions=conditions), as_dict=1)
+				modified DESC""".format(date=date, title_field=title_field, owner = owner, other_fields=other_fields, doc=doc, conditions=conditions), as_dict=1)
 
 		d = dt[:]
 		id = 0
@@ -204,6 +207,10 @@ def get_data(filters):
 			child_doctype_list = [filters.doctype + " Account"]
 
 	for idx,doc in enumerate(doctype_list):
+		if doc == "Job Card":
+			owner = "IF(submitted_by , submitted_by, modified_by)"
+		else:
+			owner = 'owner'
 		conditions = ''
 		if filters.based_on == "Creation Date":
 			date = 'CAST(creation AS DATE)'
@@ -217,7 +224,7 @@ def get_data(filters):
 		if filters.user:conditions += " and owner = '{0}'".format(filters.user)
 		dt = frappe.db.sql("""
 			SELECT
-				owner, count(name) as total_entries
+				{owner} as owner, count(name) as total_entries
 			FROM
 				`tab{doc}`
 			WHERE
@@ -227,7 +234,7 @@ def get_data(filters):
 				owner
 			ORDER BY
 				modified DESC
-		""".format(doc=doc, conditions=conditions), as_dict=1)
+		""".format(doc=doc, owner=owner, conditions=conditions), as_dict=1)
 		
 		dt_map = {}
 		user_tuple = '('
