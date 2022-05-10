@@ -153,7 +153,8 @@ doc_events = {
 		"validate":"finbyzerp.api.supplier_validate"
 	},
 	"Item": {
-		"validate":"finbyzerp.finbyzerp.doc_events.item.validate"
+		"validate":"finbyzerp.finbyzerp.doc_events.item.validate",
+		"before_naming":"finbyzerp.finbyzerp.doc_events.item.before_validate"
 	},
 	"User": {
 		"validate":"finbyzerp.api.validate_user"
