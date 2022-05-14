@@ -142,9 +142,9 @@ def get_data(filters):
 	
 		outward_data.append(frappe.db.sql("""
 			SELECT sum(Abs(sle.actual_qty)) as outward_qty, sum(Abs(sle.stock_value_difference)) as consumption,
-			sum(IFNULL(si.amount, IFNULL(dn.amount, IFNULL(se.amount, Abs(sle.stock_value_difference))))) as outward_value,
-			(sum(IFNULL(si.amount, IFNULL(dn.amount, IFNULL(se.amount, Abs(sle.stock_value_difference)))))-sum(Abs(sle.stock_value_difference))) as gross_profit,
-			(((sum(IFNULL(si.amount, IFNULL(dn.amount, IFNULL(se.amount, Abs(sle.stock_value_difference)))))-sum(Abs(sle.stock_value_difference)))/sum(Abs(sle.stock_value_difference))) * 100) as gross_profit_percent,
+			sum(IFNULL(si.base_amount , IFNULL(dn.base_amount, IFNULL(se.amount, Abs(sle.stock_value_difference))))) as outward_value,
+			(sum(IFNULL(si.base_amount, IFNULL(dn.base_amount, IFNULL(se.amount, Abs(sle.stock_value_difference)))))-sum(Abs(sle.stock_value_difference))) as gross_profit,
+			(((sum(IFNULL(si.base_amount, IFNULL(dn.base_amount, IFNULL(se.amount, Abs(sle.stock_value_difference)))))-sum(Abs(sle.stock_value_difference)))/sum(Abs(sle.stock_value_difference))) * 100) as gross_profit_percent,
 			'{}' as month
 			FROM `tabStock Ledger Entry`as sle
 			LEFT JOIN `tabSales Invoice Item` as si ON si.name = sle.voucher_detail_no

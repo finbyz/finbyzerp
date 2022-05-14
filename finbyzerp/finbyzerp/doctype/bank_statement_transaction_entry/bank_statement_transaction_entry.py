@@ -45,7 +45,7 @@ class BankStatementTransactionEntry(Document):
 	def calculte_totals(self):
 		total_amount = 0
 		for row in self.new_transaction_items:
-			total_amount += flt(row.amount)
+			total_amount += row.amount
 		self.total_amount = total_amount
 
 	def validate(self):
@@ -74,10 +74,15 @@ class BankStatementTransactionEntry(Document):
 		statement_headers = self.get_statement_headers()
 		transactions = get_transaction_entries(file_url, statement_headers)
 		for entry in transactions:
-			date = entry[statement_headers["Date"]].strip()
+			date = str(entry[statement_headers["Date"]]).strip()
 			#print("Processing entry DESC:{0}-W:{1}-D:{2}-DT:{3}".format(entry["Particulars"], entry["Withdrawals"], entry["Deposits"], entry["Date"]))
 			if (not date): continue
-			transaction_date = datetime.strptime(date, date_format).date()
+			try:
+				date = datetime.strptime(str(date), date_format + " %H:%M:%S").date()
+			except:
+				pass
+
+			transaction_date = datetime.strptime(str(date), date_format).date()
 			if (self.from_date and transaction_date < datetime.strptime(self.from_date, '%Y-%m-%d').date()): continue
 			if (self.to_date and transaction_date > datetime.strptime(self.to_date, '%Y-%m-%d').date()): continue
 			bank_entry = self.append('new_transaction_items', {})
@@ -89,12 +94,12 @@ class BankStatementTransactionEntry(Document):
 				bank_entry.party_type = mapped_item.mapped_data_type
 				bank_entry.party = mapped_item.mapped_data
 			else:
-				bank_entry.party_type = "Supplier" if not entry[statement_headers["Deposits"]].strip() else "Customer"
+				bank_entry.party_type = "Supplier" if not str(entry[statement_headers["Deposits"]]).strip() else "Customer"
 				party_list = frappe.get_all(bank_entry.party_type, fields=["name"])
 				parties = [party.name for party in party_list]
 				matches = difflib.get_close_matches(frappe.safe_decode(bank_entry.description.lower()), parties, 1, 0.4)
 				if len(matches) > 0: bank_entry.party = matches[0]
-			bank_entry.amount = -float(entry[statement_headers["Withdrawals"]]) if not entry[statement_headers["Deposits"]].strip() else float(entry[statement_headers["Deposits"]])
+			bank_entry.amount = -float(entry[statement_headers["Withdrawals"]]) if not str(entry[statement_headers["Deposits"]]).strip() else float(entry[statement_headers["Deposits"]])
 		self.map_unknown_transactions()
 		self.map_transactions_on_journal_entry()
 
@@ -159,7 +164,7 @@ class BankStatementTransactionEntry(Document):
 					inv_entry.outstanding_amount = doc.outstanding_amount
 					inv_entry.allocated_amount = min(float(doc.outstanding_amount), amount)
 
-				amount -= flt(inv_entry.get('allocated_amount'))
+				amount -= inv_entry.get('allocated_amount')
 				if (amount < 0): break
 
 			amount = abs(entry.amount)
@@ -429,8 +434,8 @@ def get_transaction_entries(file_url, headers):
 		rows = get_rows_from_xls_file(filename)
 	else:
 		frappe.throw(_("Only .csv and .xlsx files are supported currently"))
-
 	stmt_headers = headers.values()
+
 	for row in rows:
 		if len(row) == 0 or row[0] == None or not row[0]: continue
 		#print("Processing row {0}".format(row))
@@ -439,6 +444,7 @@ def get_transaction_entries(file_url, headers):
 			transactions.append(transaction)
 		elif is_headers_present(stmt_headers, row):
 			header_index = get_header_index(stmt_headers, row)
+
 	return transactions
 
 def get_rows_from_xls_file(filename):
