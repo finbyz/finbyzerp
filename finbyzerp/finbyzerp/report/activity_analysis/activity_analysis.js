@@ -24,7 +24,7 @@ frappe.query_reports["Activity Analysis"] = {
             "fieldname": "doctype",
             "label": __("DocType"),
             "fieldtype": "Select",
-            "options": "\nQuotation\nPurchase Order\nPurchase Receipt\nPurchase Invoice\nSales Order\nDelivery Note\nSales Invoice\nStock Entry"
+            "options": "\nQuotation\nPurchase Order\nPurchase Receipt\nPurchase Invoice\nSales Order\nDelivery Note\nSales Invoice\nStock Entry\nJournal Entry\nPayment Entry\nJob Card"
         },
         {
             "fieldname": "user",

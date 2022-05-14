@@ -20,7 +20,7 @@ def validate_document_name(doc, method=None):
 	if country != "India" or getdate(doc.posting_date) < getdate("2021-04-01"):
 		return
 	
-	if len(doc.name) > 14 and not frappe.db.get_single_value("System Settings",'disable_invoice_length_check'):
+	if len(doc.name) > 14 and not frappe.db.get_single_value("System Settings",'disable_invoice_length_check') and not doc.amended_from:
 		frappe.throw(_(f"For GST fillings Invoice name should be less than 16 digits, to keep scope of amened documents please ensure invoice number doesn't go beyond 14 digits {doc.name}"))
 
 	if einvoice_enable and len(doc.name) > 16:
