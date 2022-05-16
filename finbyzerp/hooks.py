@@ -238,6 +238,10 @@ from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as
 from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
 gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
 
+from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
+from erpnext.stock.report.stock_ledger import stock_ledger
+stock_ledger.execute = stock_ledger_execute
+
 # Override Stock and Accounts diff validation for throw when amount is > 5
 from erpnext.accounts import utils
 from finbyzerp.api import check_if_stock_and_account_balance_synced
