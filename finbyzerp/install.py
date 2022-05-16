@@ -108,9 +108,10 @@ def after_install():
 	frappe.db.commit()
 
 def update_website_settings():
-    doc = frappe.get_doc("Website Settings")
-    doc.home_page = "login"
-    doc.app_name = "FinbyzERP"
-    doc.disable_signup = 1
-    doc.save(ignore_permissions=True)
-    doc.save(ignore_permissions=True)
+	doc = frappe.get_doc("Website Settings")
+	doc.home_page = "login"
+	doc.app_name = "FinbyzERP"
+	doc.disable_signup = 1
+	doc.hide_footer_signup = 1
+	doc.save(ignore_permissions=True)
+	doc.save(ignore_permissions=True)
