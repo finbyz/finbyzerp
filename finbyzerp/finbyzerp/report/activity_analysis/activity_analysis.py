@@ -12,6 +12,10 @@ def execute(filters=None):
 	filters = frappe.parse_json(filters)
 	if filters.get('timespan') and not filters.timespan == "":
 		filters.from_date, filters.to_date = get_timespan_date_range(filters.timespan)
+
+	if filters.get("doctype") == "Job Card":
+		return [],[]
+
 	if filters.show_details == 1:
 		columns = get_columns_details()
 		data = get_data_details(filters)
@@ -37,7 +41,7 @@ def get_columns_details():
 
 def get_data_details(filters):
 
-	doctype_list = ['Quotation', 'Purchase Order', 'Purchase Receipt', 'Purchase Invoice', 'Sales Order', 'Delivery Note', 'Sales Invoice','Stock Entry','Journal Entry', 'Job Card','Payment Entry']
+	doctype_list = ['Quotation', 'Purchase Order', 'Purchase Receipt', 'Purchase Invoice', 'Sales Order', 'Delivery Note', 'Sales Invoice','Stock Entry','Journal Entry', 'Payment Entry']
 	
 	child_doctype_list = ['Quotation Item', 'Purchase Order Item', 'Purchase Receipt Item', 'Purchase Invoice Item', 'Sales Order Item', 'Delivery Note Item', 'Sales Invoice Item','Stock Entry Detail','Journal Entry Account']
 	doctype = []
@@ -62,12 +66,7 @@ def get_data_details(filters):
 	for idx,doc in enumerate(doctype):
 		if doc == "Payment Entry":
 			other_fields = "party_name as 'Item Name', paid_amount as 'Amount',"
-			owner = 'owner'
-		elif doc == "Job Card":
-			owner = "IF(submitted_by , submitted_by, modified_by)"
-			other_fields = "operation as 'Item Name', IF(total_completed_qty > 0, total_completed_qty, 0) as 'Amount',"
 		else:
-			owner = 'owner'
 			other_fields = ''
 		title_field = frappe.db.get_value("Property Setter",{"doc_type":doc,"property":'title_field'},'value')
 		if not title_field:
@@ -86,21 +85,21 @@ def get_data_details(filters):
 		
 		dt = frappe.db.sql("""
 			SELECT
-				name as 'ID', {date} as 'Date', {owner} as 'Created By',{other_fields} {title_field} as 'Title'
+				name as 'ID', {date} as 'Date', owner as 'Created By',{other_fields} {title_field} as 'Title'
 			FROM
 				`tab{doc}`
 			WHERE
 				docstatus < 2
 				{conditions}
 			ORDER BY
-				modified DESC""".format(date=date, title_field=title_field, owner = owner, other_fields=other_fields, doc=doc, conditions=conditions), as_dict=1)
+				modified DESC""".format(date=date, title_field=title_field, other_fields=other_fields, doc=doc, conditions=conditions), as_dict=1)
 
 		d = dt[:]
 		id = 0
 
 		for row in d:
 			row["Document"] = doc
-			if row['Document'] in ["Payment Entry", "Job Card"]:
+			if row['Document'] in ["Payment Entry"]:
 				row["Owner"] = get_user_fullname(row["Created By"])
 			else:
 				id = insert_items(dt, row, child_doctype_list[idx], id+1)
@@ -126,7 +125,7 @@ def insert_items(data, row, doc, id):
 			FROM
 				`tab{0}`
 			WHERE
-				parent = '{1}' """.format(doc, row['ID']), as_dict=1)
+				parent = "{1}" """.format(doc, row['ID']), as_dict=1)
 
 	if items:
 		row["Item Name"] = items[0]["Item Name"]
@@ -189,7 +188,7 @@ def get_columns():
 
 def get_data(filters):
 
-	doctype_list = ['Quotation', 'Purchase Order', 'Purchase Receipt', 'Purchase Invoice', 'Sales Order', 'Delivery Note', 'Sales Invoice','Stock Entry','Journal Entry', 'Job Card', 'Payment Entry']
+	doctype_list = ['Quotation', 'Purchase Order', 'Purchase Receipt', 'Purchase Invoice', 'Sales Order', 'Delivery Note', 'Sales Invoice','Stock Entry','Journal Entry', 'Payment Entry']
 	
 	child_doctype_list = ['Quotation Item', 'Purchase Order Item', 'Purchase Receipt Item', 'Purchase Invoice Item', 'Sales Order Item', 'Delivery Note Item', 'Sales Invoice Item','Stock Entry Detail','Journal Entry Account']
 
@@ -207,10 +206,6 @@ def get_data(filters):
 			child_doctype_list = [filters.doctype + " Account"]
 
 	for idx,doc in enumerate(doctype_list):
-		if doc == "Job Card":
-			owner = "IF(submitted_by , submitted_by, modified_by)"
-		else:
-			owner = 'owner'
 		conditions = ''
 		if filters.based_on == "Creation Date":
 			date = 'CAST(creation AS DATE)'
@@ -224,7 +219,7 @@ def get_data(filters):
 		if filters.user:conditions += " and owner = '{0}'".format(filters.user)
 		dt = frappe.db.sql("""
 			SELECT
-				{owner} as owner, count(name) as total_entries
+				owner as owner, count(name) as total_entries
 			FROM
 				`tab{doc}`
 			WHERE
@@ -234,7 +229,7 @@ def get_data(filters):
 				{group_by_field}
 			ORDER BY
 				modified DESC
-		""".format(doc=doc, owner=owner, conditions=conditions,group_by_field="submitted_by" if doc == "Job Card" else 'owner'), as_dict=1)
+		""".format(doc=doc, conditions=conditions,group_by_field='owner'), as_dict=1)
 		
 		dt_map = {}
 		user_tuple = '('
@@ -259,7 +254,7 @@ def get_data(filters):
 			if filters.from_date: conditions += " and {0} >= '{1}'".format(date, filters.from_date)
 			if filters.to_date: conditions += " and {0} <= '{1}'".format(date, filters.to_date)
 			if filters.user:conditions += " and p.owner = '{0}'".format(filters.user)
-			if doc not in ["Payment Entry", "Job Card"]:
+			if doc not in ["Payment Entry"]:
 				items = frappe.db.sql("""
 					select child.owner,count(child.name) as total_items
 					from `tab{}` as child
