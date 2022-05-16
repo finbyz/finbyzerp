@@ -7,6 +7,9 @@
 		"public/js/finbyzerp/ui/page.js",
 		"public/js/finbyzerp/views/workspace/workspace.js",
 		"public/js/finbyzerp/views/container.js",
-		"public/js/frappe/request.js"
+		"public/js/frappe/request.js",
+		"public/js/report_js/stock_balance.js",
+		"public/js/report_js/stock_ledger.js",
+		"public/js/report_js/trial_balance_for_party.js"
     ]
 }
