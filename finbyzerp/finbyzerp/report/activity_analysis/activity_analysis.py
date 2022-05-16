@@ -122,11 +122,11 @@ def insert_items(data, row, doc, id):
 	else:
 		items = frappe.db.sql("""
 			SELECT
-				item_code as 'Item Name', amount as 'Amount', owner as 'Owner'
+				item_code as 'Item Name', amount as 'Amount', owner as 'Owner'	
 			FROM
 				`tab{0}`
 			WHERE
-				parent = '{1}' """.format(doc, row['ID']), as_dict=1)
+				parent = "{1}" """.format(doc, row['ID']), as_dict=1)
 
 	if items:
 		row["Item Name"] = items[0]["Item Name"]
