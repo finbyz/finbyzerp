@@ -92,11 +92,8 @@ frappe.query_reports["Stock Ledger"] = {
 		else if (column.fieldname == "inward_qty" && data && data.inward_qty != 0) {
 			value = `<span style='color:green; font-weight: bold;'>${value}</span>`;
 		}
-        else if (column.fieldname == "qty_after_transaction" && data && data.qty_after_transaction > 0) {
-			value = `<span style='color:green; font-weight: bold;'>${value}</span>`;
-		}
-        else if (column.fieldname == "qty_after_transaction" && data && data.qty_after_transaction < 0) {
-			value = `<span style='color:red; font-weight: bold;'>${value}</span>`;
+        else if (column.fieldname == "qty_after_transaction" && data && data.qty_after_transaction != 0) {
+			value = `<span style='font-weight: bold;'>${value}</span>`;
 		}
 		return value;
 	},
