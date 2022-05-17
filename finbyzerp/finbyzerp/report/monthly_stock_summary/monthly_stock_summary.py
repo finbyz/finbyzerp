@@ -2,6 +2,7 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
+from fileinput import close
 import frappe
 from frappe.utils import getdate
 from dateutil.relativedelta import relativedelta
@@ -21,7 +22,7 @@ def execute(filters=None):
 			"fieldname": "inward_qty",
 			"label": ("Inward Qty"),
 			"fieldtype": "Float",
-			"width": 120
+			"width": 120,
 		},
 		{
 			"fieldname": "inward_value",
@@ -89,17 +90,17 @@ def diff_month(d1, d2):
 
 def get_data(filters):
 	conditions = ''
-	group_by_cond = 'i.item_group'
+	group_by_cond = 'sle.company'
 
-	if not filters.get("item_group") and not filters.get("item_code"):
-		frappe.throw("Item code or Item group has to be selected to generate the report")
+	# if not filters.get("item_group") and not filters.get("item_code"):
+	# 	frappe.throw("Item code or Item group has to be selected to generate the report")
 
 	if filters.get("company"):
 		conditions += " and sle.company = %s" % frappe.db.escape(filters.get("company"))
 
 	if filters.get("item_group"):
 		conditions += " and i.item_group = %s" % frappe.db.escape(filters.get("item_group"))
-		
+		group_by_cond = 'sle.item_group'
 	if filters.get("item_code"):
 		conditions += " and sle.item_code = %s" % frappe.db.escape(filters.get("item_code"))
 		group_by_cond = 'sle.item_code'
@@ -125,43 +126,50 @@ def get_data(filters):
 		opening_data = frappe.db.sql("""
 			SELECT sum(sle.actual_qty) as closing_qty, sum(sle.stock_value_difference) as closing_value
 			FROM `tabStock Ledger Entry` as sle
-			LEFT JOIN `tabItem` as i ON i.name = sle.item_code
+			JOIN `tabItem` as i ON i.name = sle.item_code
 			where sle.is_cancelled = 0 and sle.posting_date < '{}' {}
 		""".format(filters.get('from_date'),conditions),as_dict=True)
 
-	for month, date in result.items():		
-		inward_data.append(frappe.db.sql("""
+	for month, date in result.items():	
+		inward_details = frappe.db.sql("""
 			SELECT sum(sle.actual_qty) as inward_qty, sum(sle.incoming_rate*sle.actual_qty) as inward_value, '{}' as month
 			FROM `tabStock Ledger Entry` as sle
-			LEFT JOIN `tabStock Entry Detail` as se ON se.name = sle.voucher_detail_no
-			LEFT JOIN `tabItem` as i ON i.name = sle.item_code
-			WHERE sle.is_cancelled = 0 and sle.actual_qty > 0 and sle.posting_date BETWEEN '{}' AND '{}' and (se.t_warehouse IS NULL or se.s_warehouse IS NULL) {}
+			JOIN `tabItem` as i ON i.name = sle.item_code
+			WHERE sle.is_cancelled = 0 and sle.actual_qty > 0 and sle.posting_date >= '{}' and sle.posting_date <= '{}' {}
 			group by {}
-		""".format(month,date[0],date[1],conditions,group_by_cond),as_dict=True))
+		""".format(month,date[0],date[1],conditions,group_by_cond),as_dict=True)
+		
+		if inward_details:
+			inward_data.append(inward_details)
+		else:
+			inward_data.append([{"month":month, "inward_qty":0, "inward_value":0}])
 
-	
-		outward_data.append(frappe.db.sql("""
+		outward_details = frappe.db.sql("""
 			SELECT sum(Abs(sle.actual_qty)) as outward_qty, sum(Abs(sle.stock_value_difference)) as consumption,
 			sum(IFNULL(si.base_amount , IFNULL(dn.base_amount, IFNULL(se.amount, Abs(sle.stock_value_difference))))) as outward_value,
 			(sum(IFNULL(si.base_amount, IFNULL(dn.base_amount, IFNULL(se.amount, Abs(sle.stock_value_difference)))))-sum(Abs(sle.stock_value_difference))) as gross_profit,
 			(((sum(IFNULL(si.base_amount, IFNULL(dn.base_amount, IFNULL(se.amount, Abs(sle.stock_value_difference)))))-sum(Abs(sle.stock_value_difference)))/sum(Abs(sle.stock_value_difference))) * 100) as gross_profit_percent,
 			'{}' as month
 			FROM `tabStock Ledger Entry`as sle
+			JOIN `tabItem` as i ON i.name = sle.item_code
 			LEFT JOIN `tabSales Invoice Item` as si ON si.name = sle.voucher_detail_no
 			LEFT JOIN `tabDelivery Note Item` as dn ON dn.name = sle.voucher_detail_no
 			LEFT JOIN `tabStock Entry Detail` as se ON se.name = sle.voucher_detail_no
-			LEFT JOIN `tabItem` as i ON i.name = sle.item_code
-			WHERE sle.is_cancelled = 0 and sle.actual_qty < 0  and sle.posting_date BETWEEN '{}' AND '{}' and (se.t_warehouse IS NULL or se.s_warehouse IS NULL) {}
+			WHERE sle.is_cancelled = 0 and sle.actual_qty < 0  and sle.posting_date >= '{}' and sle.posting_date <= '{}' {}
 			group by {}
-		""".format(month,date[0],date[1],conditions,group_by_cond),as_dict=True))
+		""".format(month,date[0],date[1],conditions,group_by_cond),as_dict=True)
+
+		if outward_details:
+			outward_data.append(outward_details)
+		else:
+			outward_data.append([{"month":month, "outward_qty":0, "consumption":0, "outward_value":0, "gross_profit":0,"gross_profit_percent":0}])
 
 		closing_data.append(frappe.db.sql("""
-			SELECT sum(sle.actual_qty) as closing_qty, sum(sle.stock_value_difference) as closing_value, '{}' as month
+			SELECT IFNULL(sum(sle.actual_qty),0) as closing_qty, IFNULL(sum(sle.stock_value_difference),0) as closing_value, '{}' as month
 			FROM `tabStock Ledger Entry` as sle
-			LEFT JOIN `tabItem` as i ON i.name = sle.item_code
+			JOIN `tabItem` as i ON i.name = sle.item_code
 			where sle.is_cancelled = 0 and sle.posting_date <= '{}' {}
 		""".format(month,date[1],conditions),as_dict=True))
-
 	
 	in_data = [item[0] for item in inward_data if item]
 	out_data = [item[0] for item in outward_data if item]
@@ -173,9 +181,17 @@ def get_data(filters):
 		for row in opening_data:
 			data = [{
 				"month": "Opening",
-				"closing_qty": row.closing_qty,
-				"closing_value": row.closing_value
+				"closing_qty": row.closing_qty or 0,
+				"closing_value": row.closing_value or 0,
+				"inward_qty":0,
+				"inward_value":0,
+				"outward_qty":0,
+				"outward_value":0,
+				"consumption":0,
+				"gross_profit":0,
+				"gross_profit_percent":0
 			}]
+	
 	data += [{**u, **v, **m } for u, v, m in zip_longest(in_data, out_data, close_data, fillvalue={})]
 	return data
 	
