@@ -1,10 +1,8 @@
 import Widget from "./../../../../../../frappe/frappe/public/js/frappe/widgets/base_widget.js";
 
 frappe.provide("frappe.utils");
-console.log('test123')
 export default class OnboardingWidget extends Widget {
 	make_body() {
-		console.log(this)
 		this.steps_wrapper = $(`<div class="onboarding-steps-wrapper"></div>`).appendTo(this.body);
 		this.step_preview = $(`<div class="onboarding-step-preview">
 			<div class="onboarding-step-body"></div>
@@ -194,7 +192,6 @@ export default class OnboardingWidget extends Widget {
 
 	show_form_tour(step) {
 		let route;
-		console.log('call from fddsdrappe')
 		if (step.is_single) {
 			route = frappe.router.slug(step.reference_document);
 		} else {

@@ -1720,14 +1720,14 @@ frappe.ui.form.Form = class FrappeForm {
 
 frappe.validated = 0;
 // Proxy for frappe.validated
-Object.defineProperty(window, 'validated', {
-	get: function() {
-		console.warn('Please use `frappe.validated` instead of `validated`. It will be deprecated soon.'); // eslint-disable-line
-		return frappe.validated;
-	},
-	set: function(value) {
-		console.warn('Please use `frappe.validated` instead of `validated`. It will be deprecated soon.'); // eslint-disable-line
-		frappe.validated = value;
-		return frappe.validated;
-	}
-});
+// Object.defineProperty(window, 'validated', {
+// 	get: function() {
+// 		console.warn('Please use `frappe.validated` instead of `validated`. It will be deprecated soon.'); // eslint-disable-line
+// 		return frappe.validated;
+// 	},
+// 	set: function(value) {
+// 		console.warn('Please use `frappe.validated` instead of `validated`. It will be deprecated soon.'); // eslint-disable-line
+// 		frappe.validated = value;
+// 		return frappe.validated;
+// 	}
+// });

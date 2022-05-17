@@ -66,7 +66,6 @@ frappe.ui.form.FormTour = class FormTour {
 
 	build_steps() {
 		this.driver_steps = [];
-		console.log(this)
 		this.tour.steps.forEach((step) => {
 			const on_next = () => {
 				if (!this.is_next_condition_satisfied(step)) {

@@ -13,6 +13,6 @@
 		"public/js/report_js/trial_balance_for_party.js",
 		"public/js/frappe/form/form_tour.js",
 		"public/js/frappe/form/form.js",
-		"public/js/frappe/custom_widgets/widget_group.js"
+		"public/js/frappe/widgets/widget_group.js"
     ]
 }
