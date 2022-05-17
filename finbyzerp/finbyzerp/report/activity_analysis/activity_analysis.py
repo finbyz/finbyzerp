@@ -81,7 +81,7 @@ def get_data_details(filters):
 
 		if filters.from_date: conditions += " and {0} >= '{1}'".format(date, filters.from_date)
 		if filters.to_date: conditions += " and {0} <= '{1}'".format(date, filters.to_date)
-		if filters.user:conditions += " and {0} = '{1}'".format(owner, filters.user)
+		if filters.user:conditions += " and owner = '{0}'".format(filters.user)
 		
 		dt = frappe.db.sql("""
 			SELECT
