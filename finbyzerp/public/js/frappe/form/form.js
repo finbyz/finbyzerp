@@ -1,7 +1,6 @@
 frappe.provide('frappe.ui.form');
 frappe.provide('frappe.model.docinfo');
-frappe.provide('frappe.ui.Page')
-frappe.provide("frappe.ui.form.FormTour")
+
 import '../../../../../../frappe/frappe/public/js/frappe/form/quick_entry';
 import '../../../../../../frappe/frappe/public/js/frappe/form/toolbar';
 import '../../../../../../frappe/frappe/public/js/frappe/form/dashboard';
@@ -13,14 +12,14 @@ import '../../../../../../frappe/frappe/public/js/frappe/form/script_manager';
 import '../../../../../../frappe/frappe/public/js/frappe/form/script_helpers';
 import '../../../../../../frappe/frappe/public/js/frappe/form/sidebar/form_sidebar';
 import '../../../../../../frappe/frappe/public/js/frappe/form/footer/footer';
+import './form_tour';
 
 
-
-frappe.ui.form.Controller = class FormController {
-	constructor(opts) {
+frappe.ui.form.Controller = Class.extend({
+	init: function(opts) {
 		$.extend(this, opts);
 	}
-};
+});
 
 frappe.ui.form.Form = class FrappeForm {
 	constructor(doctype, parent, in_form, doctype_layout_name) {
