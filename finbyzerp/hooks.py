@@ -217,57 +217,57 @@ scheduler_events = {
 	]
 }
 
-# # BOM Stock Calculated Report Override:
+# BOM Stock Calculated Report Override:
 # from finbyzerp.finbyzerp.report.bom_stock_calculated import execute as bsc_execute
 # from erpnext.manufacturing.report.bom_stock_calculated import bom_stock_calculated
 # bom_stock_calculated.execute = bsc_execute
 
-# from frappe.utils import pdf
-# from finbyzerp.print_format import get_pdf
-# pdf.get_pdf = get_pdf
+from frappe.utils import pdf
+from finbyzerp.print_format import get_pdf
+pdf.get_pdf = get_pdf
 
-# # Item wise sales register and purchase register reports changes for selecting account_head instead of description from tax table
-# from finbyzerp.finbyzerp.report.item_wise_sales_register import execute as item_wise_sales_register_execute
-# from erpnext.accounts.report.item_wise_sales_register import item_wise_sales_register
-# item_wise_sales_register.execute = item_wise_sales_register_execute
+# Item wise sales register and purchase register reports changes for selecting account_head instead of description from tax table
+from finbyzerp.finbyzerp.report.item_wise_sales_register import execute as item_wise_sales_register_execute
+from erpnext.accounts.report.item_wise_sales_register import item_wise_sales_register
+item_wise_sales_register.execute = item_wise_sales_register_execute
 
-# from finbyzerp.finbyzerp.report.item_wise_purchase_register import execute as item_wise_purchase_register_execute
-# from erpnext.accounts.report.item_wise_purchase_register import item_wise_purchase_register
-# item_wise_purchase_register.execute = item_wise_purchase_register_execute
+from finbyzerp.finbyzerp.report.item_wise_purchase_register import execute as item_wise_purchase_register_execute
+from erpnext.accounts.report.item_wise_purchase_register import item_wise_purchase_register
+item_wise_purchase_register.execute = item_wise_purchase_register_execute
 
-# from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
-# from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
-# gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
+from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
+from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
+gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
 
-# from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
-# from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
-# gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
+from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
+from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
+gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
 
-# from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
-# from erpnext.stock.report.stock_ledger import stock_ledger
-# stock_ledger.execute = stock_ledger_execute
+from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
+from erpnext.stock.report.stock_ledger import stock_ledger
+stock_ledger.execute = stock_ledger_execute
 
-# from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
-# from erpnext.stock.report.stock_balance import stock_balance
-# stock_balance.execute = stock_balance_execute
+from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
+from erpnext.stock.report.stock_balance import stock_balance
+stock_balance.execute = stock_balance_execute
 
-# from finbyzerp.finbyzerp.report.trial_balance_for_party import execute as trial_balance_for_party_execute
-# from erpnext.accounts.report.trial_balance_for_party import trial_balance_for_party
-# trial_balance_for_party.execute = trial_balance_for_party_execute
+from finbyzerp.finbyzerp.report.trial_balance_for_party import execute as trial_balance_for_party_execute
+from erpnext.accounts.report.trial_balance_for_party import trial_balance_for_party
+trial_balance_for_party.execute = trial_balance_for_party_execute
 
-# # Override Stock and Accounts diff validation for throw when amount is > 5
-# from erpnext.accounts import utils
-# from finbyzerp.api import check_if_stock_and_account_balance_synced
-# utils.check_if_stock_and_account_balance_synced = check_if_stock_and_account_balance_synced
+# Override Stock and Accounts diff validation for throw when amount is > 5
+from erpnext.accounts import utils
+from finbyzerp.api import check_if_stock_and_account_balance_synced
+utils.check_if_stock_and_account_balance_synced = check_if_stock_and_account_balance_synced
 
-# from frappe import utils
-# from finbyzerp.api import get_timespan_date_range
-# utils.get_timespan_date_range = get_timespan_date_range
+from frappe import utils
+from finbyzerp.api import get_timespan_date_range
+utils.get_timespan_date_range = get_timespan_date_range
 
-# from frappe.model import db_query
-# from finbyzerp.api import get_date_range
-# db_query.get_date_range = get_date_range
+from frappe.model import db_query
+from finbyzerp.api import get_date_range
+db_query.get_date_range = get_date_range
 
-# from frappe.workflow.doctype.workflow_action import workflow_action
-# from finbyzerp.api import process_workflow_actions
-# workflow_action.process_workflow_actions = process_workflow_actions
+from frappe.workflow.doctype.workflow_action import workflow_action
+from finbyzerp.api import process_workflow_actions
+workflow_action.process_workflow_actions = process_workflow_actions
