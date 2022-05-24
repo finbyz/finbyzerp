@@ -247,9 +247,12 @@ from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_exec
 from erpnext.stock.report.stock_ledger import stock_ledger
 stock_ledger.execute = stock_ledger_execute
 
-from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
-from erpnext.stock.report.stock_balance import stock_balance
-stock_balance.execute = stock_balance_execute
+try:
+	from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
+	from erpnext.stock.report.stock_balance import stock_balance
+	stock_balance.execute = stock_balance_execute
+except:
+	pass
 
 from finbyzerp.finbyzerp.report.trial_balance_for_party import execute as trial_balance_for_party_execute
 from erpnext.accounts.report.trial_balance_for_party import trial_balance_for_party

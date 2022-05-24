@@ -121,6 +121,11 @@ frappe.query_reports["Party Ledger"] = {
 			"fieldtype": "Select",
 			"options": erpnext.get_presentation_currency_list()
 		},
+		{
+			"label": __("Print With Item"),
+			"fieldname": "print_with_item",
+			"fieldtype": "Check"
+		},	
 		// {
 		// 	"fieldname": "show_opening_entries",
 		// 	"label": __("Show Opening Entries"),

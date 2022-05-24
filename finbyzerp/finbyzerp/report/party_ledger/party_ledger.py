@@ -131,7 +131,7 @@ def get_gl_entries(filters):
 	gl_entries = frappe.db.sql(
 		"""
 		select
-			posting_date, account, party_type, party,
+			name,posting_date, account, party_type, party,
 			voucher_type, voucher_no, cost_center, project,
 			against_voucher_type, against_voucher, account_currency,
 			remarks, against, is_opening, GROUP_CONCAT(account SEPARATOR '<br>') as accounts_list,
@@ -245,9 +245,66 @@ def get_data_with_opening_closing(filters, account_details, gl_entries):
 	data.append(totals.total)
 
 	# closing
+	
 	data.append(totals.closing)
-
+	if filters.get('print_with_item'):
+		purchase_invoice_map,total_taxes_and_charges = get_sales_purchase_invoice_data(filters)
+		
+		for d in data:
+			try:
+				if d.get('name'):
+					d['si_details'] = html_sales_invoice_purchase_invoic_data(purchase_invoice_map[d.name],total_taxes_and_charges[d.name])
+				else:
+					d['si_details'] = ''
+			except KeyError:
+				d['si_details'] = ''
 	return data
+
+def get_sales_purchase_invoice_data(filters):
+	conditions = "gle.is_cancelled = 0"
+	conditions += f" AND gle.`posting_date` >= '{filters.from_date}'"	
+	conditions += f" AND gle.`posting_date` <= '{filters.to_date}'"
+	conditions += f" AND gle.`party_type` = '{filters.party_type}'" if filters.get('party_type') else f" AND gle.`party_type` in ('Customer', 'Supplier')"
+	conditions += f" AND gle.`party` = '{filters.party}'" if filters.get('party') else ''
+	
+	pi_data = frappe.db.sql(f"""
+		SELECT 
+			gle.name, pii.parent as pi_name,pii.item_name,pii.item_code, pi.total,pi.rounded_total, pii.rate, pii.qty
+		FROM
+			`tabGL Entry` as gle
+			JOIN `tabPurchase Invoice Item` as pii ON pii.parent=gle.voucher_no
+			JOIN `tabPurchase Invoice` as pi ON pi.name = gle.voucher_no
+		WHERE
+			{conditions} AND gle.voucher_type = 'Purchase Invoice'
+	""", as_dict = True)
+	
+	pi_data += frappe.db.sql(f"""
+		SELECT 
+			gle.name, sii.parent as si_name,sii.item_name,sii.item_code, si.total,si.rounded_total, sii.rate, sii.qty
+		FROM
+			`tabGL Entry` as gle
+			JOIN `tabSales Invoice Item` as sii ON sii.parent=gle.voucher_no
+			JOIN `tabSales Invoice` as si ON si.name = gle.voucher_no
+		WHERE
+			{conditions} AND gle.voucher_type = 'Sales Invoice'
+	""", as_dict = True)
+	
+	purchase_invoice_map = {}
+	total_taxes_and_charges = {}
+	for row in pi_data:
+		total_taxes_and_charges[row.name] = row.rounded_total - row.total
+		purchase_invoice_map.setdefault(row.name, {})\
+		.setdefault(row.item_code, {})\
+		.setdefault(row.rate, frappe._dict({
+				"qty": 0.0,
+				"item_name": ""
+		}))
+		purchase_invoice__dict = purchase_invoice_map[row.name][row.item_code][row.rate]
+		purchase_invoice__dict.qty += row.qty
+		purchase_invoice__dict.item_name += row.item_name
+
+	return purchase_invoice_map,total_taxes_and_charges
+
 
 def get_totals_dict():
 	def _get_debit_credit_dict(label):
@@ -380,6 +437,28 @@ def get_result_as_list(data, filters):
 
 		data_min = [i for i in data if i]
 	return data_min
+
+
+def html_sales_invoice_purchase_invoic_data(purchase_invoice_map,total_taxes_and_charges):
+	table = ""
+	for item_code,value in purchase_invoice_map.items():
+			for k,v in value.items():
+				table+= f"""
+						<p style="font-size:10px">
+							<strong>{v["item_name"]}</strong>
+						</p>
+						<p style="font-size:10px">
+							{v["qty"]} x {frappe.format(k,{'fieldtype': 'Currency'})} = <span><strong>{frappe.format(v["qty"] * k,{'fieldtype': 'Currency'})}</strong></span>
+						</p>	
+					"""
+	if total_taxes_and_charges:
+		table += f"""<p>
+			<span><strong>Taxes & Charges = {frappe.format(total_taxes_and_charges,{'fieldtype': 'Currency'})}</strong></span>
+		</p>
+	"""
+	return table
+
+
 
 def get_supplier_invoice_details():
 	inv_details = {}

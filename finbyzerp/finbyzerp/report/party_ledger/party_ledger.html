@@ -40,7 +40,10 @@
 				<td>{%= data[i].voucher_type %}
 					<br>{%= data[i].voucher_no %}</td>
 				<td>
-					<strong>{%= data[i].party || data[i].account %}</strong>
+					<strong>{%= data[i].party || data[i].account %}s</strong>
+					{% if (filters.print_with_item == 1) { %}
+						{{ data[i].si_details }}
+					{% } %}
 					<br>{%= data[i].debit_credit_list%}
 					{% if(data[i].bill_no) { %}
 						<br>{%= __("Supplier Invoice No") %}: {%= data[i].bill_no %}
