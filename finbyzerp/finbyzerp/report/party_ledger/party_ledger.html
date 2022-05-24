@@ -40,7 +40,7 @@
 				<td>{%= data[i].voucher_type %}
 					<br>{%= data[i].voucher_no %}</td>
 				<td>
-					<strong>{%= data[i].party || data[i].account %}s</strong>
+					<strong>{%= data[i].party || data[i].account %}</strong>
 					{% if (filters.print_with_item == 1) { %}
 						{{ data[i].si_details }}
 					{% } %}
