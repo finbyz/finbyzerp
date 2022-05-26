@@ -126,6 +126,56 @@ frappe.ui.form.Form = class FrappeForm {
 			ignore_inputs: true,
 			condition: () => !this.is_new()
 		});
+
+		let grid_shortcut_keys = [
+			{
+				'shortcut': 'Up Arrow',
+				'description': __('Move cursor to above row')
+			},
+			{
+				'shortcut': 'Down Arrow',
+				'description': __('Move cursor to below row')
+			},
+			{
+				'shortcut': 'tab',
+				'description': __('Move cursor to next column')
+			},
+			{
+				'shortcut': 'shift+tab',
+				'description': __('Move cursor to previous column')
+			},
+			{
+				'shortcut': 'Ctrl+up',
+				'description': __('Add a row above the current row')
+			},
+			{
+				'shortcut': 'Ctrl+down',
+				'description': __('Add a row below the current row')
+			},
+			{
+				'shortcut': 'Ctrl+shift+up',
+				'description': __('Add a row at the top')
+			},
+			{
+				'shortcut': 'Ctrl+shift+down',
+				'description': __('Add a row at the bottom')
+			},
+			{
+				'shortcut': 'shift+alt+down',
+				'description': __('To duplcate current row')
+			}
+		];
+
+		grid_shortcut_keys.forEach(row => {
+			frappe.ui.keys.add_shortcut({
+				shortcut: row.shortcut,
+				page: this.page,
+				description: __(row.description),
+				ignore_inputs: true,
+				condition: () => !this.is_new()
+			});
+		});
+
 	}
 
 	setup_std_layout() {
@@ -770,37 +820,33 @@ frappe.ui.form.Form = class FrappeForm {
 	}
 
 	_cancel(btn, callback, on_error, skip_confirm) {
-		const cancel_doc = () => {
-			frappe.validated = true;
-			this.script_manager.trigger("before_cancel").then(() => {
-				if (!frappe.validated) {
-					return this.handle_save_fail(btn, on_error);
-				}
-
-				const original_name = this.docname;
-				const after_cancel = (r) => {
-					if (r.exc) {
-						this.handle_save_fail(btn, on_error);
-					} else {
-						frappe.utils.play_sound("cancel");
-						callback && callback();
-						this.script_manager.trigger("after_cancel");
-						frappe.run_serially([
-							() => this.rename_notify(this.doctype, original_name, r.docs[0].name),
-							() => frappe.router.clear_re_route(this.doctype, original_name),
-							() => this.refresh(),
-						]);
+			const me = this;
+			const cancel_doc = () => {
+				frappe.validated = true;
+				me.script_manager.trigger("before_cancel").then(() => {
+					if (!frappe.validated) {
+						return me.handle_save_fail(btn, on_error);
 					}
-				};
-				frappe.ui.form.save(this, "cancel", after_cancel, btn);
-			});
-		}
-
-		if (skip_confirm) {
-			cancel_doc();
-		} else {
-			frappe.confirm(__("Permanently Cancel {0}?", [this.docname]), cancel_doc, this.handle_save_fail(btn, on_error));
-		}
+	
+					var after_cancel = function(r) {
+						if (r.exc) {
+							me.handle_save_fail(btn, on_error);
+						} else {
+							frappe.utils.play_sound("cancel");
+							me.refresh();
+							callback && callback();
+							me.script_manager.trigger("after_cancel");
+						}
+					};
+					frappe.ui.form.save(me, "cancel", after_cancel, btn);
+				});
+			}
+	
+			if (skip_confirm) {
+				cancel_doc();
+			} else {
+				frappe.confirm(__("Permanently Cancel {0}?", [this.docname]), cancel_doc, me.handle_save_fail(btn, on_error));
+			}
 	};
 
 	savetrash() {
@@ -1093,12 +1139,24 @@ frappe.ui.form.Form = class FrappeForm {
 	}
 
 	// UTILITIES
-	add_fetch(link_field, src_field, tar_field) {
-		if(!this.fetch_dict[link_field]) {
-			this.fetch_dict[link_field] = {'columns':[], 'fields':[]};
-		}
-		this.fetch_dict[link_field].columns.push(src_field);
-		this.fetch_dict[link_field].fields.push(tar_field);
+	add_fetch(link_field, source_field, target_field, target_doctype) {
+		/*
+		Example fetch dict to get sender_email from email_id field in sender:
+			{
+				"Notification": {
+					"sender": {
+						"sender_email": "email_id"
+					}
+				}
+			}
+		*/
+
+		if (!target_doctype) target_doctype = "*";
+
+		// Target field kept as key because source field could be non-unique
+		this.fetch_dict
+			.setDefault(target_doctype, {})
+			.setDefault(link_field, {})[target_field] = source_field;
 	}
 
 	has_perm(ptype) {

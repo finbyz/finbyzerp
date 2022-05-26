@@ -148,14 +148,17 @@ override_doctype_dashboards = {
 
 doc_events = {
 	"Customer": {
-		"validate":"finbyzerp.api.customer_validate"
+		"validate":"finbyzerp.api.customer_validate",
+		"before_rename": "finbyzerp.finbyzerp.doc_events.customer.before_rename"
 	},
 	"Supplier": {
-		"validate":"finbyzerp.api.supplier_validate"
+		"validate":"finbyzerp.api.supplier_validate",
+		"before_rename": "finbyzerp.finbyzerp.doc_events.supplier.before_rename"
 	},
 	"Item": {
 		"validate":"finbyzerp.finbyzerp.doc_events.item.validate",
-		"before_naming":"finbyzerp.finbyzerp.doc_events.item.before_validate"
+		"before_naming":"finbyzerp.finbyzerp.doc_events.item.before_validate",
+		"before_rename": "finbyzerp.finbyzerp.doc_events.item.before_rename"
 	},
 	"User": {
 		"validate":"finbyzerp.api.validate_user"
@@ -274,3 +277,11 @@ db_query.get_date_range = get_date_range
 from frappe.workflow.doctype.workflow_action import workflow_action
 from finbyzerp.api import process_workflow_actions
 workflow_action.process_workflow_actions = process_workflow_actions
+
+from erpnext.accounts import general_ledger
+from finbyzerp.finbyzerp.override.general_ledger import check_freezing_date
+general_ledger.check_freezing_date = check_freezing_date
+
+from erpnext.stock.doctype.stock_ledger_entry.stock_ledger_entry import StockLedgerEntry
+from finbyzerp.finbyzerp.override.stock_ledger_entry import check_stock_frozen_date
+StockLedgerEntry.check_stock_frozen_date = check_stock_frozen_date
