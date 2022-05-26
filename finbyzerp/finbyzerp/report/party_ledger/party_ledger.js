@@ -125,7 +125,13 @@ frappe.query_reports["Party Ledger"] = {
 			"label": __("Print With Item"),
 			"fieldname": "print_with_item",
 			"fieldtype": "Check"
-		},	
+		},
+		{
+			"label": __("Print With Description"),
+			"fieldname": "print_with_description",
+			"fieldtype": "Check",
+			"default":1
+		},		
 		// {
 		// 	"fieldname": "show_opening_entries",
 		// 	"label": __("Show Opening Entries"),

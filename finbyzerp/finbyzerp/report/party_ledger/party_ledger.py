@@ -419,13 +419,14 @@ def get_result_as_list(data, filters):
 			
 			d['debit_credit_list'] = "<table width='100%%' class='tbspace'><tbody>"
 			for x, y, z in zip(accounts_list, dr_cr, debit_credit_list):
-				d['debit_credit_list'] += """
-				<tr>
-					<td width='70%%'>{}</td>
-					<td>{}</td>
-					<td align='right'>{}</td>
-				</tr>
-				""".format(x, y, z)
+				if filters.get("print_with_description"):
+					d['debit_credit_list'] += """
+					<tr>
+						<td width='70%%'>{}</td>
+						<td>{}</td>
+						<td align='right'>{}</td>
+					</tr>
+					""".format(x, y, z)
 
 			d['debit_credit_list'] += "<tbody></table>"
 		debit_credit_list = None
