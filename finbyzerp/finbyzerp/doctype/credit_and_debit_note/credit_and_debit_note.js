@@ -349,6 +349,7 @@ function Calculate_taxes_and_totals(frm){
 		frm.set_value("purchase_taxes_and_charges",frm.doc.taxes_and_charges)
 		frm.refresh();
 	}
+	delete frm.doc['taxes']
 	// return frappe.call({
 	// 	method:"calculate_debit_credit_taxes",
 	// 	doc:frm.doc,
