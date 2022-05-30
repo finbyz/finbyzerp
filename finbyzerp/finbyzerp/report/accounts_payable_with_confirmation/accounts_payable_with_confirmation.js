@@ -176,7 +176,10 @@ function make_payment_entry(doctype, docname){
 		callback: function(r) {
 			if (r.message){
 				HideButton(docname);
-				frappe.query_report.refresh();
+				frappe.msgprint(r.message)
+				setTimeout((()=>{
+					frappe.query_report.refresh();
+				}),500)
 			}
 		}
 	})
