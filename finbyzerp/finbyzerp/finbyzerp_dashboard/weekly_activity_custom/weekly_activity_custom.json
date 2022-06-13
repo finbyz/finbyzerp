@@ -51,7 +51,7 @@
   }
  ],
  "creation": "2022-05-06 15:44:07.450817",
- "dashboard_name": "Weekly Activity Custom",
+ "dashboard_name": "Weekly Activity",
  "docstatus": 0,
  "doctype": "Dashboard",
  "idx": 0,
@@ -60,6 +60,6 @@
  "modified": "2022-05-10 16:13:32.693135",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
- "name": "Weekly Activity Custom",
+ "name": "Weekly Activity",
  "owner": "Administrator"
 }
