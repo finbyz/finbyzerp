@@ -37,7 +37,16 @@ def execute(filters=None):
 		"party_type": "Supplier",
 		"naming_by": ["Buying Settings", "supp_master_name"],
 	}
-	return ReceivablePayableReport(filters).run(args)
+	final_data=[]
+	columns, data, col, chart, row, skip_total_row=ReceivablePayableReport(filters).run(args)
+	for each in data:
+		if filters.get('outstanding_amount'):
+			if each.get('outstanding') >= filters.get('outstanding_amount'):
+				final_data.append(each)
+		else:
+			final_data.append(each)
+	return columns, final_data, col, chart, row, skip_total_row
+	# return ReceivablePayableReport(filters).run(args)
 
 
 class ReceivablePayableReport(object):
@@ -263,7 +272,7 @@ class ReceivablePayableReport(object):
 				abs(row.outstanding_in_account_currency) > 1.0 / 10**self.currency_precision
 			):
 				# non-zero oustanding, we must consider this row
-
+				exist = frappe.db.exists("Payment Entry Reference", {'reference_name': row.voucher_no,'docstatus':0})
 				if self.is_invoice(row) and self.filters.based_on_payment_terms:
 					# is an invoice, allocate based on fifo
 					# adds a list `payment_terms` which contains new rows for each term
@@ -279,17 +288,39 @@ class ReceivablePayableReport(object):
 						self.allocate_extra_payments_or_credits(row)
 					else:
 						self.append_row(row)
-						if row.on_hold:
+						if not exist and row.voucher_type == "Purchase Invoice" and row.outstanding > 0:
 							row.payment_entry = f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #1581E1; padding: 3px 5px;border-radius: 5px;'
 								id = "{row['voucher_no']}" target="_blank" doctype = '{row['voucher_type']}' docname = '{row['voucher_no']}'
 								onClick=make_payment_entry(this.getAttribute('doctype'),this.getAttribute('docname'))>Payment</button>"""
+						if row.voucher_type == "Purchase Invoice":
+							if not row.on_hold:
+								row.hold_payment = f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #1581E1; padding: 3px 5px;border-radius: 5px;'
+									doctype = '{row['voucher_type']}' docname = '{row['voucher_no']}'
+									onClick=hold_payment(this.getAttribute('doctype'),this.getAttribute('docname'))>Hold Payment</button>"""
+							if row.on_hold:
+								row.hold_payment = f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #1581E1; padding: 3px 5px;border-radius: 5px;'
+									doctype = '{row['voucher_type']}' docname = '{row['voucher_no']}'
+									onClick=unhold_payment(this.getAttribute('doctype'),this.getAttribute('docname'))>Unhold Payment</button>"""
+						else:
+							row.on_hold = None
+
 				else:
 					self.append_row(row)
-					if row.on_hold:
+					if not exist and row.voucher_type == "Purchase Invoice" and row.outstanding > 0:
 						row.payment_entry = f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #1581E1; padding: 3px 5px;border-radius: 5px;'
 							id = "{row['voucher_no']}" target="_blank" doctype = '{row['voucher_type']}' docname = '{row['voucher_no']}'
 							onClick=make_payment_entry(this.getAttribute('doctype'),this.getAttribute('docname'))>Payment</button>"""
-
+					if row.voucher_type == "Purchase Invoice":
+						if not row.on_hold:
+							row.hold_payment = f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #1581E1; padding: 3px 5px;border-radius: 5px;'
+								doctype = '{row['voucher_type']}' docname = '{row['voucher_no']}'
+								onClick=hold_payment(this.getAttribute('doctype'),this.getAttribute('docname'))>Hold Payment</button>"""
+						if row.on_hold:
+							row.hold_payment = f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #1581E1; padding: 3px 5px;border-radius: 5px;'
+								doctype = '{row['voucher_type']}' docname = '{row['voucher_no']}'
+								onClick=unhold_payment(this.getAttribute('doctype'),this.getAttribute('docname'))>Unhold Payment</button>"""
+					else:
+						row.on_hold = None
 		if self.filters.get("group_by_party"):
 			self.append_subtotal_row(self.previous_party)
 			if self.data:
@@ -367,7 +398,7 @@ class ReceivablePayableReport(object):
 		if self.party_type == "Customer":
 			si_list = frappe.db.sql(
 				"""
-				select name, due_date, po_no
+				select name, due_date, po_no, broker
 				from `tabSales Invoice`
 				where posting_date <= %s
 			""",
@@ -400,7 +431,7 @@ class ReceivablePayableReport(object):
 		if self.party_type == "Supplier":
 				for pi in frappe.db.sql(
 					"""
-					select name, due_date, bill_no, bill_date, on_hold {}
+					select name, due_date, bill_no, bill_date, on_hold, broker {}
 					from `tabPurchase Invoice`
 					where posting_date <= %s
 				""".format(select_branch),
@@ -428,7 +459,7 @@ class ReceivablePayableReport(object):
 		# customer / supplier name
 		party_details = self.get_party_details(row.party) or {}
 		row.update(party_details)
-		if self.filters.get(scrub(self.filters.party_type)):
+		if self.filters.get(scrub(self.filters.party_type)) or self.filters.get("party_account"):
 			row.currency = row.account_currency
 		else:
 			row.currency = self.company_currency
@@ -698,7 +729,7 @@ class ReceivablePayableReport(object):
 		else:
 			date_condition = "AND posting_date <=%s"
 
-		if self.filters.get(scrub(self.party_type)):
+		if self.filters.get(scrub(self.party_type)) or self.filters.get("party_account"):
 			select_fields = "debit_in_account_currency as debit, credit_in_account_currency as credit"
 		else:
 			select_fields = "debit, credit"
@@ -911,6 +942,13 @@ class ReceivablePayableReport(object):
 			options=self.party_type,
 			width=180,
 		)
+		self.add_column(
+			label=_("Broker"),
+			fieldname="broker",
+			fieldtype="Link",
+			options="Supplier",
+			width=180,
+		)
 
 		if "branch" in frappe.get_meta("Purchase Invoice").__dict__.keys():
 			self.add_column(
@@ -953,6 +991,9 @@ class ReceivablePayableReport(object):
 			options="voucher_type",
 			width=180,
 		)
+		if self.filters.party_type == "Supplier":
+			self.add_column(label=_("On Hold"), fieldname="on_hold", fieldtype="Data")
+			self.add_column(label=_("Hold Payment"), fieldname="hold_payment", fieldtype="button")
 
 		if self.filters.show_remarks:
 			self.add_column(label=_("Remarks"), fieldname="remarks", fieldtype="Text", width=200),
@@ -1091,8 +1132,9 @@ def make_payment_entry(doctype, docname):
 		else:
 			payment_entry_map[row.reference_name] += row.allocated_amount
 
-	if (not payment_entry_map.get(docname) or payment_entry_map.get(docname) <= frappe.db.get_value(doctype, docname, "rounded_total")) and frappe.db.get_value(doctype, docname, "on_hold") == 1 :
-		frappe.db.set_value(doctype, docname, "on_hold", 0, update_modified = False)
+	if (not payment_entry_map.get(docname) or payment_entry_map.get(docname) <= frappe.db.get_value(doctype, docname, "rounded_total")) :
+		if frappe.db.get_value(doctype, docname, "on_hold") == 1:
+			frappe.db.set_value(doctype, docname, "on_hold", 0, update_modified = False)
 		doc = get_payment_entry(doctype, docname)
 		doc.reference_no = "UTR :"
 		doc.reference_date = frappe.db.get_value(doctype, docname, "posting_date")
@@ -1101,7 +1143,8 @@ def make_payment_entry(doctype, docname):
 			doc.save()
 
 		except Exception as e:
-			frappe.db.set_value(doctype, docname, "on_hold", 1, update_modified = False)
+			if frappe.db.get_value(doctype, docname, "on_hold") == 0:
+				frappe.db.set_value(doctype, docname, "on_hold", 1, update_modified = False)
 			frappe.throw(str(e))
 
 		return "Payment Entry " + get_link_to_form(doc.doctype, doc.name) + " Created For " + get_link_to_form(doctype,docname)

@@ -51,6 +51,7 @@ frappe.query_reports["Accounts Payable With Confirmation"] = {
 				} else {
 					frappe.query_report.set_filter_value('tax_id', "");
 				}
+				frappe.query_report.refresh();
 			}
 		},
 		{
@@ -142,11 +143,15 @@ frappe.query_reports["Accounts Payable With Confirmation"] = {
 			"label": __("Tax Id"),
 			"fieldtype": "Data",
 			"hidden": 1
+		},
+		{
+			"fieldname": "outstanding_amount",
+			"label": __("Outstanding Amount"),
+			"fieldtype": "Currency",
 		}
 	],
 
 	"formatter": function(value, row, column, data, default_formatter) {
-		data.onhold = 0;
 		value = default_formatter(value, row, column, data);
 		if (data && data.bold) {
 			value = value.bold();
@@ -165,7 +170,6 @@ frappe.query_reports["Accounts Payable With Confirmation"] = {
 erpnext.utils.add_dimensions('Accounts Payable', 9);
 
 function make_payment_entry(doctype, docname){
-	
 	frappe.call({
 		method: "finbyzerp.finbyzerp.report.accounts_payable_with_confirmation.accounts_payable_with_confirmation.make_payment_entry",
 		args: {
@@ -175,7 +179,6 @@ function make_payment_entry(doctype, docname){
 		freeze:true,
 		callback: function(r) {
 			if (r.message){
-				HideButton(docname);
 				frappe.msgprint(r.message)
 				setTimeout((()=>{
 					frappe.query_report.refresh();
@@ -184,6 +187,15 @@ function make_payment_entry(doctype, docname){
 		}
 	})
 }
-function HideButton(docname){
-	$(`#${docname}`).addClass('d-none')
+function hold_payment(doctype, docname){
+	frappe.db.set_value(doctype, docname, 'on_hold', 1);
+	setTimeout((()=>{
+		frappe.query_report.refresh();
+	}),500)
+}
+function unhold_payment(doctype, docname){
+	frappe.db.set_value(doctype, docname, 'on_hold', 0);
+	setTimeout((()=>{
+		frappe.query_report.refresh();
+	}),500)
 }

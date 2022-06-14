@@ -1,5 +1,5 @@
 {
- "add_total_row": 0,
+ "add_total_row": 1,
  "columns": [],
  "creation": "2022-05-24 14:05:44.574959",
  "disable_prepared_report": 0,
@@ -9,8 +9,8 @@
  "filters": [],
  "idx": 0,
  "is_standard": "Yes",
- "letter_head": "Carbon Graphite & Allied Products",
- "modified": "2022-05-24 14:05:44.574959",
+ "letter_head": "",
+ "modified": "2022-06-14 10:07:50.680862",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Accounts Payable With Confirmation",
