@@ -394,14 +394,17 @@ class ReceivablePayableReport(object):
 				self.delivery_notes.setdefault(d.against_sales_invoice, set()).add(d.parent)
 
 	def get_invoice_details(self):
+		select_field = ''
+		if "broker" in frappe.get_meta("Purchase Invoice").__dict__.keys():
+			select_field = ", broker"
 		self.invoice_details = frappe._dict()
 		if self.party_type == "Customer":
 			si_list = frappe.db.sql(
 				"""
-				select name, due_date, po_no, broker
+				select name, due_date, po_no, {}
 				from `tabSales Invoice`
 				where posting_date <= %s
-			""",
+			""".format(select_field),
 				self.filters.report_date,
 				as_dict=1,
 			)
@@ -427,11 +430,12 @@ class ReceivablePayableReport(object):
 		select_branch = ""
 		if "branch" in frappe.get_meta("Purchase Invoice").__dict__.keys():
 			select_branch = ", branch"
-
+		if "broker" in frappe.get_meta("Purchase Invoice").__dict__.keys():
+			select_branch += ", broker"
 		if self.party_type == "Supplier":
 				for pi in frappe.db.sql(
 					"""
-					select name, due_date, bill_no, bill_date, on_hold, broker {}
+					select name, due_date, bill_no, bill_date, on_hold {}
 					from `tabPurchase Invoice`
 					where posting_date <= %s
 				""".format(select_branch),
@@ -942,13 +946,14 @@ class ReceivablePayableReport(object):
 			options=self.party_type,
 			width=180,
 		)
-		self.add_column(
-			label=_("Broker"),
-			fieldname="broker",
-			fieldtype="Link",
-			options="Supplier",
-			width=180,
-		)
+		if "broker" in frappe.get_meta("Purchase Invoice").__dict__.keys():
+			self.add_column(
+				label=_("Broker"),
+				fieldname="broker",
+				fieldtype="Link",
+				options="Supplier",
+				width=180,
+			)
 
 		if "branch" in frappe.get_meta("Purchase Invoice").__dict__.keys():
 			self.add_column(
