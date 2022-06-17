@@ -4,7 +4,7 @@
 
 {% include "erpnext/regional/report/india_gst_common/india_gst_common.js" %}
 
-frappe.query_reports["HSN WISE OUTWORD SUMMARY"] = {
+frappe.query_reports["HSN WISE OUTWARD SUMMARY"] = {
 	"filters": [
 		{
 			"fieldname":"company",
