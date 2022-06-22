@@ -283,3 +283,15 @@ general_ledger.check_freezing_date = check_freezing_date
 from erpnext.stock.doctype.stock_ledger_entry.stock_ledger_entry import StockLedgerEntry
 from finbyzerp.finbyzerp.override.stock_ledger_entry import check_stock_frozen_date
 StockLedgerEntry.check_stock_frozen_date = check_stock_frozen_date
+
+from finbyzerp.finbyzerp.report.sales_order_analysis import execute as sales_order_analysis_execute
+from erpnext.selling.report.sales_order_analysis import sales_order_analysis
+sales_order_analysis.execute = sales_order_analysis_execute
+
+from finbyzerp.finbyzerp.report.pending_so_items_for_purchase_request import execute as pending_so_items_for_purchase_request_execute
+from erpnext.selling.report.pending_so_items_for_purchase_request import pending_so_items_for_purchase_request
+pending_so_items_for_purchase_request.execute = pending_so_items_for_purchase_request_execute
+
+from finbyzerp.finbyzerp.report.trends import get_data as trends_data
+from erpnext.controllers import trends
+trends.get_data = trends_data
