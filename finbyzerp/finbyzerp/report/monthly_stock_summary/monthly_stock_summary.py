@@ -6,6 +6,7 @@ from fileinput import close
 import frappe
 from frappe.utils import getdate
 from dateutil.relativedelta import relativedelta
+from erpnext.stock.report.stock_ledger.stock_ledger import get_item_group_condition
 
 from itertools import zip_longest
 
@@ -99,8 +100,9 @@ def get_data(filters):
 		conditions += " and sle.company = %s" % frappe.db.escape(filters.get("company"))
 
 	if filters.get("item_group"):
-		conditions += " and i.item_group = %s" % frappe.db.escape(filters.get("item_group"))
-		group_by_cond = 'sle.item_group'
+		# conditions += " and i.item_group = %s" % frappe.db.escape(filters.get("item_group"))
+		conditions = conditions + str(get_item_group_condition(filters.get("item_group")))
+		# group_by_cond = 'sle.item_group'
 	if filters.get("item_code"):
 		conditions += " and sle.item_code = %s" % frappe.db.escape(filters.get("item_code"))
 		group_by_cond = 'sle.item_code'
