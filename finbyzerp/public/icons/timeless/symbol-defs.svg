@@ -508,6 +508,9 @@
 	<symbol viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" id="icon-tick">
 		<path d="M2 9.66667L5.33333 13L14 3" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
 	</symbol>
+	<symbol viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" id="icon-folder-normal">
+		<path d="M2.5 4v10a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V6.5a1 1 0 0 0-1-1h-6.283a.5.5 0 0 1-.417-.224L8.441 3.224A.5.5 0 0 0 8.024 3H3.5a1 1 0 0 0-1 1z" stroke="var(--icon-stroke)" stroke-miterlimit="10" stroke-linecap="square"></path>
+	</symbol>
 	<symbol fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 46 40" id="icon-folder-normal-large">
 		<path d="M.245 16.22A2 2 0 012.233 14h41.534a2 2 0 011.987 2.22L43.52 36.44A4 4 0 0139.543 40H6.457a4 4 0 01-3.976-3.56L.245 16.22zM43.125 11V7a2 2 0 00-2-2H20.312a.5.5 0 01-.328-.123L14.657.245A1 1 0 0014.001 0H4.875a2 2 0 00-2 2v9a1 1 0 001 1h38.25a1 1 0 001-1z" fill="#A6B1B9"></path>
 	</symbol>
