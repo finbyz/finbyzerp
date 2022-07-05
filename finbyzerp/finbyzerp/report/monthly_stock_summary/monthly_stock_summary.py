@@ -6,7 +6,6 @@ from fileinput import close
 import frappe
 from frappe.utils import getdate
 from dateutil.relativedelta import relativedelta
-from erpnext.stock.report.stock_ledger.stock_ledger import get_item_group_condition
 
 from itertools import zip_longest
 
@@ -101,7 +100,7 @@ def get_data(filters):
 
 	if filters.get("item_group"):
 		# conditions += " and i.item_group = %s" % frappe.db.escape(filters.get("item_group"))
-		conditions = conditions + str(get_item_group_condition(filters.get("item_group")))
+		conditions = conditions +  " and " + str(get_item_group_condition(filters.get("item_group")))
 		# group_by_cond = 'sle.item_group'
 	if filters.get("item_code"):
 		conditions += " and sle.item_code = %s" % frappe.db.escape(filters.get("item_code"))
@@ -257,3 +256,12 @@ def get_period_month_ranges(period, year_start_date,year_end_date):
 		period_month_ranges.append(months_in_this_period)
 
 	return period_month_ranges
+
+def get_item_group_condition(item_group):
+	item_group_details = frappe.db.get_value("Item Group", item_group, ["lft", "rgt"], as_dict=1)
+	if item_group_details:
+		return "i.item_group in (select ig.name from `tabItem Group` ig \
+			where ig.lft >= %s and ig.rgt <= %s and i.item_group = ig.name)"%(item_group_details.lft,
+			item_group_details.rgt)
+
+	return ''
