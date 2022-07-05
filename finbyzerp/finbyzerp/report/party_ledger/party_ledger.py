@@ -268,7 +268,7 @@ def get_gl_entries(filters, accounting_dimensions):
 		additional_dict[row.voucher_no] = {'accounts_list' : row.accounts_list, 'debit_list' : row.debit_list, 'credit_list' : row.credit_list}
 
 	for row in gl_entries:
-		if additional_dict.get(row.item_code):
+		if additional_dict.get(row.voucher_no):
 			row['accounts_list'] = additional_dict[row.voucher_no]['accounts_list']
 			row['debit_list'] = additional_dict[row.voucher_no]['debit_list']
 			row['credit_list'] = additional_dict[row.voucher_no]['credit_list']
