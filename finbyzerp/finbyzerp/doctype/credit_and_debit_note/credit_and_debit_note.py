@@ -127,10 +127,10 @@ class CreditandDebitNote(Document):
 					target.posting_date=source.posting_date
 				if target_doctype == "Sales Invoice":
 					target.customer = source.party
-					target.naming_series="SI-CR-.fiscal.-" if source.type=="Credit Note" else 'SI-DR-.fiscal.-'
+					target.naming_series="SI-CR-.fiscal.-.###" if source.type=="Credit Note" else 'SI-DR-.fiscal.-.###'
 				else:
 					target.supplier = source.party
-					target.naming_series=' PI-DR-.fiscal.-' if source.type=="Debit Note" else "PI-CR-.fiscal.-"
+					target.naming_series=' PI-DR-.fiscal.-.###' if source.type=="Debit Note" else "PI-CR-.fiscal.-.###"
 				target.series_value = source.series_value
 				target.run_method("set_missing_values")
 				target.run_method("calculate_taxes_and_totals")
@@ -182,17 +182,25 @@ class CreditandDebitNote(Document):
 		try:
 			return_entry.flags.ignore_permissions = True
 			return_entry.save()
-			return_entry.submit()
+			submit=0
+			if not cint(frappe.db.get_single_value("E Invoice Settings", "enable")):
+				submit=1
+			else:
+				if not frappe.db.get_value("E Invoice User", {"company": self.get("company")}):
+					submit=1
+			if submit:
+				return_entry.submit()
+			state="submitted" if submit else "Created"
 			if return_entry.doctype == "Sales Invoice":
 				self.db_set('si_ref',return_entry.name)
 				self.db_set('pi_ref',None)
 				url = get_url_to_form("Sales Invoice",return_entry.name)
-				frappe.msgprint(_("Sales Invoice <b><a href='{url}'>{name}</a></b> has been submitted!".format(url=url, name=return_entry.name)), title="Sales Invoice submitted", indicator="green")
+				frappe.msgprint(_("Sales Invoice <b><a href='{url}'>{name}</a></b> has been {state}!".format(url=url, name=return_entry.name,state=state)), title="Sales Invoice "+str(state), indicator="green")
 			else:
 				self.db_set('pi_ref',return_entry.name)
 				self.db_set('si_ref',None)
 				url = get_url_to_form("Purchase Invoice",return_entry.name)
-				frappe.msgprint(_("Purchase Invoice <b><a href='{url}'>{name}</a></b> has been submitted!".format(url=url, name=return_entry.name)), title="Purchase Invoice submitted", indicator="green")
+				frappe.msgprint(_("Purchase Invoice <b><a href='{url}'>{name}</a></b> has been {state}!".format(url=url, name=return_entry.name,state=state)), title="Purchase Invoice "+str(state), indicator="green")
 
 		except Exception as e:
 			frappe.throw(_(str(e)))
