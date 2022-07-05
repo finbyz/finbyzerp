@@ -155,7 +155,7 @@
    "label": "Edit Posting Date and Time"
   },
   {
-   "default": "1",
+   "default": "0",
    "fieldname": "is_consolidated",
    "fieldtype": "Check",
    "hidden": 1,
