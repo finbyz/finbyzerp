@@ -268,9 +268,10 @@ def get_gl_entries(filters, accounting_dimensions):
 		additional_dict[row.voucher_no] = {'accounts_list' : row.accounts_list, 'debit_list' : row.debit_list, 'credit_list' : row.credit_list}
 
 	for row in gl_entries:
-		row['accounts_list'] = additional_dict[row.voucher_no]['accounts_list']
-		row['debit_list'] = additional_dict[row.voucher_no]['debit_list']
-		row['credit_list'] = additional_dict[row.voucher_no]['credit_list']
+		if additional_dict.get(row.item_code):
+			row['accounts_list'] = additional_dict[row.voucher_no]['accounts_list']
+			row['debit_list'] = additional_dict[row.voucher_no]['debit_list']
+			row['credit_list'] = additional_dict[row.voucher_no]['credit_list']
 	# if filters.get('party_type') and filters.party:
 	# 	list_keys = [filters.get('party_type'), filters.party]
 	# 	gl_entries = list(filter(lambda d: d.party_type == filters.get('party_type') and d.party in filters.get('party'),
@@ -403,9 +404,6 @@ def get_conditions(filters):
 		filters.cost_center = get_cost_centers_with_children(filters.cost_center)
 		conditions.append("cost_center in %(cost_center)s")
 	
-	if filters.get("from_date"):
-		conditions.append("posting_date > %(from_date)s")
-
 	if filters.get("voucher_no"):
 		conditions.append("voucher_no=%(voucher_no)s")
 
