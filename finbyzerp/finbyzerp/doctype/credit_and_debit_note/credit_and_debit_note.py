@@ -126,6 +126,7 @@ class CreditandDebitNote(Document):
 					target.posting_time=source.posting_time
 					target.posting_date=source.posting_date
 				if target_doctype == "Sales Invoice":
+					target.is_consolidated=0
 					target.customer = source.party
 					target.naming_series="SI-CR-.fiscal.-.###" if source.type=="Credit Note" else 'SI-DR-.fiscal.-.###'
 				else:
@@ -188,7 +189,7 @@ class CreditandDebitNote(Document):
 			else:
 				if not frappe.db.get_value("E Invoice User", {"company": self.get("company")}):
 					submit=1
-			if submit:
+			if (submit and return_entry.doctype == "Sales Invoice") or return_entry.doctype == "Purchase Invoice":
 				return_entry.submit()
 			state="submitted" if submit else "Created"
 			if return_entry.doctype == "Sales Invoice":
@@ -254,7 +255,7 @@ class CreditandDebitNote(Document):
 		elif tax.charge_type == "On Item Quantity":
 			current_tax_amount = tax_rate * item.qty
 
-		if not self.doc.get("is_consolidated"):
+		if not (self.doc.get("is_consolidated") or tax.get("dont_recompute_tax")):
 			self.set_item_wise_tax(item, tax, tax_rate, current_tax_amount)
 
 		return current_tax_amount
@@ -268,7 +269,7 @@ class CreditandDebitNote(Document):
 	def set_item_wise_tax(self, item, tax, tax_rate, current_tax_amount):
 		# store tax breakup for each item
 		key = item.item_code or item.item_name
-		item_wise_tax_amount = current_tax_amount*self.doc.conversion_rate
+		item_wise_tax_amount = flt(current_tax_amount*self.doc.conversion_rate,4)
 		if tax.item_wise_tax_detail.get(key):
 			item_wise_tax_amount += tax.item_wise_tax_detail[key][1]
 
