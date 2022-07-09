@@ -11,6 +11,7 @@
 		"public/js/report_js/stock_balance.js",
 		"public/js/report_js/stock_ledger.js",
 		"public/js/report_js/trial_balance_for_party.js",
-		"public/js/report_js/sales_order_analysis.js"
+		"public/js/report_js/sales_order_analysis.js",
+		"public/js/report_js/general_ledger.js"
     ]
 }

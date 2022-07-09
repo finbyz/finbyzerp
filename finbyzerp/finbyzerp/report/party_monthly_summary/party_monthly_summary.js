@@ -8,7 +8,7 @@ function getUrlParameter(name) {
     var results = regex.exec(location.search);
     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
-frappe.query_reports["Party Monthly Summery"] = {
+frappe.query_reports["Party Monthly Summary"] = {
 	onload: function() {
 		var party = getUrlParameter("party");
 		if(party){
