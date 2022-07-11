@@ -123,7 +123,7 @@ def set_account_currency(filters):
 
 				if is_same_account_currency:
 					account_currency = currency
-		
+
 		elif filters.get("party"):
 			gle_currency = frappe.db.get_value(
 				"GL Entry",
@@ -157,7 +157,7 @@ def get_result(filters, account_details):
 	data = get_data_with_opening_closing(filters, account_details, accounting_dimensions, gl_entries)
 
 	result = get_result_as_list(data, filters)
-	
+
 	return result
 
 def get_gl_entries(filters, accounting_dimensions):
@@ -285,7 +285,7 @@ def get_gl_entries(filters, accounting_dimensions):
 		if filters.get('party_type') and d.party_type !=filters.get('party_type'):
 			gl_entries[index]  = None
 
-		if filters.get('party') and d.party !=filters.get('party'):
+		if filters.get('party') and d.party not in filters.get('party'):
 			gl_entries[index]  = None
 
 		if d.voucher_no and not d.party:
@@ -346,12 +346,7 @@ def get_additional_data_conditions(filters):
 	if filters.get("voucher_no"):
 		conditions.append("voucher_no=%(voucher_no)s")
 
-	if not (
-		filters.get("account")
-		or filters.get("party")
-		or filters.get("group_by") in ["Group by Account", "Group by Party"]
-	):		
-		conditions.append("posting_date >=%(from_date)s")
+	conditions.append("posting_date >=%(from_date)s")
 
 	conditions.append("(posting_date <=%(to_date)s or is_opening = 'Yes')")
 
@@ -395,7 +390,7 @@ def get_additional_data_conditions(filters):
 
 def get_conditions(filters):
 	conditions = []
-	
+
 	if filters.get("account"):
 		filters.account = get_accounts_with_children(filters.account)
 		conditions.append("account in %(account)s")
@@ -403,7 +398,7 @@ def get_conditions(filters):
 	if filters.get("cost_center"):
 		filters.cost_center = get_cost_centers_with_children(filters.cost_center)
 		conditions.append("cost_center in %(cost_center)s")
-	
+
 	if filters.get("voucher_no"):
 		conditions.append("voucher_no=%(voucher_no)s")
 
@@ -420,7 +415,7 @@ def get_conditions(filters):
 		filters.get("account")
 		or filters.get("party")
 		or filters.get("group_by") in ["Group by Account", "Group by Party"]
-	):		
+	):
 		conditions.append("posting_date >=%(from_date)s")
 
 	conditions.append("(posting_date <=%(to_date)s or is_opening = 'Yes')")
