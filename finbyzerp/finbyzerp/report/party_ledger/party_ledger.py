@@ -227,7 +227,7 @@ def get_gl_entries(filters, accounting_dimensions):
 	gl_entries = frappe.db.sql(
 		"""
 		select
-			name as gl_entry, posting_date, account, party_type, party,
+			name, posting_date, account, party_type, party,
 			voucher_type, voucher_no, {dimension_fields}
 			cost_center, project,
 			against_voucher_type, against_voucher, account_currency,
@@ -249,7 +249,7 @@ def get_gl_entries(filters, accounting_dimensions):
 	additional_dict = {}
 	additional_data = frappe.db.sql("""
 		SELECT
-			GROUP_CONCAT(account SEPARATOR '<br>') as accounts_list,
+			IF(voucher_type = "Payment Entry", GROUP_CONCAT(IF(against_voucher_type IS NOT NULL, CONCAT(against_voucher_type," ", against_voucher), account) SEPARATOR '<br>'), GROUP_CONCAT(account SEPARATOR '<br>')) as accounts_list,
 			GROUP_CONCAT(debit_in_account_currency SEPARATOR '<br>') as debit_list,
 			GROUP_CONCAT(credit_in_account_currency SEPARATOR '<br>') as credit_list, voucher_no
 		FROM
@@ -263,7 +263,7 @@ def get_gl_entries(filters, accounting_dimensions):
 			distributed_cost_center_query=distributed_cost_center_query,
 			order_by_statement=order_by_statement,
 		),filters, as_dict = 1)
-
+	frappe.msgprint(str(additional_data))
 	for row in additional_data:
 		additional_dict[row.voucher_no] = {'accounts_list' : row.accounts_list, 'debit_list' : row.debit_list, 'credit_list' : row.credit_list}
 
@@ -531,10 +531,12 @@ def get_sales_purchase_invoice_data(filters):
 	conditions += f" AND gle.`posting_date` <= '{filters.to_date}'"
 	conditions += f" AND gle.`party_type` = '{filters.party_type}'" if filters.get('party_type') else f" AND gle.`party_type` in ('Customer', 'Supplier')"
 	conditions += f" AND gle.`party` = {list_to_sql(filters.get('party'))}" if filters.get('party') else ''
-	
+	if filters.get('voucher_no'):
+		conditions += f"AND gle.voucher_no = '{filters.get('voucher_no')}'"
 	pi_data = frappe.db.sql(f"""
 		SELECT 
-			gle.name, pii.parent as pi_name,pii.item_name,pii.item_code, pi.total,pi.rounded_total, pii.rate, pii.qty
+			gle.name, pii.parent as pi_name,pii.item_name,pii.item_code, pi.total,pi.rounded_total, pii.rate, pii.qty, "Purchase Invoice" as doctype,
+			pi.total_taxes_and_charges as pi_total_taxes
 		FROM
 			`tabGL Entry` as gle
 			JOIN `tabPurchase Invoice Item` as pii ON pii.parent=gle.voucher_no
@@ -545,7 +547,8 @@ def get_sales_purchase_invoice_data(filters):
 	
 	pi_data += frappe.db.sql(f"""
 		SELECT 
-			gle.name, sii.parent as si_name,sii.item_name,sii.item_code, si.total,si.rounded_total, sii.rate, sii.qty
+			gle.name, sii.parent as si_name,sii.item_name,sii.item_code, si.total,si.rounded_total, sii.rate, sii.qty,
+			"Sales Invoice" as doctype, si.total_taxes_and_charges as si_total_taxes
 		FROM
 			`tabGL Entry` as gle
 			JOIN `tabSales Invoice Item` as sii ON sii.parent=gle.voucher_no
@@ -557,7 +560,28 @@ def get_sales_purchase_invoice_data(filters):
 	purchase_invoice_map = {}
 	total_taxes_and_charges = {}
 	for row in pi_data:
-		total_taxes_and_charges[row.name] = row.rounded_total - row.total
+		add_deduct_tax = ""
+		if row.doctype == "Sales Invoice":
+			tax_template = "Sales Taxes and Charges"
+		elif row.doctype == "Purchase Invoice":
+			tax_template = "Purchase Taxes and Charges"
+			add_deduct_tax = ", add_deduct_tax"
+
+		tax_data = frappe.db.sql(f"""
+			select account_head, tax_amount {add_deduct_tax}
+			from `tab{tax_template}`
+			where parent = '{row.pi_name or row.si_name}' and included_in_print_rate = 0
+			order by idx
+		""", as_dict = 1)
+		if tax_data:
+			total_taxes_and_charges[row.name] = {"Taxes and Charges" : row.pi_total_taxes or row.si_total_taxes}
+
+		for tax in tax_data:
+			if tax.add_deduct_tax == "Deduct":
+				total_taxes_and_charges[row.name].update({tax.account_head : (tax.tax_amount * -1)})
+			else:
+				total_taxes_and_charges[row.name].update({tax.account_head : tax.tax_amount})
+
 		purchase_invoice_map.setdefault(row.name, {})\
 		.setdefault(row.item_code, {})\
 		.setdefault(row.rate, frappe._dict({
@@ -736,10 +760,15 @@ def html_sales_invoice_purchase_invoic_data(purchase_invoice_map,total_taxes_and
 						</p>	
 					"""
 	if total_taxes_and_charges:
-		table += f"""<p>
-			<span><strong>Taxes & Charges = {frappe.format(total_taxes_and_charges,{'fieldtype': 'Currency'})}</strong></span>
-		</p>
-	"""
+		for row in total_taxes_and_charges:
+			table += f"""<p style="font-size:10px !important; overflow: hidden !important;{"font-weight:bold !important" if row == "Taxes and Charges" else "font-weight:normal !important"}">
+				<span>
+					{row}
+				</span>
+				<span style="float: right !important;">
+					{frappe.format(total_taxes_and_charges[row],{'fieldtype': 'Currency'})}
+				</span>
+			</p>"""
 	return table
 
 def list_to_sql(lst):
