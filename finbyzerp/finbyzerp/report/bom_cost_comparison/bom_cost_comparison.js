@@ -40,8 +40,13 @@ frappe.query_reports["BOM Cost Comparison"] = {
 					docstatus : 1
 				});
 			}
-			
-			
+		},
+		{
+			"fieldname":"price_list",
+			"label": __("Price List"),
+			"fieldtype": "Link",
+			"options" : "Price List",
+			"reqd" : 1
 		}
 	]
 };

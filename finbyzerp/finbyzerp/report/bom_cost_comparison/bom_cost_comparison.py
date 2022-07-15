@@ -2,14 +2,10 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-from asyncio import constants
-from typing import final
 import frappe
 from frappe import _
-# import frappe
 import re
 from frappe.utils.data import get_link_to_form
-from frappe.share import add
 
 # function to clean string for names in coloumn
 
@@ -60,18 +56,19 @@ def get_columns(filters):
 def column_query(filters):
 	conditions = ''
 	if not filters.get('bom'):
-		conditions += f"and item = '{filters.get('item')}' and creation between '{filters.get('from_date')}' and '{filters.get('to_date')}'"
+		conditions += f"and item = '{filters.get('item')}' and creation >= '{filters.get('from_date')}' and creation < '{frappe.utils.add_days(filters.get('to_date'), 1)}'"
 	else:
 		conditions += " and name in {} ".format(
 			"(" + ", ".join([f'"{l}"' for l in filters.get("bom")]) + ")")
+	
 	# Getting dynamic column name
 	column = frappe.db.sql(f"""
-	SELECT 
-		name from `tabBOM`
-	WHERE
-		docstatus = 1
-		{conditions}
-	""")
+		SELECT 
+			name from `tabBOM`
+		WHERE
+			docstatus = 1
+			{conditions}
+		""")
 	return column
 
 
@@ -79,33 +76,59 @@ def get_data(filters):
 	# adding where condition according to filters
 	condition = ''
 	if not filters.get('bom'):
-		condition += f"and bom.item = '{filters.get('item')}' and bom.creation between '{filters.get('from_date')}' and '{filters.get('to_date')}'"
+		condition += f"and bom.item = '{filters.get('item')}' and bom.creation >= '{filters.get('from_date')}' and bom.creation < '{frappe.utils.add_days(filters.get('to_date'), 1)}'"
 	else:
 		condition += " and bom.name in {} ".format(
 			"(" + ", ".join([f'"{l}"' for l in filters.get("bom")]) + ")")
 	
-	# sql query to get data for column
+	item_price_map={}
+	item_price_data=frappe.db.sql(f"""
+		select price_list_rate, item_code 
+		from `tabItem Price`
+		where price_list = '{filters.get('price_list')}' and valid_from between '{filters.get('from_date')}' and '{frappe.utils.today()}'
+		order by valid_from
+	""",as_dict=1)
+
+	for row in item_price_data:
+		item_price_map[row.item_code] = row.price_list_rate
+
 	data = frappe.db.sql(f"""
 		SELECT 
-			bom_item.item_code, bom_item.qty, bom_item.rate as rate,
+			bom_item.item_code, bom_item.qty, IF(bom.is_multiple_item, bom.total_quantity, bom.quantity) as quantity, MAX(ip.valid_from) as valid_from,
 			bom.name as bom
 		FROM
 			`tabBOM Item` as bom_item
 			LEFT JOIN `tabBOM` as bom ON bom_item.parent = bom.name
-		WHERE bom.docstatus = 1 {condition}
+			LEFT JOIN `tabItem Price` as ip ON ip.item_code = bom_item.item_code and ip.price_list = '{filters.get('price_list')}' and ip.valid_from between '{filters.get('from_date')}' and '{frappe.utils.today()}'
+		WHERE 
+			bom.docstatus = 1 {condition}
+		GROUP BY bom.name, bom_item.item_code
 		""", as_dict=1)
 
 	item_code_dict = {}
-	bom_dict = {}
+	unit_material_dict = {}
+	bom_dict = {"bom" : {}, "qty" : {"raw_material" : "Quantity"}}
 	for row in data:
-		bom_dict[row.bom] = get_link_to_form("BOM", row.bom)
+		row.rate = 0
+		
+		if item_price_map.get(row.item_code):
+			row.rate = item_price_map[row.item_code]
+		bom_dict["bom"][row.bom] = get_link_to_form("BOM", row.bom)
+		bom_dict["qty"][row.bom] = row.quantity
+		
+		if not unit_material_dict.get(row.bom):
+			unit_material_dict[row.bom] = (row.qty * row.rate)
+		else:
+			unit_material_dict[row.bom] += (row.qty * row.rate)
+		
 		if item_code_dict.get(row.item_code):
 			item_code_dict[row.item_code].update({row.bom: [row.qty, row.rate]})
 		else:
 			item_code_dict[row.item_code] = {row.bom: [row.qty, row.rate]}
 
 	final_data_list = []
-	final_data_list.append(bom_dict)
+	final_data_list.append(bom_dict["bom"])
+	final_data_list.append(bom_dict["qty"])
 	for item in item_code_dict:
 		final_data = {}
 
@@ -114,31 +137,37 @@ def get_data(filters):
 				final_data.update(
 					{"raw_material": item, row.bom: round(item_code_dict[item][row.bom][0], 2), "rate" : item_code_dict[item][row.bom][1]})
 			else:
-				final_data.update({"raw_material": item, row.bom: 0})
+				final_data.update({"raw_material": item, row.bom: 0, "rate" : 0})
 
 		if final_data:
 			final_data_list.append(final_data)
 
+	additional_conditions = ''
+	if not filters.get('bom'):
+		additional_conditions += f"and item = '{filters.get('item')}' and creation >= '{filters.get('from_date')}' and creation < '{frappe.utils.add_days(filters.get('to_date'), 1)}'"
+	else:
+		additional_conditions += " and name in {} ".format(
+			"(" + ", ".join([f'"{l}"' for l in filters.get("bom")]) + ")")
+
 	additional_data = frappe.db.sql(f"""
-		SELECT
-			name, per_unit_rmc as raw_material_cost, per_unit_operational_cost, total_cost, quantity
-		FROM
-			`tabBOM`
-		WHERE docstatus = 1 and item = '{filters.get('item')}' and creation between '{filters.get('from_date')}' and '{filters.get('to_date')}'
-	""", as_dict=1)
+			SELECT
+				name, per_unit_operational_cost
+			FROM
+				`tabBOM`
+			WHERE docstatus = 1 {additional_conditions}
+		""", as_dict=1)
 
 	material_dict = {"raw_material": "Raw Material Cost"}
 	operational_dict = {"raw_material": "Per Unit Operational_cost"}
 	total_cost_dict = {"raw_material": "Total Cost"}
 
 	for bom in additional_data:
-		material_dict.update({bom.name:  round(bom.raw_material_cost, 2)})
+		material_dict.update({bom.name:  round(unit_material_dict.get(bom.name)/ bom_dict["qty"][bom.name], 2)})
 		operational_dict.update({bom.name:  round(bom.per_unit_operational_cost, 2)})
-		total_cost_dict.update({bom.name: round((bom.total_cost / bom.quantity), 2)})
+		total_cost_dict.update({bom.name: round((unit_material_dict[bom.name]/ bom_dict["qty"][bom.name]) + bom.per_unit_operational_cost, 2)})
 
 	final_data_list.append(material_dict)
 	final_data_list.append(operational_dict)
 	final_data_list.append(total_cost_dict)
 
 	return final_data_list
-	

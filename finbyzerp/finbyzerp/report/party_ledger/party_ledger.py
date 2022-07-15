@@ -263,7 +263,6 @@ def get_gl_entries(filters, accounting_dimensions):
 			distributed_cost_center_query=distributed_cost_center_query,
 			order_by_statement=order_by_statement,
 		),filters, as_dict = 1)
-	frappe.msgprint(str(additional_data))
 	for row in additional_data:
 		additional_dict[row.voucher_no] = {'accounts_list' : row.accounts_list, 'debit_list' : row.debit_list, 'credit_list' : row.credit_list}
 
