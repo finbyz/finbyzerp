@@ -184,6 +184,7 @@ body{
 /*----------- dark theme----------- */
 [data-theme="dark"] input.input-with-feedback.form-control,
 [data-theme="dark"] .control-input textarea.input-with-feedback.form-control,
+[data-theme="dark"] .frappe-control .multiselect-list .form-control,
 [data-theme="dark"] .frappe-control[data-fieldtype=Select] .control-input select,
 [data-theme="dark"] .frappe-control[data-fieldtype=Select] .control-input select, 
 [data-theme="dark"] .frappe-control[data-fieldtype=Select].form-group select{
