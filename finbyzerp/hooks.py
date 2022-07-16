@@ -294,3 +294,8 @@ pending_so_items_for_purchase_request.execute = pending_so_items_for_purchase_re
 from finbyzerp.finbyzerp.report.trends import get_data as trends_data
 from erpnext.controllers import trends
 trends.get_data = trends_data
+
+from erpnext.controllers import sales_and_purchase_return
+from finbyzerp.api import validate_returned_items
+sales_and_purchase_return.validate_returned_items = validate_returned_items
+
