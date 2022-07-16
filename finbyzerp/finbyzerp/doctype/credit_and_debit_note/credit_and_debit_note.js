@@ -25,6 +25,15 @@ cur_frm.fields_dict.items.grid.get_field("expense_account").get_query = function
 	}
 };
 
+cur_frm.fields_dict.items.grid.get_field("income_account").get_query = function(doc) {
+	return {
+		filters: {
+			"company": doc.company,
+		}
+	}
+};
+
+
 // Customer Address Filter
 cur_frm.set_query("customer_address", function () {
     return {

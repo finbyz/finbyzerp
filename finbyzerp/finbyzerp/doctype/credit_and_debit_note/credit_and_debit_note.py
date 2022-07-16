@@ -159,6 +159,8 @@ class CreditandDebitNote(Document):
 						target.stock_qty = -(target.stock_qty)
 				if target_doctype == "Sales Invoice":
 					target.income_account = frappe.db.get_value("Company",source_parent.company,"default_income_account")
+				target.income_account=source.income_account
+				target.expense_account=source.expense_account
 
 			doclist = get_mapped_doc(source_doc.doctype, source_doc.name, {
 				source_doc.doctype: {
