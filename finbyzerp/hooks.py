@@ -176,8 +176,7 @@ doc_events = {
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate",
-		"before_submit":"finbyzerp.finbyzerp.doc_events.purchase_invoice.before_submit"
+		"validate": "finbyzerp.api.pi_validate"
 	},
 		"Purchase Receipt": {
 		"validate": "finbyzerp.api.pr_validate"
