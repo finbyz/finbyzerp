@@ -176,7 +176,8 @@ doc_events = {
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate"
+		"validate": "finbyzerp.api.pi_validate",
+		"before_submit":"finbyzerp.finbyzerp.doc_events.purchase_invoice.before_submit"
 	},
 		"Purchase Receipt": {
 		"validate": "finbyzerp.api.pr_validate"
@@ -205,6 +206,12 @@ doc_events = {
 		"before_save":"finbyzerp.finbyzerp.doc_events.form_tour.before_save",
 		"on_update":"finbyzerp.finbyzerp.doc_events.form_tour.on_update"
 	},
+	("Quotation","Sales Order","Delivery Note","Sales Invoice"):{
+			"on_submit":"finbyzerp.finbyzerp.doc_events.quotation.on_submit",
+			"before_update_after_submit":"finbyzerp.finbyzerp.doc_events.quotation.before_update_after_submit",
+			"before_cancel":"finbyzerp.finbyzerp.doc_events.quotation.on_cancel",
+			"on_trash":"finbyzerp.finbyzerp.doc_events.quotation.on_trash"
+		},
 }
 
 scheduler_events = {
