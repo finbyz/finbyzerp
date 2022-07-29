@@ -3,16 +3,15 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-import frappe, erpnext
+import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import nowdate, flt, getdate
+from erpnext.accounts.utils import get_outstanding_invoices
+from frappe.utils import nowdate, flt
 from datetime import datetime
 import csv, os, re, io
 import difflib
 import copy
-from erpnext.accounts.utils import get_held_invoices
-
 
 class BankStatementTransactionEntry(Document):
 	def autoname(self):
@@ -74,6 +73,18 @@ class BankStatementTransactionEntry(Document):
 			mapped_items = frappe.get_doc("Bank Statement Settings", self.bank_settings).mapped_items
 		statement_headers = self.get_statement_headers()
 		transactions = get_transaction_entries(file_url, statement_headers)
+
+		supplier_list = frappe.get_all("Supplier", fields=['name', 'supplier_name'])
+		customer_list = frappe.get_all("Customer", fields=['name', 'customer_name'])
+
+		supplier_dict = {}
+		customer_dict = {}
+		for row in supplier_list:
+			supplier_dict[row.supplier_name] = row.name
+		
+		for row in customer_list:
+			customer_dict[row.customer_name] = row.name
+
 		for entry in transactions:
 			date = str(entry[statement_headers["Date"]]).strip()
 			#print("Processing entry DESC:{0}-W:{1}-D:{2}-DT:{3}".format(entry["Particulars"], entry["Withdrawals"], entry["Deposits"], entry["Date"]))
@@ -96,10 +107,15 @@ class BankStatementTransactionEntry(Document):
 				bank_entry.party = mapped_item.mapped_data
 			else:
 				bank_entry.party_type = "Supplier" if not str(entry[statement_headers["Deposits"]]).strip() else "Customer"
-				party_list = frappe.get_all(bank_entry.party_type, fields=["name"])
-				parties = [party.name for party in party_list]
+				if bank_entry.party_type == "Supplier":
+					party_list = supplier_list
+					parties = [party.supplier_name for party in party_list]
+				else:
+					party_list = customer_list
+					parties = [party.customer_name for party in party_list]
+
 				matches = difflib.get_close_matches(frappe.safe_decode(bank_entry.description.lower()), parties, 1, 0.4)
-				if len(matches) > 0: bank_entry.party = matches[0]
+				if len(matches) > 0: bank_entry.party = supplier_dict.get(matches[0]) or customer_dict.get(matches[0]) or matches[0]
 			bank_entry.amount = -float(entry[statement_headers["Withdrawals"]]) if not str(entry[statement_headers["Deposits"]]).strip() else float(entry[statement_headers["Deposits"]])
 		self.map_unknown_transactions()
 		self.map_transactions_on_journal_entry()
@@ -464,114 +480,3 @@ def get_rows_from_xls_file(filename):
 			row_values.append(sheets[0].cell_value(row, col))
 		rows.append(row_values)
 	return rows
-
-def get_outstanding_invoices(party_type, party, account, condition=None, filters=None):
-	outstanding_invoices = []
-	precision = frappe.get_precision("Sales Invoice", "outstanding_amount") or 2
-
-	if account:
-		root_type, account_type = frappe.get_cached_value(
-			"Account", account, ["root_type", "account_type"]
-		)
-		party_account_type = "Receivable" if root_type == "Asset" else "Payable"
-		party_account_type = account_type or party_account_type
-	else:
-		party_account_type = erpnext.get_party_account_type(party_type)
-
-	if party_account_type == "Receivable":
-		dr_or_cr = "debit_in_account_currency - credit_in_account_currency"
-		payment_dr_or_cr = "credit_in_account_currency - debit_in_account_currency"
-	else:
-		dr_or_cr = "credit_in_account_currency - debit_in_account_currency"
-		payment_dr_or_cr = "debit_in_account_currency - credit_in_account_currency"
-
-	held_invoices = get_held_invoices(party_type, party)
-
-	branch = ""
-	if frappe.get_meta("GL Entry").get_field("branch"):
-		branch = " branch,"
-
-	invoice_list = frappe.db.sql(
-		"""
-		select
-			voucher_no, voucher_type, posting_date, due_date, {branch}
-			ifnull(sum({dr_or_cr}), 0) as invoice_amount,
-			account_currency as currency
-		from
-			`tabGL Entry`
-		where
-			party_type = %(party_type)s and party = %(party)s
-			and account = %(account)s and {dr_or_cr} > 0
-			and is_cancelled=0
-			{condition}
-			and ((voucher_type = 'Journal Entry'
-					and (against_voucher = '' or against_voucher is null))
-				or (voucher_type not in ('Journal Entry', 'Payment Entry')))
-		group by voucher_type, voucher_no
-		order by posting_date, name""".format(
-			branch=branch , dr_or_cr=dr_or_cr, condition=condition or ""
-		),
-		{
-			"party_type": party_type,
-			"party": party,
-			"account": account,
-		},
-		as_dict=True,
-	)
-	payment_entries = frappe.db.sql(
-		"""
-		select against_voucher_type, against_voucher,
-			ifnull(sum({payment_dr_or_cr}), 0) as payment_amount
-		from `tabGL Entry`
-		where party_type = %(party_type)s and party = %(party)s
-			and account = %(account)s
-			and {payment_dr_or_cr} > 0
-			and against_voucher is not null and against_voucher != ''
-			and is_cancelled=0
-		group by against_voucher_type, against_voucher
-	""".format(
-			payment_dr_or_cr=payment_dr_or_cr
-		),
-		{"party_type": party_type, "party": party, "account": account},
-		as_dict=True,
-	)
-
-	pe_map = frappe._dict()
-	for d in payment_entries:
-		pe_map.setdefault((d.against_voucher_type, d.against_voucher), d.payment_amount)
-
-	for d in invoice_list:
-		payment_amount = pe_map.get((d.voucher_type, d.voucher_no), 0)
-		outstanding_amount = flt(d.invoice_amount - payment_amount, precision)
-		if outstanding_amount > 0.5 / (10**precision):
-			if (
-				filters
-				and filters.get("outstanding_amt_greater_than")
-				and not (
-					outstanding_amount >= filters.get("outstanding_amt_greater_than")
-					and outstanding_amount <= filters.get("outstanding_amt_less_than")
-				)
-			):
-				continue
-
-			if not d.voucher_type == "Purchase Invoice" or d.voucher_no not in held_invoices:
-				outstanding_invoices.append(
-					frappe._dict(
-						{
-							"voucher_no": d.voucher_no,
-							"voucher_type": d.voucher_type,
-							"posting_date": d.posting_date,
-							"invoice_amount": flt(d.invoice_amount),
-							"payment_amount": payment_amount,
-							"outstanding_amount": outstanding_amount,
-							"due_date": d.due_date,
-							"currency": d.currency,
-							"branch" : d.branch
-						}
-					)
-				)
-
-	outstanding_invoices = sorted(
-		outstanding_invoices, key=lambda k: k["due_date"] or getdate(nowdate())
-	)
-	return outstanding_invoices
