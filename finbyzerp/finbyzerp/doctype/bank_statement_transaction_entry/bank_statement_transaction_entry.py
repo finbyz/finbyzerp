@@ -182,7 +182,7 @@ class BankStatementTransactionEntry(Document):
 					inv_entry.outstanding_amount = doc.outstanding_amount
 					inv_entry.allocated_amount = min(float(doc.outstanding_amount), amount)
 
-				amount -= inv_entry.get('allocated_amount')
+				amount -= flt(inv_entry.get('allocated_amount'))
 				if (amount < 0): break
 
 			amount = abs(entry.amount)
