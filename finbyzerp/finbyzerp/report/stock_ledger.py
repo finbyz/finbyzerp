@@ -197,6 +197,8 @@ def get_sle_conditions(filters):
 		conditions.append("sle.batch_no=%(batch_no)s")
 	if filters.get("company"):
 		conditions.append("sle.company=%(company)s")
+	if filters.get("project") and frappe.get_meta("Stock Ledger Entry").get_field("project"):
+		conditions.append("sle.project=%(project)s")
 	return "and {}".format(" and ".join(conditions)) if conditions else ""
 
 def get_opening_balance(filters, columns):

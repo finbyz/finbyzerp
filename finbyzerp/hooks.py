@@ -170,14 +170,12 @@ doc_events = {
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
 			"finbyzerp.api.si_validate"
 		],
-		"before_submit":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_submit",
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		"on_submit": "finbyzerp.api.sales_invoice_on_submit",
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate",
-		"before_submit":"finbyzerp.finbyzerp.doc_events.purchase_invoice.before_submit"
+		"validate": "finbyzerp.api.pi_validate"
 	},
 		"Purchase Receipt": {
 		"validate": "finbyzerp.api.pr_validate"

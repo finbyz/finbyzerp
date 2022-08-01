@@ -3,6 +3,7 @@
 
 frappe.ui.form.on('Bank Statement Transaction Entry', {
 	setup: function(frm) {
+		frm.get_field("payment_invoice_items").grid.cannot_add_rows = true;
 		frm.events.account_filters(frm)
 		frm.events.invoice_filter(frm)
 	},

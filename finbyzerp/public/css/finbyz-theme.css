@@ -13,7 +13,7 @@ body{
 .standard-icon-sidebar-section a:hover{
 	text-decoration: none;
 }
-.d__none{
+.d__none,.Chemical-sidebar-icon use{
 	display: none ;
 }
 .navbar-brand{
