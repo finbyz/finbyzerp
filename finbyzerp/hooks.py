@@ -170,14 +170,12 @@ doc_events = {
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
 			"finbyzerp.api.si_validate"
 		],
-		"before_submit":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_submit",
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		"on_submit": "finbyzerp.api.sales_invoice_on_submit",
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate",
-		"before_submit":"finbyzerp.finbyzerp.doc_events.purchase_invoice.before_submit"
+		"validate": "finbyzerp.api.pi_validate"
 	},
 		"Purchase Receipt": {
 		"validate": "finbyzerp.api.pr_validate"
@@ -206,14 +204,20 @@ doc_events = {
 		"before_save":"finbyzerp.finbyzerp.doc_events.form_tour.before_save",
 		"on_update":"finbyzerp.finbyzerp.doc_events.form_tour.on_update"
 	},
+	("Quotation","Sales Order","Delivery Note","Sales Invoice"):{
+			"on_submit":"finbyzerp.finbyzerp.doc_events.quotation.on_submit",
+			"before_update_after_submit":"finbyzerp.finbyzerp.doc_events.quotation.before_update_after_submit",
+			"before_cancel":"finbyzerp.finbyzerp.doc_events.quotation.on_cancel",
+			"on_trash":"finbyzerp.finbyzerp.doc_events.quotation.on_trash"
+		},
 }
 
 scheduler_events = {
-	"cron":{
-		"*/5 * * * *":[
-			"finbyzerp.api.repost_transaction_entries"
-		],
-	},
+# 	"cron":{
+# 		"*/5 * * * *":[
+# 			"finbyzerp.api.repost_transaction_entries"
+# 		],
+# 	},
 	"daily":[
 		"finbyzerp.api.daily_entry_summary_mail",
 		"finbyzerp.api.daily_transaction_summary_mail"
@@ -283,3 +287,20 @@ general_ledger.check_freezing_date = check_freezing_date
 from erpnext.stock.doctype.stock_ledger_entry.stock_ledger_entry import StockLedgerEntry
 from finbyzerp.finbyzerp.override.stock_ledger_entry import check_stock_frozen_date
 StockLedgerEntry.check_stock_frozen_date = check_stock_frozen_date
+
+from finbyzerp.finbyzerp.report.sales_order_analysis import execute as sales_order_analysis_execute
+from erpnext.selling.report.sales_order_analysis import sales_order_analysis
+sales_order_analysis.execute = sales_order_analysis_execute
+
+from finbyzerp.finbyzerp.report.pending_so_items_for_purchase_request import execute as pending_so_items_for_purchase_request_execute
+from erpnext.selling.report.pending_so_items_for_purchase_request import pending_so_items_for_purchase_request
+pending_so_items_for_purchase_request.execute = pending_so_items_for_purchase_request_execute
+
+from finbyzerp.finbyzerp.report.trends import get_data as trends_data
+from erpnext.controllers import trends
+trends.get_data = trends_data
+
+from erpnext.controllers import sales_and_purchase_return
+from finbyzerp.api import validate_returned_items
+sales_and_purchase_return.validate_returned_items = validate_returned_items
+

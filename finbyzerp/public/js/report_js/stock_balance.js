@@ -1,7 +1,26 @@
 // Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors and contributors
 // For license information, please see license.txt
-
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
 frappe.query_reports["Stock Balance"] = {
+	onload: function() {
+		var item_code = getUrlParameter("item_code");
+		var item_group = getUrlParameter('item_group');
+		var warehouse = getUrlParameter('warehouse');
+		if(item_group){
+			frappe.query_report.set_filter_value('item_group', item_group);
+		}
+		if(warehouse){
+			frappe.query_report.set_filter_value('warehouse', warehouse);
+		}
+		if(item_code){
+			frappe.query_report.set_filter_value('item_code', item_code);
+		}
+	},
 	"filters": [
 		{
 			"fieldname": "company",

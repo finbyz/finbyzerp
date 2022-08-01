@@ -73,6 +73,18 @@ class BankStatementTransactionEntry(Document):
 			mapped_items = frappe.get_doc("Bank Statement Settings", self.bank_settings).mapped_items
 		statement_headers = self.get_statement_headers()
 		transactions = get_transaction_entries(file_url, statement_headers)
+
+		supplier_list = frappe.get_all("Supplier", fields=['name', 'supplier_name'])
+		customer_list = frappe.get_all("Customer", fields=['name', 'customer_name'])
+
+		supplier_dict = {}
+		customer_dict = {}
+		for row in supplier_list:
+			supplier_dict[row.supplier_name] = row.name
+		
+		for row in customer_list:
+			customer_dict[row.customer_name] = row.name
+
 		for entry in transactions:
 			date = str(entry[statement_headers["Date"]]).strip()
 			#print("Processing entry DESC:{0}-W:{1}-D:{2}-DT:{3}".format(entry["Particulars"], entry["Withdrawals"], entry["Deposits"], entry["Date"]))
@@ -95,10 +107,15 @@ class BankStatementTransactionEntry(Document):
 				bank_entry.party = mapped_item.mapped_data
 			else:
 				bank_entry.party_type = "Supplier" if not str(entry[statement_headers["Deposits"]]).strip() else "Customer"
-				party_list = frappe.get_all(bank_entry.party_type, fields=["name"])
-				parties = [party.name for party in party_list]
+				if bank_entry.party_type == "Supplier":
+					party_list = supplier_list
+					parties = [party.supplier_name for party in party_list]
+				else:
+					party_list = customer_list
+					parties = [party.customer_name for party in party_list]
+
 				matches = difflib.get_close_matches(frappe.safe_decode(bank_entry.description.lower()), parties, 1, 0.4)
-				if len(matches) > 0: bank_entry.party = matches[0]
+				if len(matches) > 0: bank_entry.party = supplier_dict.get(matches[0]) or customer_dict.get(matches[0]) or matches[0]
 			bank_entry.amount = -float(entry[statement_headers["Withdrawals"]]) if not str(entry[statement_headers["Deposits"]]).strip() else float(entry[statement_headers["Deposits"]])
 		self.map_unknown_transactions()
 		self.map_transactions_on_journal_entry()
@@ -134,6 +151,7 @@ class BankStatementTransactionEntry(Document):
 				ent.party_type = entry.party_type
 				ent.party = entry.party
 				ent.invoice = e.get('voucher_no')
+				ent.branch = e.get('branch')
 				added_invoices += [ent.invoice]
 				invoice_type="Journal Entry" if frappe.db.exists("Journal Entry",e.get('voucher_no')) else "Purchase Invoice"
 				ent.invoice_type = "Sales Invoice" if entry.party_type == "Customer" else invoice_type
@@ -164,7 +182,7 @@ class BankStatementTransactionEntry(Document):
 					inv_entry.outstanding_amount = doc.outstanding_amount
 					inv_entry.allocated_amount = min(float(doc.outstanding_amount), amount)
 
-				amount -= inv_entry.get('allocated_amount')
+				amount -= flt(inv_entry.get('allocated_amount'))
 				if (amount < 0): break
 
 			amount = abs(entry.amount)
@@ -276,6 +294,8 @@ class BankStatementTransactionEntry(Document):
 			reference.reference_doctype = inv_entry.invoice_type
 			reference.reference_name = inv_entry.invoice
 			reference.allocated_amount = inv_entry.allocated_amount
+			if frappe.get_meta("Bank Statement Transaction Invoice Item").get_field("branch"):
+				payment.branch = inv_entry.branch
 			print ("Adding invoice {0} {1}".format(reference.reference_name, reference.allocated_amount))
 		payment.setup_party_account_field()
 		payment.set_missing_values()

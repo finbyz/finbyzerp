@@ -99,8 +99,9 @@ def get_data(filters):
 		conditions += " and sle.company = %s" % frappe.db.escape(filters.get("company"))
 
 	if filters.get("item_group"):
-		conditions += " and i.item_group = %s" % frappe.db.escape(filters.get("item_group"))
-		group_by_cond = 'sle.item_group'
+		# conditions += " and i.item_group = %s" % frappe.db.escape(filters.get("item_group"))
+		conditions = conditions +  " and " + str(get_item_group_condition(filters.get("item_group")))
+		# group_by_cond = 'sle.item_group'
 	if filters.get("item_code"):
 		conditions += " and sle.item_code = %s" % frappe.db.escape(filters.get("item_code"))
 		group_by_cond = 'sle.item_code'
@@ -255,3 +256,12 @@ def get_period_month_ranges(period, year_start_date,year_end_date):
 		period_month_ranges.append(months_in_this_period)
 
 	return period_month_ranges
+
+def get_item_group_condition(item_group):
+	item_group_details = frappe.db.get_value("Item Group", item_group, ["lft", "rgt"], as_dict=1)
+	if item_group_details:
+		return "i.item_group in (select ig.name from `tabItem Group` ig \
+			where ig.lft >= %s and ig.rgt <= %s and i.item_group = ig.name)"%(item_group_details.lft,
+			item_group_details.rgt)
+
+	return ''

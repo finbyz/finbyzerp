@@ -113,5 +113,8 @@ def update_website_settings():
 	doc.app_name = "FinbyzERP"
 	doc.disable_signup = 1
 	doc.hide_footer_signup = 1
+	doc.banner_image="/assets/finbyzerp/images/favicon.ico"
+	doc.splash_image="/assets/finbyzerp/images/FinbyzLogo.svg"
+	doc.favicon="/assets/finbyzerp/images/favicon.ico"
 	doc.save(ignore_permissions=True)
 	doc.save(ignore_permissions=True)
