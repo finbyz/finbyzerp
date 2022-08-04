@@ -4,27 +4,7 @@
 // var dt = frappe.db.get_value("Fiscal Year",frappe.sys_defaults.fiscal_year,'start_date',function(r){
 // 	return r.start_date
 // })
-function getUrlParameter(name) {
-    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-    var results = regex.exec(location.search);
-    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-};
 frappe.query_reports["Monthly Stock Summary"] = {
-	onload: function() {
-		var item_code = getUrlParameter("item_code");
-		var item_group = getUrlParameter('item_group');
-		var warehouse = getUrlParameter('warehouse');
-		if(item_group){
-			frappe.query_report.set_filter_value('item_group', item_group);
-		}
-		if(warehouse){
-			frappe.query_report.set_filter_value('warehouse', warehouse);
-		}
-		if(item_code){
-			frappe.query_report.set_filter_value('item_code', item_code);
-		}
-	},
 	"filters": [
 		{
 			"fieldname":"period",
@@ -77,5 +57,22 @@ frappe.query_reports["Monthly Stock Summary"] = {
 			"label": __("Show Profit"),
 			"fieldtype": "Check"
 		},
-	]
+	],
+	"formatter": function (value, row, column, data, default_formatter) {
+		value = default_formatter(value, row, column, data);
+		if (column.fieldname == "inward_value" && data && data.inward_value > 0) {
+			value =  `<span style='color:green; font-weight: bold;'>${value}</span>`;
+		}
+		if (column.fieldname == "inward_qty" && data && data.inward_value > 0) {
+			value =  `<span style='color:green; font-weight: bold;'>${value}</span>`;
+		}
+		if (column.fieldname == "outward_qty" && data && data.outward_value > 0) {
+			value =  `<span style='color:red; font-weight: bold;'>${value}</span>`;
+		}
+		if (column.fieldname == "outward_value" && data && data.outward_value > 0){
+
+			value  =  `<span style='color:red; font-weight: bold;'>${value}</span>`;
+		}
+		return value
+	}
 };
