@@ -230,8 +230,6 @@ def get_conditions(filters):
 	else:
 		frappe.throw(_("'To Date' is required"))
 
-	if filters.get("company"):
-		conditions += " and sle.company = %s" % frappe.db.escape(filters.get("company"))
 
 	if filters.get("warehouse"):
 		warehouse_details = frappe.db.get_value(
@@ -263,18 +261,16 @@ def get_stock_ledger_entries(filters, items):
 
 	conditions = get_conditions(filters)
 
-	return frappe.db.sql(
-		"""
+	return frappe.db.sql(f"""
 		select
 			sle.item_code, warehouse, sle.posting_date, sle.actual_qty, sle.valuation_rate,
 			sle.company, sle.voucher_type, sle.qty_after_transaction, sle.stock_value_difference,
 			sle.item_code as name, sle.voucher_no, sle.stock_value, sle.batch_no
 		from
 			`tabStock Ledger Entry` sle
-		where sle.docstatus < 2 %s %s
+		where sle.docstatus < 2 and sle.company = '{filters.get('company')}' {item_conditions_sql} {conditions}
 		and is_cancelled = 0
-		order by sle.posting_date, sle.posting_time, sle.creation, sle.actual_qty"""
-		% (item_conditions_sql, conditions),  # nosec
+		order by sle.posting_date, sle.posting_time, sle.creation, sle.actual_qty""",  # nosec
 		as_dict=1,
 	)
 
