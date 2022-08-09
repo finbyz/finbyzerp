@@ -132,6 +132,7 @@ class CreditandDebitNote(Document):
 				else:
 					target.supplier = source.party
 					target.naming_series=' PI-DR-.fiscal.-.###' if source.type=="Debit Note" else "PI-CR-.fiscal.-.###"
+				target.remarks = source.remarks
 				target.series_value = source.series_value
 				target.run_method("set_missing_values")
 				target.run_method("calculate_taxes_and_totals")
@@ -159,6 +160,8 @@ class CreditandDebitNote(Document):
 						target.stock_qty = -(target.stock_qty)
 				if target_doctype == "Sales Invoice":
 					target.income_account = frappe.db.get_value("Company",source_parent.company,"default_income_account")
+				target.income_account=source.income_account
+				target.expense_account=source.expense_account
 
 			doclist = get_mapped_doc(source_doc.doctype, source_doc.name, {
 				source_doc.doctype: {
@@ -183,6 +186,8 @@ class CreditandDebitNote(Document):
 		try:
 			return_entry.flags.ignore_permissions = True
 			return_entry.save()
+			return_entry.taxes_and_charges=self.get('sales_taxes_and_charges') if self.party_type == "Customer" else  self.get('purchase_taxes_and_charges')
+			return_entry.tax_category=None
 			submit=0
 			if not cint(frappe.db.get_single_value("E Invoice Settings", "enable")):
 				submit=1
