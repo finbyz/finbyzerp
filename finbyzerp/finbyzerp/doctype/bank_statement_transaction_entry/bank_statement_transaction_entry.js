@@ -73,6 +73,11 @@ frappe.ui.form.on('Bank Statement Transaction Entry', {
 	submit_payments: function(frm) {
 		frm.events.invoke_doc_function(frm, "submit_payment_entries");
 	},
+	remove_unallocated_invoices: function(frm) {
+		frm.events.invoke_doc_function(frm, "remove_unallocated_entries");
+		frm.refresh_field("payment_invoice_items");
+		cur_frm.reload_doc()
+	},
 });
 
 

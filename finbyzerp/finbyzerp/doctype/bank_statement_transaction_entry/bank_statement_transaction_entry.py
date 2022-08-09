@@ -53,6 +53,15 @@ class BankStatementTransactionEntry(Document):
 		if not self.new_transaction_items:
 			self.populate_payment_entries()
 
+	@frappe.whitelist()
+	def remove_unallocated_entries(self):
+		self.set("payment_invoice_items", self.get("payment_invoice_items", {"allocated_amount": ["not in", [0, None, ""]]}))
+		frappe.db.sql(
+			"""delete from `tabBank Statement Transaction Invoice Item`
+			where parent = %s and allocated_amount = 0""",
+			self.name,
+		)
+
 	def get_statement_headers(self):
 		if not self.bank_settings:
 			frappe.throw(_("Bank Data mapper doesn't exist"))
@@ -157,9 +166,9 @@ class BankStatementTransactionEntry(Document):
 				ent.invoice_type = "Sales Invoice" if entry.party_type == "Customer" else invoice_type
 				ent.invoice_date = e.get('posting_date')
 				ent.outstanding_amount = e.get('outstanding_amount')
-				ent.allocated_amount = min(float(e.get('outstanding_amount')), amount)
-				amount -= float(e.get('outstanding_amount'))
-				if (amount <= 5): break
+				ent.allocated_amount = min(float(e.get('outstanding_amount')), amount) or 0
+				# amount -= float(e.get('outstanding_amount'))
+				# if (amount <= 5): break #commented for ushanti
 		self.match_invoice_to_payment()
 		self.populate_matching_vouchers()
 		self.map_transactions_on_journal_entry()
@@ -293,7 +302,7 @@ class BankStatementTransactionEntry(Document):
 			reference = payment.append("references", {})
 			reference.reference_doctype = inv_entry.invoice_type
 			reference.reference_name = inv_entry.invoice
-			reference.allocated_amount = inv_entry.allocated_amount
+			reference.allocated_amount = flt(inv_entry.allocated_amount)
 			if frappe.get_meta("Bank Statement Transaction Invoice Item").get_field("branch"):
 				payment.branch = inv_entry.branch
 			print ("Adding invoice {0} {1}".format(reference.reference_name, reference.allocated_amount))
