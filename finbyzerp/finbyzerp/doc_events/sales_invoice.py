@@ -19,8 +19,13 @@ def set_shipping_address(self):
         self.customer_gstin=self.billing_address_gstin
         self.shipping_address=self.address_display
 
-def before_submit(self, method):
-    unlink_credit_note_entries(self)
+def on_trash(self, method):
+    validate_irn_generated_invoice(self)
+
+def validate_irn_generated_invoice(self):
+    if self.get('irn') or self.get('ewaybill') or self.get('irn_cancelled') or self.get('eway_bill_cancelled'):
+        frappe.throw("Once the E-Invoice (IRN) is cancelled, the same invoice number cannot be re-used to generate another IRN",
+         title= "IRN or E-way Bill Generated Invoice Cannot be deleted""")
 
 def calculate_gst_taxable_value(self):
 	self.gst_taxable_value = abs(sum([flt(i.get('taxable_value')) for i in self.get('items')]))
@@ -78,7 +83,3 @@ def get_fiscal(date):
     from erpnext.accounts.utils import get_fiscal_year
     fiscal_year = get_fiscal_year(date)
     return str(fiscal_year[0]),str(fiscal_year[1]),str(fiscal_year[2])
-
-def unlink_credit_note_entries(self):
-    if self.is_return and self.return_against:
-        unlink_ref_doc_from_payment_entries(frappe.get_doc("Sales Invoice",self.return_against))

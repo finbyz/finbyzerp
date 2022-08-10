@@ -25,6 +25,15 @@ cur_frm.fields_dict.items.grid.get_field("expense_account").get_query = function
 	}
 };
 
+cur_frm.fields_dict.items.grid.get_field("income_account").get_query = function(doc) {
+	return {
+		filters: {
+			"company": doc.company,
+		}
+	}
+};
+
+
 // Customer Address Filter
 cur_frm.set_query("customer_address", function () {
     return {
@@ -349,6 +358,7 @@ function Calculate_taxes_and_totals(frm){
 		frm.set_value("purchase_taxes_and_charges",frm.doc.taxes_and_charges)
 		frm.refresh();
 	}
+	delete frm.doc['taxes']
 	// return frappe.call({
 	// 	method:"calculate_debit_credit_taxes",
 	// 	doc:frm.doc,

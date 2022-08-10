@@ -88,14 +88,14 @@ def after_install():
 					box-shadow: 0px 0px 9px rgba(0,0,0,0.5);
 					max-width: 8.3in;
 					min-height: 11.69in;
-					padding: 12px!important;
-					margin: 12px!important;
+					padding: 0px!important;
+					margin: 0px!important;
 					}
 				}
 			@media print {
 				.print-format  {
-					padding: 7px!important;
-					margin: 7px!important;
+					padding: 0px!important;
+					margin: 0px!important;
 				}
 			}
 		"""
@@ -104,4 +104,17 @@ def after_install():
 
 	print_setting = frappe.get_doc("Print Settings","Print Settings")
 	print_setting.db_set('print_style','FinByz')
+	update_website_settings()
 	frappe.db.commit()
+
+def update_website_settings():
+	doc = frappe.get_doc("Website Settings")
+	doc.home_page = "login"
+	doc.app_name = "FinbyzERP"
+	doc.disable_signup = 1
+	doc.hide_footer_signup = 1
+	doc.banner_image="/assets/finbyzerp/images/favicon.ico"
+	doc.splash_image="/assets/finbyzerp/images/FinbyzLogo.svg"
+	doc.favicon="/assets/finbyzerp/images/favicon.ico"
+	doc.save(ignore_permissions=True)
+	doc.save(ignore_permissions=True)

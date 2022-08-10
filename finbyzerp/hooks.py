@@ -44,11 +44,11 @@ dashboard.make_records = make_records
 # e_invoice overrides
 import erpnext
 # from finbyzerp.e_invoice_override import validate_einvoice_fields,get_transaction_details,get_item_list,make_einvoice,get_invoice_value_details,update_invoice_taxes
-from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name
+from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name, make_einvoice
 erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
 erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
+erpnext.regional.india.e_invoice.utils.make_einvoice = make_einvoice
 # erpnext.regional.india.e_invoice.utils.get_transaction_details = get_transaction_details
-# erpnext.regional.india.e_invoice.utils.make_einvoice = make_einvoice
 # erpnext.regional.india.e_invoice.utils.get_invoice_value_details=get_invoice_value_details
 # erpnext.regional.india.e_invoice.utils.update_invoice_taxes = update_invoice_taxes
 #erpnext.regional.india.e_invoice.utils.update_item_taxes = update_item_taxes
@@ -61,10 +61,10 @@ utils.validate_document_name = validate_document_name
 #GSPConnector.set_einvoice_data = set_einvoice_data
 
 
-import erpnext
-from finbyzerp.e_invoice_override import get_item_list,validate_einvoice_fields
-erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
-erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
+# import erpnext
+# from finbyzerp.e_invoice_override import get_item_list,validate_einvoice_fields
+# erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
+# erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
 
 # email Campaign override
 from finbyzerp.finbyzerp.doc_events.email_campaign import send_email_to_leads_or_contacts
@@ -79,6 +79,7 @@ sync.get_doc_files = get_doc_files
 from erpnext.hr.doctype.expense_claim.expense_claim import ExpenseClaim
 from finbyzerp.finbyzerp.doc_events.expense_claim import set_status
 ExpenseClaim.set_status = set_status
+
 
 app_include_css = ["/assets/finbyzerp/css/permission.css","/assets/finbyzerp/css/finbyz-theme.css"]
 app_include_js = [
@@ -110,6 +111,8 @@ doctype_js = {
 	"Opportunity":"public/js/doctype_js/opportunity.js",
 	"Opening Invoice Creation Tool":"public/js/doctype_js/opening_invoice_creation_tool.js",
 	"Payment Reconciliation":"public/js/doctype_js/payment_reconciliation.js",
+	"BOM":"public/js/doctype_js/bom.js",
+	"Form Tour": "public/js/doctype_js/form_tour.js",
 }
 website_context = {
 	"favicon": 	"/assets/finbyzerp/images/favicon.ico",
@@ -128,7 +131,7 @@ override_whitelisted_methods = {
 	"erpnext.setup.doctype.company.delete_company_transactions.delete_company_transactions": "finbyzerp.finbyzerp.override.delete_company_transactions.delete_company_transactions",
 	"frappe.desk.moduleview.get_desktop_settings": "finbyzerp.api.get_desktop_settings",
 	"frappe.desk.moduleview.get_options_for_global_modules": "finbyzerp.api.get_options_for_global_modules",
-	"erpnext.regional.india.e_invoice.utils.cancel_eway_bill": "finbyzerp.e_invoice_override.cancel_eway_bill" # cancel eway bill override for enable cancel_eway_bill api
+	"erpnext.regional.india.e_invoice.utils.cancel_eway_bill": "finbyzerp.e_invoice_override.cancel_eway_bill", # cancel eway bill override for enable cancel_eway_bill api
 	#"frappe.utils.print_format.download_pdf": "finbyzerp.print_format.download_pdf",
 }
 
@@ -145,13 +148,17 @@ override_doctype_dashboards = {
 
 doc_events = {
 	"Customer": {
-		"validate":"finbyzerp.api.customer_validate"
+		"validate":"finbyzerp.api.customer_validate",
+		"before_rename": "finbyzerp.finbyzerp.doc_events.customer.before_rename"
 	},
 	"Supplier": {
-		"validate":"finbyzerp.api.supplier_validate"
+		"validate":"finbyzerp.api.supplier_validate",
+		"before_rename": "finbyzerp.finbyzerp.doc_events.supplier.before_rename"
 	},
 	"Item": {
-		"validate":"finbyzerp.finbyzerp.doc_events.item.validate"
+		"validate":"finbyzerp.finbyzerp.doc_events.item.validate",
+		"before_naming":"finbyzerp.finbyzerp.doc_events.item.before_validate",
+		"before_rename": "finbyzerp.finbyzerp.doc_events.item.before_rename"
 	},
 	"User": {
 		"validate":"finbyzerp.api.validate_user"
@@ -163,13 +170,12 @@ doc_events = {
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
 			"finbyzerp.api.si_validate"
 		],
-		"before_submit":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_submit",
-		'on_submit': "finbyzerp.api.sales_invoice_on_submit",
+		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
+		"on_submit": "finbyzerp.api.sales_invoice_on_submit",
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate",
-		"before_submit":"finbyzerp.finbyzerp.doc_events.purchase_invoice.before_submit"
+		"validate": "finbyzerp.api.pi_validate"
 	},
 		"Purchase Receipt": {
 		"validate": "finbyzerp.api.pr_validate"
@@ -191,24 +197,34 @@ doc_events = {
 	("Purchase Order","Sales Order"):{
 		"before_cancel":"finbyzerp.api.po_so_before_cancel",
 	},
-	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note"): {
+	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice","Mould Trail Request"): {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
+	"Form Tour": {
+		"before_save":"finbyzerp.finbyzerp.doc_events.form_tour.before_save",
+		"on_update":"finbyzerp.finbyzerp.doc_events.form_tour.on_update"
+	},
+	("Quotation","Sales Order","Delivery Note","Sales Invoice"):{
+			"on_submit":"finbyzerp.finbyzerp.doc_events.quotation.on_submit",
+			"before_update_after_submit":"finbyzerp.finbyzerp.doc_events.quotation.before_update_after_submit",
+			"before_cancel":"finbyzerp.finbyzerp.doc_events.quotation.on_cancel",
+			"on_trash":"finbyzerp.finbyzerp.doc_events.quotation.on_trash"
+		},
 }
 
 scheduler_events = {
-	"cron":{
-		"*/5 * * * *":[
-			"finbyzerp.api.repost_transaction_entries"
-		],
-	},
+# 	"cron":{
+# 		"*/5 * * * *":[
+# 			"finbyzerp.api.repost_transaction_entries"
+# 		],
+# 	},
 	"daily":[
 		"finbyzerp.api.daily_entry_summary_mail",
 		"finbyzerp.api.daily_transaction_summary_mail"
 	]
 }
 
-# # BOM Stock Calculated Report Override:
+# BOM Stock Calculated Report Override:
 # from finbyzerp.finbyzerp.report.bom_stock_calculated import execute as bsc_execute
 # from erpnext.manufacturing.report.bom_stock_calculated import bom_stock_calculated
 # bom_stock_calculated.execute = bsc_execute
@@ -234,6 +250,19 @@ from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as
 from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
 gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
 
+from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
+from erpnext.stock.report.stock_ledger import stock_ledger
+stock_ledger.execute = stock_ledger_execute
+
+from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
+from erpnext.stock.report.stock_balance import stock_balance
+stock_balance.execute = stock_balance_execute
+
+
+from finbyzerp.finbyzerp.report.trial_balance_for_party import execute as trial_balance_for_party_execute
+from erpnext.accounts.report.trial_balance_for_party import trial_balance_for_party
+trial_balance_for_party.execute = trial_balance_for_party_execute
+
 # Override Stock and Accounts diff validation for throw when amount is > 5
 from erpnext.accounts import utils
 from finbyzerp.api import check_if_stock_and_account_balance_synced
@@ -247,4 +276,31 @@ from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
 
+from frappe.workflow.doctype.workflow_action import workflow_action
+from finbyzerp.api import process_workflow_actions
+workflow_action.process_workflow_actions = process_workflow_actions
+
+from erpnext.accounts import general_ledger
+from finbyzerp.finbyzerp.override.general_ledger import check_freezing_date
+general_ledger.check_freezing_date = check_freezing_date
+
+from erpnext.stock.doctype.stock_ledger_entry.stock_ledger_entry import StockLedgerEntry
+from finbyzerp.finbyzerp.override.stock_ledger_entry import check_stock_frozen_date
+StockLedgerEntry.check_stock_frozen_date = check_stock_frozen_date
+
+from finbyzerp.finbyzerp.report.sales_order_analysis import execute as sales_order_analysis_execute
+from erpnext.selling.report.sales_order_analysis import sales_order_analysis
+sales_order_analysis.execute = sales_order_analysis_execute
+
+from finbyzerp.finbyzerp.report.pending_so_items_for_purchase_request import execute as pending_so_items_for_purchase_request_execute
+from erpnext.selling.report.pending_so_items_for_purchase_request import pending_so_items_for_purchase_request
+pending_so_items_for_purchase_request.execute = pending_so_items_for_purchase_request_execute
+
+from finbyzerp.finbyzerp.report.trends import get_data as trends_data
+from erpnext.controllers import trends
+trends.get_data = trends_data
+
+from erpnext.controllers import sales_and_purchase_return
+from finbyzerp.api import validate_returned_items
+sales_and_purchase_return.validate_returned_items = validate_returned_items
 

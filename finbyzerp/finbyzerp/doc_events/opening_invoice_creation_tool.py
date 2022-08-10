@@ -1,6 +1,6 @@
 import frappe
 from frappe import _
-from frappe.utils import flt
+from frappe.utils import flt, nowdate
 from frappe import _, scrub
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import get_accounting_dimensions
 
@@ -96,7 +96,7 @@ def make_invoices(self):
 			doc.submit()
 			names.append(doc.name)
 		elif row.outstanding_amount > 0:
-			doc = frappe.get_doc(args).insert()
+			doc = frappe.get_doc(args).insert(set_name=args.get('invoice_number',None))
 			doc.submit()
 			names.append(doc.name)
 
@@ -122,16 +122,16 @@ def get_invoice_dict(self, row=None):
 			frappe.throw(
 				_("Please set the Default Cost Center in {0} company.").format(frappe.bold(self.company))
 			)
-		
+		income_expense_account_field = ("income_account" if row.party_type == "Customer" else "expense_account")
 		row.outstanding_amount = flt(row.outstanding_amount)
 		row.qty = flt(row.qty)
 		rate = flt(row.outstanding_amount) / flt(row.qty)
 
-		return frappe._dict({
+		item_dict = frappe._dict({
 			"uom": default_uom,
 			"rate": rate or 0.0,
-			"price":rate or 0.0,
 			"qty": row.qty,
+			"price":rate or 0.0,
 			"quantity":row.qty,
 			"conversion_factor": 1.0,
 			"item_name": row.item_name or "Opening Invoice Item",
@@ -139,6 +139,10 @@ def get_invoice_dict(self, row=None):
 			income_expense_account_field: row.temporary_opening_account,
 			"cost_center": cost_center
 		})
+		for dimension in get_accounting_dimensions():
+			item_dict.update({dimension: row.get(dimension)})
+
+		return item_dict
 
 	if not row:
 		return None
@@ -162,7 +166,11 @@ def get_invoice_dict(self, row=None):
 		"due_date": row.due_date,
 		"posting_date": row.posting_date,
 		frappe.scrub(party_type): row.party,
+		"is_pos": 0,
 		"doctype": "Sales Invoice" if self.invoice_type == "Sales" else "Purchase Invoice",
+		"update_stock": 0,
+		"invoice_number": row.invoice_number,
+		"disable_rounded_total": 1,
 		"currency": row.currency or frappe.get_cached_value('Company',  self.company,  "default_currency"),
 		"conversion_rate": row.exchange_rate,
 		account_field: row.account
@@ -177,9 +185,9 @@ def get_invoice_dict(self, row=None):
 
 	if self.invoice_type == "Sales":
 		args["is_pos"] = 0
-		args['invoice_no'] = row.invoice_no
+		# args['invoice_no'] = row.invoice_no
 	else:
-		args['bill_no'] = row.invoice_no
+		args['bill_no'] = row.get('bill_no') or row.invoice_no
 
 	return args
 

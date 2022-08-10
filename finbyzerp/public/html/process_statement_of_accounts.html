@@ -1,0 +1,228 @@
+<div class="page-break">
+	<div id="header-html" class="hidden-pdf">
+		{% if letter_head %}
+		<div class="letter-head text-center">{{ letter_head.content }}</div>
+		<hr style="height:2px;border-width:0;color:black;background-color:black;">
+		{% endif %}
+	</div>
+	<div id="footer-html" class="visible-pdf">
+		{% if letter_head.footer %}
+		<div class="letter-head-footer">
+			<hr style="border-width:0;color:black;background-color:black;padding-bottom:2px;">
+			{{ letter_head.footer }}
+		</div>
+		{% endif %}
+	</div>
+	<div>
+		<table border="0" width="100%">
+            <tr>
+                <td width="50%" align="left">
+					<table border="0" width="100%">
+						<td width="10%"> <p>To</p></td>
+						<td width="5%"><p>:</p></td>
+						<td width="85%">
+							<p>
+							{% set customer_list=frappe.db.get_all("Dynamic Link",{'link_doctype':filters.party_type,'link_name':filters.party[0],'parenttype':"Address"},'parent') or '' %}
+							{% for each in customer_list %}
+								{% if frappe.db.get_value("Address",each['parent'],"is_primary_address")%}
+									{% set address = frappe.db.get_value("Address",each['parent'] ,['address_title','address_line1', 'address_line2','city', 'pincode', 'state','gstin']) %}	
+										{%- if address -%}
+											<p class="text">
+												{{ address[0] if address[0] else "" }}
+											</p>
+										{% endif %}
+										{% if address[1] %}
+										<p class="text">
+											{{ address[1] if address[1] else "" }}
+										</p>
+										{% endif %}
+										{% if address[2] %}
+										<p class="text">
+											{{ address[2] if address[2] else "" }}
+										</p>
+										{% endif %}
+										{% if address[3] %}
+										<p class="text">
+											{{ address[3] if address[3] else "" }}
+										</p>
+										{% endif %}
+										{% if address[6] %}
+										<p class="text">
+											{{ address[6] if address[6] else "" }}
+										</p>
+										{% endif %}
+								{% endif %}
+							{% endfor %}
+							</p>
+						</td>
+					</table>
+                </td>
+                <td width="50%" align="right">
+					<table border="0" width="100%">
+						<td width="10%"> <p>From</p></td>
+						<td width="5%"><p>:</p></td>
+						<td width="85%">
+							<p>
+								{% set company_list=frappe.db.get_all("Dynamic Link",{'link_doctype':"Company",'link_name':filters.company,'parenttype':"Address"},'parent') or '' %}
+								{% for each in company_list %}
+									
+										{% set address = frappe.db.get_value("Address",each['parent'] ,['address_title','address_line1', 'address_line2','city', 'pincode', 'state','gstin']) %}	
+											{%- if address -%}
+												<p class="text">
+													{{ address[0] if address[0] else "" }}
+												</p>
+											{% endif %}
+											{% if address[1] %}
+											<p class="text">
+												{{ address[1] if address[1] else "" }}
+											</p>
+											{% endif %}
+											{% if address[2] %}
+											<p class="text">
+												{{ address[2] if address[2] else "" }}
+											</p>
+											{% endif %}
+											{% if address[3] %}
+											<p class="text">
+												{{ address[3] if address[3] else "" }}
+											</p>
+											{% endif %}
+											{% if address[6] %}
+											<p class="text">
+												{{ address[6] if address[6] else "" }}
+											</p>
+											{% endif %}
+								{% endfor %}
+							</p>
+						</td>
+					</table>
+                </td>
+            </tr>
+            <tr>
+                <td width="50%" style="padding: 0px !important;">
+                    <h5>Dear Sir/Madam,</h5>
+                </td>
+                <td width="50%" align="right" style="padding: 0px !important;">
+                    <h5>	{{ _("Date: ") }}<b>{{ frappe.format(filters.creation, 'Date')}}</b></h5>
+                </td> 
+            </tr>
+            <tr>
+                <td colspan="2" align="center" style="padding: 0px !important;">
+                    <h5><b>Sub: Confirmation of Account</b></h5>
+                    <p>{{ frappe.format(filters.from_date, 'Date')}} {{ _("to") }}{{ frappe.format(filters.to_date, 'Date')}} </p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="left" style="padding: 0px !important;">
+                    <p>Given below is the details of your Accounts as standing in my/our Books of Accounts for the above mentioned period.
+                        Kindly return 3 copies stating your I.T. Permanent A/c No., duly signed and sealed, in confirmation of the same. Please
+                        note that if no reply is received from you within a fortnight, it will be assumed that you have accepted the balance shown
+                        below.</p>
+                </td>
+            </tr>
+        </table>
+	</div>
+	<br>
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th style="width: 12%">{{ _("Date") }}</th>
+				<th style="width: 15%">{{ _("Reference") }}</th>
+				<th style="width: 25%">{{ _("Remarks") }}</th>
+				<th style="width: 15%">{{ _("Debit") }}</th>
+				<th style="width: 15%">{{ _("Credit") }}</th>
+				<th style="width: 18%">{{ _("Balance (Dr - Cr)") }}</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for row in data %}
+			<tr>
+			{% if(row.posting_date) %}
+				<td>{{ frappe.format(row.posting_date, 'Date') }}</td>
+				<td>{{ row.voucher_type }}
+					<br>{{ row.voucher_no }}</td>
+				<td>
+					{% if not (filters.party or filters.account)  %}
+						{{ row.party or row.account }}
+						<br>
+					{% endif %}
+
+					{{ _("Against") }}: {{ row.against }}
+					<br>{{ _("Remarks") }}: {{ row.remarks }}
+					{% if row.bill_no %}
+						<br>{{ _("Supplier Invoice No") }}: {{ row.bill_no }}
+					{% endif %}
+					</td>
+					<td style="text-align: right">
+						{{ frappe.utils.fmt_money(row.debit, currency=filters.presentation_currency) }}</td>
+					<td style="text-align: right">
+						{{ frappe.utils.fmt_money(row.credit, currency=filters.presentation_currency) }}</td>
+			{% else %}
+				<td></td>
+				<td></td>
+				<td><b>{{ frappe.format(row.account, {fieldtype: "Link"}) or "&nbsp;" }}</b></td>
+				<td style="text-align: right">
+					{{ row.get('account', '') and frappe.utils.fmt_money(row.debit, currency=filters.presentation_currency) }}
+				</td>
+				<td style="text-align: right">
+					{{ row.get('account', '') and frappe.utils.fmt_money(row.credit, currency=filters.presentation_currency) }}
+				</td>
+			{% endif %}
+				<td style="text-align: right">
+					{{ frappe.utils.fmt_money(row.balance, currency=filters.presentation_currency) }}
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+	<br>
+	{% if ageing %}
+	<h4 class="text-center">{{ _("Ageing Report based on ") }} {{ ageing.ageing_based_on }}
+		{{ _("up to " ) }}  {{ frappe.format(filters.to_date, 'Date')}}
+	</h4>
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th style="width: 25%">30 Days</th>
+				<th style="width: 25%">60 Days</th>
+				<th style="width: 25%">90 Days</th>
+				<th style="width: 25%">120 Days</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>{{ frappe.utils.fmt_money(ageing.range1, currency=filters.presentation_currency) }}</td>
+				<td>{{ frappe.utils.fmt_money(ageing.range2, currency=filters.presentation_currency) }}</td>
+				<td>{{ frappe.utils.fmt_money(ageing.range3, currency=filters.presentation_currency) }}</td>
+				<td>{{ frappe.utils.fmt_money(ageing.range4, currency=filters.presentation_currency) }}</td>
+			</tr>
+		</tbody>
+	</table>
+	{% endif %}
+	{% if terms_and_conditions %}
+	<div>
+		{{ terms_and_conditions }}
+	</div>
+	{% endif %}
+    <table width="100%" border="0">
+        <tr>
+            <td width="50%" style="padding: 0px !important">
+                <p  align="left">I/We hereby confirm the above</p>
+                <br><br><br>
+            </td>
+            <td width="50%" style="padding: 0px !important">
+                <p align="rignt">Yours faithfully,</p>
+                <br><br><br>
+            </td>
+        </tr>
+        <tr>
+            <td >
+                <p align="left">I.T. PAN No. : {{ frappe.db.get_value(filters.party_type,filters.party[0],'tax_id') or '' }}</p>
+            </td>
+            <td >
+                <p align="rignt">Our I.T. PAN No. : {{ frappe.db.get_value("Company",filters.company,'tax_id')}}</p>
+            </td>
+        </tr>
+    </table>
+</div> 

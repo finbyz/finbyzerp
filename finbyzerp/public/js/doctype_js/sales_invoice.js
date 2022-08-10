@@ -1,13 +1,21 @@
 frappe.ui.form.on('Sales Invoice', {
 	refresh: (frm) => {
 		if (frm.doc.__islocal){
-		frm.set_df_property("company", "read_only", (!frm.doc.__islocal || frm.doc.amended_from) ? 1 : 0);
+			frm.set_df_property("company", "read_only", (!frm.doc.__islocal || frm.doc.amended_from) ? 1 : 0);
 		}
 	},
 	onload: (frm) => {
 		if (frm.doc.__islocal){
-		frm.trigger('naming_series');
+			frm.trigger('naming_series');
 		}
+		if (frm.doc.irn_cancelled && frm.doc.irn && frm.doc.__islocal && frm.doc.amended_from){
+            frm.set_value("irn",'')
+            frm.set_value("irn_cancelled",0)
+        }
+        if (frm.doc.eway_bill_cancelled && frm.doc.ewaybill && frm.doc.__islocal && frm.doc.amended_from){
+            frm.set_value("ewaybill",'')
+            frm.set_value("eway_bill_cancelled",0)
+        }
 	},
 	naming_series: function (frm) {
 		if (frappe.meta.get_docfield("Sales Invoice", "series_value", frm.doc.name)){

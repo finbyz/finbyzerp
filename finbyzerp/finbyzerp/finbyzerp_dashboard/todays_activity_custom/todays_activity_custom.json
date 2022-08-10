@@ -1,0 +1,62 @@
+{
+ "cards": [
+  {
+   "card": "Today's Sales Orders"
+  },
+  {
+   "card": "Today's Outgoing Bills"
+  },
+  {
+   "card": "Today's Purchase Orders"
+  },
+  {
+   "card": "Today's Incoming Bills"
+  },
+  {
+   "card": "Today's Outgoing Payment"
+  },
+  {
+   "card": "Today's Incoming Payment"
+  },
+  {
+   "card": "Today's Work Orders"
+  },
+  {
+   "card": "Today's Journal Entries"
+  }
+ ],
+ "charts": [
+  {
+   "chart": "Today's Activity Analysis",
+   "width": "Full"
+  },
+  {
+   "chart": "Sales Invoice Trends",
+   "width": "Half"
+  },
+  {
+   "chart": "Purchase Invoice Trends",
+   "width": "Half"
+  },
+  {
+   "chart": "Amount Received",
+   "width": "Half"
+  },
+  {
+   "chart": "Amount Paid",
+   "width": "Half"
+  }
+ ],
+ "creation": "2022-05-06 16:48:10.187167",
+ "dashboard_name": "Todays Activity",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2022-05-06 16:51:27.373107",
+ "modified_by": "Administrator",
+ "module": "Finbyzerp",
+ "name": "Todays Activity",
+ "owner": "Administrator"
+}

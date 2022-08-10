@@ -15,12 +15,21 @@ from erpnext.accounts.utils import get_stock_accounts,get_stock_and_account_bala
 from frappe.utils.data import (nowdate,add_to_date,get_first_day_of_week,get_last_day_of_week,get_first_day,get_last_day,
 		get_quarter_start,get_quarter_ending,get_year_start,get_year_ending)
 
+from frappe.workflow.doctype.workflow_action.workflow_action import (
+	get_common_email_args, deduplicate_actions, clear_workflow_actions, get_next_possible_transitions, get_doc_workflow_state,
+	is_workflow_action_already_created, update_completed_workflow_actions, clear_old_workflow_actions, get_users_next_action_data,
+	create_workflow_actions_for_users)
+from frappe.desk.doctype.notification_log.notification_log import make_notification_logs
+from frappe.utils.background_jobs import enqueue
+from frappe.model.workflow import get_workflow_name, send_email_alert
+from frappe.desk.notifications import clear_doctype_notifications
+
 import json
 import os
 import sys
 import time
-
 from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_entries
+from erpnext.controllers.sales_and_purchase_return import *
 
 def before_insert(self, method):
 	opening_naming_series(self)
@@ -119,10 +128,12 @@ def check_counter_series(name, company_series = None, date = None):
 
 def opening_naming_series(self):
 	if not self.name and self.is_opening == "Yes":
-		if self.naming_series[0] != ".":
-			self.naming_series = "O" + "." + self.naming_series
-		else:
-			self.naming_series = "O" + self.naming_series
+		self.naming_series = "O" + self.naming_series
+		if self.naming_series.find("Ofiscal") != -1:
+			self.naming_series = self.naming_series.replace("Ofiscal", "O.fiscal")
+		
+		if self.naming_series.find("Ocompany_series") != -1:
+			self.naming_series = self.naming_series.replace("Ocompany_series", "O.company_series")
 
 @frappe.whitelist()
 def get_desktop_settings():
@@ -464,6 +475,7 @@ def set_account_in_transaction(self):
 def make_meetings(source_name, doctype, ref_doctype, target_doc=None):
 	def set_missing_values(source, target):
 		target.party_type = doctype
+		target.party = source_name
 		now = now_datetime()
 		if ref_doctype == "Meeting Schedule":
 			target.scheduled_from = target.scheduled_to = now
@@ -504,6 +516,9 @@ import os
 def get_doc_files(files, start_path):
 	"""walk and sync all doctypes and pages"""
 
+	if not files:
+		files = []
+
 	# load in sequence - warning for devs
 	document_types = ['doctype', 'page', 'report', 'dashboard_chart_source', 'print_format',
 		'website_theme', 'web_form', 'web_template', 'notification', 'print_style',
@@ -519,7 +534,9 @@ def get_doc_files(files, start_path):
 					if os.path.exists(doc_path):
 						if not doc_path in files:
 							files.append(doc_path)
-							
+
+	return files
+
 def finbyz_future_sle_exists(args):
 	return frappe.db.sql("""
 		select name
@@ -675,3 +692,152 @@ def po_so_before_cancel(self,method):
 @frappe.whitelist()
 def repost_transaction_entries():
 	repost_entries()
+
+def process_workflow_actions(doc, state):
+	workflow = get_workflow_name(doc.get('doctype'))
+	if not workflow: return
+
+	if state == "on_trash":
+		clear_workflow_actions(doc.get('doctype'), doc.get('name'))
+		return
+
+	if is_workflow_action_already_created(doc): return
+
+	clear_old_workflow_actions(doc)
+	update_completed_workflow_actions(doc)
+	clear_doctype_notifications('Workflow Action')
+
+	next_possible_transitions = get_next_possible_transitions(workflow, get_doc_workflow_state(doc), doc)
+
+	if not next_possible_transitions: return
+
+	user_data_map = get_users_next_action_data(next_possible_transitions, doc)
+
+	if not user_data_map: return
+
+	create_workflow_actions_for_users(user_data_map.keys(), doc)
+
+	if send_email_alert(workflow):
+		enqueue(send_workflow_action_email, queue='short', users_data=list(user_data_map.values()), doc=doc)
+
+
+def send_workflow_action_email(users_data, doc):
+	common_args = get_common_email_args(doc)
+	message = common_args.pop('message', None)
+	user_list = []
+	for d in users_data:
+		email_args = {
+			'recipients': [d.get('email')],
+			'args': {
+				'actions': list(deduplicate_actions(d.get('possible_actions'))),
+				'message': message
+			},
+			'reference_name': doc.name,
+			'reference_doctype': doc.doctype
+		}
+		email_args.update(common_args)
+		if frappe.db.exists("User",d.get("email")):
+			user_list.append(d.get("email"))
+		enqueue(method=frappe.sendmail, queue='short', **email_args)
+
+	notification_doc = frappe._dict({
+		'type': 'Workflow Alert',
+		'document_type': doc.doctype,
+		'document_name': doc.name,
+		'subject': f"{doc.name} Status Has been updated to {doc.workflow_state}",
+		'from_user': doc.owner
+	})
+	make_notification_logs(notification_doc, user_list)
+
+def validate_returned_items(doc):
+	from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos
+
+	valid_items = frappe._dict()
+
+	select_fields = "item_code, qty, stock_qty, rate, parenttype, conversion_factor"
+	if doc.doctype != "Purchase Invoice":
+		select_fields += ",serial_no, batch_no"
+
+	if doc.doctype in ["Purchase Invoice", "Purchase Receipt"]:
+		select_fields += ",rejected_qty, received_qty"
+
+	for d in frappe.db.sql(
+		"""select {0} from `tab{1} Item` where parent = %s""".format(select_fields, doc.doctype),
+		doc.return_against,
+		as_dict=1,
+	):
+		valid_items = get_ref_item_dict(valid_items, d)
+
+	if doc.doctype in ("Delivery Note", "Sales Invoice"):
+		for d in frappe.db.sql(
+			"""select item_code, qty, serial_no, batch_no from `tabPacked Item`
+			where parent = %s""",
+			doc.return_against,
+			as_dict=1,
+		):
+			valid_items = get_ref_item_dict(valid_items, d)
+
+	already_returned_items = get_already_returned_items(doc)
+
+	# ( not mandatory when it is Purchase Invoice or a Sales Invoice without Update Stock )
+	warehouse_mandatory = not (
+		(doc.doctype == "Purchase Invoice" or doc.doctype == "Sales Invoice") and not doc.update_stock
+	)
+
+	items_returned = False
+	for d in doc.get("items"):
+		if d.item_code and (flt(d.qty) < 0 or flt(d.get("received_qty")) < 0):
+			if d.item_code not in valid_items:
+				#finbyz chnages start
+				pass
+				# frappe.throw(
+				# 	_("Row # {0}: Returned Item {1} does not exist in {2} {3}").format(
+				# 		d.idx, d.item_code, doc.doctype, doc.return_against
+				# 	)
+				# )
+				#finbyz chnages start
+			else:
+				ref = valid_items.get(d.item_code, frappe._dict())
+				validate_quantity(doc, d, ref, valid_items, already_returned_items)
+
+				if ref.rate and doc.doctype in ("Delivery Note", "Sales Invoice") and flt(d.rate) > ref.rate:
+					frappe.throw(
+						_("Row # {0}: Rate cannot be greater than the rate used in {1} {2}").format(
+							d.idx, doc.doctype, doc.return_against
+						)
+					)
+
+				elif ref.batch_no and d.batch_no not in ref.batch_no:
+					frappe.throw(
+						_("Row # {0}: Batch No must be same as {1} {2}").format(
+							d.idx, doc.doctype, doc.return_against
+						)
+					)
+
+				elif ref.serial_no:
+					if not d.serial_no:
+						frappe.throw(_("Row # {0}: Serial No is mandatory").format(d.idx))
+					else:
+						serial_nos = get_serial_nos(d.serial_no)
+						for s in serial_nos:
+							if s not in ref.serial_no:
+								frappe.throw(
+									_("Row # {0}: Serial No {1} does not match with {2} {3}").format(
+										d.idx, s, doc.doctype, doc.return_against
+									)
+								)
+
+				if (
+					warehouse_mandatory
+					and not d.get("warehouse")
+					and frappe.db.get_value("Item", d.item_code, "is_stock_item")
+				):
+					frappe.throw(_("Warehouse is mandatory"))
+
+			items_returned = True
+
+		elif d.item_name:
+			items_returned = True
+
+	if not items_returned:
+		frappe.throw(_("Atleast one item should be entered with negative quantity in return document"))

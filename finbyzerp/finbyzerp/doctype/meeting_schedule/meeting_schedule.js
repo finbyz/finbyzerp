@@ -22,8 +22,15 @@ frappe.ui.form.on('Meeting Schedule', {
 			frm.trigger("get_party_details");
 		}
 	},
+	scheduled_from(frm) {
+		if (frm.doc.scheduled_from && !frm.doc.scheduled_to){
+		    // frm.set_value('scheduled_to',frm.doc.scheduled_from)
+			frm.set_value('scheduled_to',frappe.datetime.get_datetime_as_string(frappe.datetime.str_to_obj(frm.doc.scheduled_from).setHours(frappe.datetime.str_to_obj(frm.doc.scheduled_from).getHours() + 1)))
+		}
+	},
 	validate: function(frm){
 		frm.trigger("set_link_documents");
+		frm.trigger("contact_person_name")
 	},
 
 	contact_person_name: function(frm) {
@@ -36,7 +43,7 @@ frappe.ui.form.on('Meeting Schedule', {
 			if(frm.doc.is_online){
 				is_online = " Online ";
 			}
-			let message = "<p>Dear " + frm.doc.contact_person_name + ",</p><p>Greeting from "+ frm.doc.company + "</p><p> This is regarding the telephonic conversation that we had about " + frm.doc.service + " for your organization " + frm.doc.organisation + ". The" + is_online + " Meeting has been scheduled on " + date + " at " + time + "</p><p>In case of Any Changes in your Schedule request you to inform us timely.</p><p></p>Thanks & Regards,<p>" + sign + "</p>";
+			let message = "<p>Dear " + frm.doc.contact_person_name + ",</p><p>Greeting from "+ frm.doc.company + "</p><p> This is regarding the telephonic conversation that we had" + ". The" + is_online + " Meeting has been scheduled on " + date + " at " + time + "</p><p>In case of Any Changes in your Schedule request you to inform us timely.</p><p></p>Thanks & Regards,<p>" + sign + "</p>";
 			frm.set_value("invitation_message", message);
 		}
 	},
@@ -87,5 +94,13 @@ frappe.ui.form.on('Meeting Schedule', {
 				}
 			}
 		})
+	},
+	send_invitation: function(frm){
+		if (frm.is_dirty()){
+			frappe.throw("Please Save the Current Document and Then Proceed again")
+		}
+		else{
+			frm.call('send_invitation');
+		}
 	}
 });

@@ -1,0 +1,65 @@
+{
+ "cards": [
+  {
+   "card": "Weekly Sales Orders"
+  },
+  {
+   "card": "Weekly Outgoing Bills"
+  },
+  {
+   "card": "Weekly Purchase Orders"
+  },
+  {
+   "card": "Weekly Incoming Bills"
+  },
+  {
+   "card": "Weekly Outgoing Payment"
+  },
+  {
+   "card": "Weekly Incoming Payment"
+  },
+  {
+   "card": "Weekly Work Orders"
+  },
+  {
+   "card": "Weekly Journal Entries"
+  },
+  {
+   "card": "Weekly Stock Entries"
+  }
+ ],
+ "charts": [
+  {
+   "chart": "Weekly Activity Analysis",
+   "width": "Full"
+  },
+  {
+   "chart": "Sales Invoice Weekly Trends",
+   "width": "Half"
+  },
+  {
+   "chart": "Purchase Invoice Weekly Trends",
+   "width": "Half"
+  },
+  {
+   "chart": "Weekly Amount Received",
+   "width": "Half"
+  },
+  {
+   "chart": "Weekly Amount Paid",
+   "width": "Half"
+  }
+ ],
+ "creation": "2022-05-06 15:44:07.450817",
+ "dashboard_name": "Weekly Activity",
+ "docstatus": 0,
+ "doctype": "Dashboard",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "modified": "2022-05-10 16:13:32.693135",
+ "modified_by": "Administrator",
+ "module": "Finbyzerp",
+ "name": "Weekly Activity",
+ "owner": "Administrator"
+}

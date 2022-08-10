@@ -5,8 +5,8 @@ frappe.ui.form.on('Opportunity', {
 				return frappe.call({
 					method : "finbyzerp.api.make_meetings",
 					args: {
-						"source_name": frm.doc.name,
-						"doctype": 'Opportunity',
+						"source_name": frm.doc.party_name,
+						"doctype": frm.doc.opportunity_from,
 						"ref_doctype": 'Meeting Schedule'
 					},
 					callback: function(r) {
@@ -22,8 +22,8 @@ frappe.ui.form.on('Opportunity', {
 				return frappe.call({
 					method : "finbyzerp.api.make_meetings",
 					args: {
-						"source_name": frm.doc.name,
-						"doctype": 'Opportunity',
+						"source_name": frm.doc.party_name,
+						"doctype": frm.doc.opportunity_from,
 						"ref_doctype": 'Meeting'
 					},
 					callback: function(r) {
@@ -41,6 +41,5 @@ frappe.ui.form.on('Opportunity', {
 			frm.set_value("contact_by", "");
 			frm.set_value("contact_date", "");
 		}
-	},
-
+	}
 });

@@ -89,8 +89,14 @@ def get_item_group(filters):
 	
 
 def get_item_map(filters):
+	if not frappe.db.exists("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":0}):
+		frappe.throw(f"Please Define GST Account For Company: {filters.company} in GST Settings")
 	gst_accounts = frappe.get_doc("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":0})
+
+	if not frappe.db.exists("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":1}):
+		frappe.throw(f"Please Define Reverse Charge GST Accounts For Company: {filters.company} in GST Settings")
 	gst_accounts_reverse = frappe.get_doc("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":1})
+
 	accounts = frappe._dict({"cgst_account":gst_accounts.cgst_account,"sgst_account":gst_accounts.sgst_account,
 							"igst_account":gst_accounts.igst_account,"cess_account":gst_accounts.cess_account,
 							"tcs_account":gst_accounts.tcs_account,"export_reverse_charge_account":gst_accounts.export_reverse_charge_account})

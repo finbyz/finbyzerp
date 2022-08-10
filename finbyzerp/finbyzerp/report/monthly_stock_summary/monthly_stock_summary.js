@@ -57,5 +57,22 @@ frappe.query_reports["Monthly Stock Summary"] = {
 			"label": __("Show Profit"),
 			"fieldtype": "Check"
 		},
-	]
+	],
+	"formatter": function (value, row, column, data, default_formatter) {
+		value = default_formatter(value, row, column, data);
+		if (column.fieldname == "inward_value" && data && data.inward_value > 0) {
+			value =  `<span style='color:green; font-weight: bold;'>${value}</span>`;
+		}
+		if (column.fieldname == "inward_qty" && data && data.inward_value > 0) {
+			value =  `<span style='color:green; font-weight: bold;'>${value}</span>`;
+		}
+		if (column.fieldname == "outward_qty" && data && data.outward_value > 0) {
+			value =  `<span style='color:red; font-weight: bold;'>${value}</span>`;
+		}
+		if (column.fieldname == "outward_value" && data && data.outward_value > 0){
+
+			value  =  `<span style='color:red; font-weight: bold;'>${value}</span>`;
+		}
+		return value
+	}
 };

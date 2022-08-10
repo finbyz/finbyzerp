@@ -1,7 +1,7 @@
 frappe.ui.form.on('Payment Entry', {
 	refresh: (frm) => {
 		if (frm.doc.__islocal){
-		frm.set_df_property("company", "read_only", (!frm.doc.__islocal || frm.doc.amended_from) ? 1 : 0);
+			frm.set_df_property("company", "read_only", (!frm.doc.__islocal || frm.doc.amended_from) ? 1 : 0);
 		}
 	},
 	onload: (frm) => {
@@ -93,3 +93,26 @@ frappe.ui.form.on('Payment Entry', {
 	
 });
 
+
+frappe.ui.form.on('Payment Entry Reference', {
+	unallocate_payment: function(frm,cdt,cdn){
+		let d = locals[cdt][cdn];
+		if (frm.doc.docstatus == 1){
+			frappe.call({
+				method:"finbyzerp.finbyzerp.doc_events.payment_entry.unallocate_payment",
+				args:{
+					"child_doc_name":d.name,
+					"parent_doc_name":frm.doc.name,
+					"reference_doctype":d.reference_doctype,
+					"reference_name":d.reference_name
+				},
+				callback: function(r){
+					if (r.message){
+						// frm.refresh_fields();
+						frappe.msgprint(r.message)
+					}
+				}
+			})
+		}
+	}
+});
