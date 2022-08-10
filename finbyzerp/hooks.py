@@ -194,6 +194,9 @@ doc_events = {
 	"Payment Entry":{
 		"validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
 	},
+	"Delivery Note":{
+		"validate":"finbyzerp.finbyzerp.doc_events.delivery_note.validate"
+	},
 	("Purchase Order","Sales Order"):{
 		"before_cancel":"finbyzerp.api.po_so_before_cancel",
 	},
