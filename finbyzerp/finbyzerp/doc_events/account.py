@@ -39,10 +39,14 @@ def get_gl_data(from_date,to_date,company,account):
             previous_date = gl.posting_date
             previous_balance += flt(gl.debit - gl.credit)         
 
-        if idx == len(gl_entries)-1:
+        if idx == len(gl_entries) - 1:
             day_diff = date_diff(to_date,previous_date)
             date_wise_balance.append({"date":previous_date,"balance":previous_balance, "days":day_diff})
-            
+
+    if not date_wise_balance and previous_balance:
+        day_diff = date_diff(to_date, from_date)
+        date_wise_balance.append({"date":previous_date, "balance":previous_balance, "days":day_diff})
+
     return date_wise_balance
 
 @frappe.whitelist()
