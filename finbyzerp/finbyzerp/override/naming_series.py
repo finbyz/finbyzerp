@@ -79,4 +79,37 @@ def get_naming_series_options(doctype):
 
 				options_list.append(name)
 		
-	return "\n".join(options_list)
+	return options_list
+
+from frappe.core.doctype.document_naming_settings.document_naming_settings import DocumentNamingSettings 
+from frappe.permissions import get_doctypes_with_read
+
+def _get_prefixes(self, doctypes) -> list[str]:
+	"""Get all prefixes for naming series.
+
+	- For all templates prefix is evaluated considering today's date
+	- All existing prefix in DB are shared as is.
+	"""
+	series_templates = set()
+	for d in doctypes:
+		try:
+			options = frappe.get_meta(d).get_naming_series_options()
+			options=get_naming_series_options(doctype)
+			series_templates.update(options)
+		except frappe.DoesNotExistError:
+			frappe.msgprint(_("Unable to find DocType {0}").format(d))
+			continue
+
+	custom_templates = frappe.get_all(
+		"DocType",
+		fields=["autoname"],
+		filters={
+			"name": ("not in", doctypes),
+			"autoname": ("like", "%.#%"),
+			"module": ("not in", ["Core"]),
+		},
+	)
+	if custom_templates:
+		series_templates.update([d.autoname.rsplit(".", 1)[0] for d in custom_templates])
+	
+	return DocumentNamingSettings._evaluate_and_clean_templates(self,series_templates)

@@ -23,9 +23,14 @@ after_install = "finbyzerp.install.after_install"
 # GSTR3BReport.get_inter_state_supplies = get_inter_state_supplies
 # GSTR3BReport.get_tax_amounts = get_tax_amounts
 
-from erpnext.setup.doctype.naming_series.naming_series import NamingSeries
-from finbyzerp.finbyzerp.override.naming_series import get_transactions
-NamingSeries.get_transactions = get_transactions
+#depreciated in v13
+# from erpnext.setup.doctype.naming_series.naming_series import NamingSeries
+# from finbyzerp.finbyzerp.override.naming_series import get_transactions
+# NamingSeries.get_transactions = get_transactions
+
+from frappe.core.doctype.document_naming_settings.document_naming_settings import DocumentNamingSettings
+from finbyzerp.finbyzerp.override.naming_series import _get_prefixes as get_prefixes
+DocumentNamingSettings._get_prefixes = get_prefixes
 
 from erpnext.accounts.doctype.opening_invoice_creation_tool.opening_invoice_creation_tool import OpeningInvoiceCreationTool
 from finbyzerp.finbyzerp.doc_events.opening_invoice_creation_tool import get_invoice_dict, make_invoices
@@ -41,21 +46,23 @@ Report.validate = report_validate
 from frappe.utils import dashboard
 from finbyzerp.finbyzerp.override.dashboard_override import make_records
 dashboard.make_records = make_records
-# e_invoice overrides
-import erpnext
-# from finbyzerp.e_invoice_override import validate_einvoice_fields,get_transaction_details,get_item_list,make_einvoice,get_invoice_value_details,update_invoice_taxes
-from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name, make_einvoice
-erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
-erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
-erpnext.regional.india.e_invoice.utils.make_einvoice = make_einvoice
-# erpnext.regional.india.e_invoice.utils.get_transaction_details = get_transaction_details
-# erpnext.regional.india.e_invoice.utils.get_invoice_value_details=get_invoice_value_details
-# erpnext.regional.india.e_invoice.utils.update_invoice_taxes = update_invoice_taxes
-#erpnext.regional.india.e_invoice.utils.update_item_taxes = update_item_taxes
-#erpnext.regional.india.e_invoice.utils.get_party_details = get_party_details
 
-from erpnext.regional.india import utils
-utils.validate_document_name = validate_document_name
+# install india compliance for e_invoice
+# # e_invoice overrides
+# import erpnext
+# # from finbyzerp.e_invoice_override import validate_einvoice_fields,get_transaction_details,get_item_list,make_einvoice,get_invoice_value_details,update_invoice_taxes
+# from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name, make_einvoice
+# erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
+# erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
+# erpnext.regional.india.e_invoice.utils.make_einvoice = make_einvoice
+# # erpnext.regional.india.e_invoice.utils.get_transaction_details = get_transaction_details
+# # erpnext.regional.india.e_invoice.utils.get_invoice_value_details=get_invoice_value_details
+# # erpnext.regional.india.e_invoice.utils.update_invoice_taxes = update_invoice_taxes
+# #erpnext.regional.india.e_invoice.utils.update_item_taxes = update_item_taxes
+# #erpnext.regional.india.e_invoice.utils.get_party_details = get_party_details
+
+# from erpnext.regional.india import utils
+# utils.validate_document_name = validate_document_name
 
 #from erpnext.regional.india.e_invoice.utils import GSPConnector
 #GSPConnector.set_einvoice_data = set_einvoice_data
@@ -76,9 +83,10 @@ from frappe.model import sync
 from finbyzerp.api import get_doc_files
 sync.get_doc_files = get_doc_files
 
-from erpnext.hr.doctype.expense_claim.expense_claim import ExpenseClaim
-from finbyzerp.finbyzerp.doc_events.expense_claim import set_status
-ExpenseClaim.set_status = set_status
+# install hrms module
+# from erpnext.hr.doctype.expense_claim.expense_claim import ExpenseClaim
+# from finbyzerp.finbyzerp.doc_events.expense_claim import set_status
+# ExpenseClaim.set_status = set_status
 
 
 app_include_css = ["/assets/finbyzerp/css/permission.css","/assets/finbyzerp/css/finbyz-theme.css"]
@@ -245,13 +253,13 @@ from finbyzerp.finbyzerp.report.item_wise_purchase_register import execute as it
 from erpnext.accounts.report.item_wise_purchase_register import item_wise_purchase_register
 item_wise_purchase_register.execute = item_wise_purchase_register_execute
 
-from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
-from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
-gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
+# from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
+# from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
+# gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
 
-from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
-from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
-gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
+# from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
+# from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
+# gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
 
 from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
 from erpnext.stock.report.stock_ledger import stock_ledger
