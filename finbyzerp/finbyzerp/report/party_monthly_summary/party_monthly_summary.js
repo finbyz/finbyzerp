@@ -23,7 +23,8 @@ frappe.query_reports["Party Monthly Summary"] = {
 			"label": __("Company"),
 			"fieldtype": "Link",
 			"options": "Company",
-			"reqd": 1
+			"reqd": 1,
+			"default": frappe.defaults.get_user_default("Company")
 		},
 		{
 			"fieldname":"period",
@@ -42,6 +43,7 @@ frappe.query_reports["Party Monthly Summary"] = {
 			"label": __("Party Type"),
 			"fieldtype": "Link",
 			"options": "Party Type",
+			"default": "Customer",
 			"reqd": 1,
 			on_change: () => {
 				frappe.query_report.set_filter_value('party', "");
@@ -51,8 +53,15 @@ frappe.query_reports["Party Monthly Summary"] = {
 			"fieldname":"party",
 			"label": __("Party"),
 			"fieldtype": "Dynamic Link",
-			"options": "party_type",
-			"reqd": 1
+			"reqd": 1,
+			"get_options": function() {
+				var party_type = frappe.query_report.get_filter_value('party_type');
+				var party = frappe.query_report.get_filter_value('party');
+				if(party && !party_type) {
+					frappe.throw(__("Please select Party Type first"));
+				}
+				return party_type;
+			}
 		},
 		{
 			"fieldname":"from_date",
