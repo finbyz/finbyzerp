@@ -7,7 +7,7 @@ from erpnext.regional.india.e_invoice.utils import (GSPConnector,raise_document_
 	validate_eligibility,update_item_taxes,get_invoice_value_details,get_party_details,update_other_charges,
 	get_overseas_address_details, validate_address_fields, sanitize_for_json, log_error)
 
-from erpnext.regional.india.utils import get_gst_accounts,get_place_of_supply
+from india_compliance.gst_india.utils import get_place_of_supply
 
 
 GST_INVOICE_NUMBER_FORMAT = re.compile(r"^[a-zA-Z0-9\-/]+$")   #alphanumeric and - /
