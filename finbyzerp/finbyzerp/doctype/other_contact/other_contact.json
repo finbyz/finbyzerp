@@ -49,9 +49,8 @@
    "fetch_from": "contact.department",
    "fetch_if_empty": 1,
    "fieldname": "department",
-   "fieldtype": "Link",
-   "label": "Department",
-   "options": "Department"
+   "fieldtype": "Data",
+   "label": "Department"
   },
   {
    "fetch_from": "contact.designation",
@@ -72,7 +71,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-06-30 17:54:28.633422",
+ "modified": "2022-08-09 10:10:49.395768",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Other Contact",

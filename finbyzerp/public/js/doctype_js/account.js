@@ -90,7 +90,7 @@ frappe.ui.form.on('Account',{
                         var val = d.get_values()
                         if (val.date_wise_balance){
                             val.date_wise_balance.forEach(function (row){
-                                interest_amount += (row.balance * row.days * val.interest_rate / (val.total_days * 100))
+                                interest_amount += (row.balance * row.days * val.interest_rate / (365 * 100))
                             })
                             d.set_value('interest_amount',interest_amount)
                         }
