@@ -44,13 +44,13 @@ dashboard.make_records = make_records
 # e_invoice overrides
 import erpnext
 # from finbyzerp.e_invoice_override import validate_einvoice_fields,get_transaction_details,get_item_list,make_einvoice,get_invoice_value_details,update_invoice_taxes
-from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name, make_einvoice
+from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name, make_einvoice,get_invoice_value_details,update_invoice_taxes
 erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
 erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
 erpnext.regional.india.e_invoice.utils.make_einvoice = make_einvoice
 # erpnext.regional.india.e_invoice.utils.get_transaction_details = get_transaction_details
-# erpnext.regional.india.e_invoice.utils.get_invoice_value_details=get_invoice_value_details
-# erpnext.regional.india.e_invoice.utils.update_invoice_taxes = update_invoice_taxes
+erpnext.regional.india.e_invoice.utils.get_invoice_value_details=get_invoice_value_details
+erpnext.regional.india.e_invoice.utils.update_invoice_taxes = update_invoice_taxes
 #erpnext.regional.india.e_invoice.utils.update_item_taxes = update_item_taxes
 #erpnext.regional.india.e_invoice.utils.get_party_details = get_party_details
 
@@ -170,6 +170,7 @@ doc_events = {
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
 			"finbyzerp.api.si_validate"
 		],
+		# "before_submit":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_submit",
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		"on_submit": "finbyzerp.api.sales_invoice_on_submit",
 	},
