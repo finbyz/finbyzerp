@@ -2,3 +2,4 @@ finbyzerp.patches.set_app_name_and_time_in_system_settings
 finbyzerp.patches.create_custom_fields
 finbyzerp.patches.create_disable_invoice_name_length_check_field
 finbyzerp.patches.create_form_tour_fields_with_steps
+finbyzerp.patches.create_custom_rate_fields
