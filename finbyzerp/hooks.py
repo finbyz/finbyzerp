@@ -217,11 +217,11 @@ doc_events = {
 }
 
 scheduler_events = {
-# 	"cron":{
-# 		"*/5 * * * *":[
-# 			"finbyzerp.api.repost_transaction_entries"
-# 		],
-# 	},
+	"cron":{
+		"*/5 * * * *":[
+			"finbyzerp.api.repost_transaction_entries"
+		],
+	},
 	"daily":[
 		"finbyzerp.api.daily_entry_summary_mail",
 		"finbyzerp.api.daily_transaction_summary_mail"
@@ -258,9 +258,9 @@ from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_exec
 from erpnext.stock.report.stock_ledger import stock_ledger
 stock_ledger.execute = stock_ledger_execute
 
-from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
-from erpnext.stock.report.stock_balance import stock_balance
-stock_balance.execute = stock_balance_execute
+# from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
+# from erpnext.stock.report.stock_balance import stock_balance
+# stock_balance.execute = stock_balance_execute
 
 
 from finbyzerp.finbyzerp.report.trial_balance_for_party import execute as trial_balance_for_party_execute
@@ -292,9 +292,9 @@ from erpnext.stock.doctype.stock_ledger_entry.stock_ledger_entry import StockLed
 from finbyzerp.finbyzerp.override.stock_ledger_entry import check_stock_frozen_date
 StockLedgerEntry.check_stock_frozen_date = check_stock_frozen_date
 
-from finbyzerp.finbyzerp.report.sales_order_analysis import execute as sales_order_analysis_execute
-from erpnext.selling.report.sales_order_analysis import sales_order_analysis
-sales_order_analysis.execute = sales_order_analysis_execute
+# from finbyzerp.finbyzerp.report.sales_order_analysis import execute as sales_order_analysis_execute
+# from erpnext.selling.report.sales_order_analysis import sales_order_analysis
+# sales_order_analysis.execute = sales_order_analysis_execute
 
 from finbyzerp.finbyzerp.report.pending_so_items_for_purchase_request import execute as pending_so_items_for_purchase_request_execute
 from erpnext.selling.report.pending_so_items_for_purchase_request import pending_so_items_for_purchase_request

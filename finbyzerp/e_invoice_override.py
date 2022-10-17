@@ -144,7 +144,7 @@ def make_einvoice(invoice):
 		if invoice.gst_category == 'Overseas':
 			shipping_details = get_overseas_address_details(invoice.shipping_address_name)
 		else:
-			shipping_details = get_party_details(invoice.shipping_address_name, skip_gstin_validation=True)
+			shipping_details = get_party_details(invoice.shipping_address_name, is_shipping_address=True)#finbyz chenge skip_gstin_validation to is_shipping_address
 
 	# Finbyz Changes START: If Export Invoice then For Eway Bill generation Ship to Details Are Mandatory and Ship To Pincode and Ship to State Code Should be Pincode and State Code of Port/Place From India
 	# In case of export transactions for goods, if e-way bill is required along with IRN, then the 'Ship-To' address should be of the place/port in India from where the goods are being exported. Otherwise E-way bill can be generated later based on IRN, by passing the 'Ship-To' address as the place/port address of India from where the goods are being exported .
@@ -153,9 +153,9 @@ def make_einvoice(invoice):
 	# Finbyz Changes END
 
 	dispatch_details = frappe._dict({})
-	if invoice.dispatch_address_name:
+	if invoice.dispatch_address_name:    
 		dispatch_details = get_party_details(invoice.dispatch_address_name, skip_gstin_validation=True)
-
+	
 	if invoice.is_pos and invoice.base_paid_amount:
 		payment_details = get_payment_details(invoice)
 
@@ -166,7 +166,7 @@ def make_einvoice(invoice):
 		eway_bill_details = get_eway_bill_details(invoice)
 
 	# not yet implemented
-	period_details = export_details = frappe._dict({})
+	dispatch_details = period_details = export_details = frappe._dict({})
 
 	einvoice = schema.format(
 		transaction_details=transaction_details, doc_details=doc_details, dispatch_details=dispatch_details,
@@ -220,6 +220,7 @@ def get_item_list(invoice):
 		item.batch_expiry_date = frappe.db.get_value('Batch', d.batch_no, 'expiry_date') if d.batch_no else None
 		item.batch_expiry_date = format_date(item.batch_expiry_date, 'dd/mm/yyyy') if item.batch_expiry_date else None
 		#finbyz Changes
+		
 		if frappe.db.get_value('Item', d.item_code, 'is_stock_item') or frappe.db.get_value('Item', d.item_code, 'is_not_service_item'):
 			item.is_service_item = 'N'  
 		else:

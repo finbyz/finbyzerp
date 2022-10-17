@@ -11,7 +11,7 @@ from frappe import _
 from frappe.model.mapper import get_mapped_doc
 from frappe.model.meta import get_field_precision
 from erpnext.accounts.utils import get_stock_accounts,get_stock_and_account_balance
-
+from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_entries
 from frappe.utils.data import (nowdate,add_to_date,get_first_day_of_week,get_last_day_of_week,get_first_day,get_last_day,
 		get_quarter_start,get_quarter_ending,get_year_start,get_year_ending)
 
