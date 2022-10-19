@@ -80,6 +80,12 @@ def validate_einvoice_fields(doc):
 			frappe.throw(_('You cannot edit the invoice after generating IRN'), title=_('Edit Not Allowed'))
 		if str(len(doc.taxes)) != str(len(frappe.db.get_all("Sales Taxes and Charges",{'parent':doc.name,'parenttype':doc.doctype}))):
 			frappe.throw(_('You cannot edit the invoice after generating IRN'), title=_('Edit Not Allowed'))
+		if str(len(doc.items)) != str(len(frappe.db.get_all("Sales Invoice Item",{'parent':doc.name,'parenttype':doc.doctype}))):
+			frappe.throw(_('You cannot edit the invoice after generating IRN'), title=_('Edit Not Allowed'))
+		field_map=['grand_total','base_total','total_taxes_and_charges','total_qty',"conversion_rate","shipping_address_name","billing_address_gstin"]
+		for each_field in field_map:
+			if str(doc.get(each_field)) != str(frappe.db.get_value("Sales Invoice",doc.name,each_field)):
+				frappe.throw(_('You cannot edit the invoice after generating IRN'), title=_('Edit Not Allowed'))
 	# Finbyz Changes End
 	if doc.docstatus == 0 and doc._action == 'save':
 		if doc.irn and not doc.eway_bill_cancelled and doc.grand_total != frappe.db.get_value("Sales Invoice",doc.name,"grand_total"):# Finbyz Changes:
