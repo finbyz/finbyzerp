@@ -121,7 +121,7 @@ body{
 	display: flex;
     align-items: center;
     font-size: var(--text-base);
-    padding: 8px 8px;
+    /* padding: 8px 8px; */
     margin-bottom: 2px;
     border-radius: var(--border-radius-md);
     overflow: hidden;
@@ -138,8 +138,13 @@ body{
 	transition: all 2s linear;
 	overflow-y:scroll;
 }
-.icon-side-section:hover{
+.icon-side-section:hover {
 	width: auto;
+}
+.icon-side-section:hover .desk-icon-sidebar .sidebar-child-item ,
+.icon-side-section:hover .desk-icon-sidebar .sidebar-item-control
+{
+	display: block;
 }
 .desk-icon-sidebar{
 	margin-right: 6px;
@@ -217,7 +222,6 @@ body{
 .awesomplete>ul>li{
     white-space: normal;
     overflow: visible;
-
 }
 /*---------- end dark theme ------------- */
 
@@ -238,86 +242,34 @@ body{
 	background: #edf3f8 !important;
 } */
 /* end */
-/*----------- icons -----------  */
-.Accounting-sidebar-icon{
-	background: url(/assets/finbyzerp/images/accounts.svg);
-}
-.Buying-sidebar-icon{
-	background: url(/assets/finbyzerp/images/buying.svg);
-}
-.Selling-sidebar-icon{
-	background: url(/assets/finbyzerp/images/selling.svg);
-}
-.Stock-sidebar-icon{
-	background: url(/assets/finbyzerp/images/stock.svg);
-}
-.Assets-sidebar-icon{
-	background: url(/assets/finbyzerp/images/assets.svg);
-}
-.Projects-sidebar-icon{
-	background: url(/assets/finbyzerp/images/projects.svg);
-}
-.CRM-sidebar-icon{
-	background: url(/assets/finbyzerp/images/CRM.svg);
-}
-.Support-sidebar-icon{
-	background: url(/assets/finbyzerp/images/support.svg);
-}
-.HR-sidebar-icon{
-	background: url(/assets/finbyzerp/images/human_resource.svg);
-}
-.Quality-sidebar-icon{
-	background: url(/assets/finbyzerp/images/quality.svg);
-}
-.Tools-sidebar-icon,.Build-sidebar-icon{
-	background: url(/assets/finbyzerp/images/tools.svg);
-}
-.Settings-sidebar-icon{
-	background: url(/assets/finbyzerp/images/settings.svg);
-}
-.Users-sidebar-icon{
-	background: url(/assets/finbyzerp/images/user_permission.svg);
-}
-.Integrations-sidebar-icon{
-	background: url(/assets/finbyzerp/images/integration.svg);
-}
-.Website-sidebar-icon{
-	background: url(/assets/finbyzerp/images/website.svg);
-}
-.Customization-sidebar-icon{
-	background: url(/assets/finbyzerp/images/customization.svg);
-}
-.Home-sidebar-icon{
-	background: url(/assets/finbyzerp/images/home.svg);
-}
-.Management-sidebar-icon,
-.Loans-sidebar-icon{
-	background: url(/assets/finbyzerp/images/Loan_Management.svg);
-}
-.Utilities-sidebar-icon{
-	background: url(/assets/finbyzerp/images/utilities.svg);	
-}
-.Payroll-sidebar-icon{
-	background: url(/assets/finbyzerp/images/payroll.svg);	
-}
-.Manufacturing-sidebar-icon{
-	background: url(/assets/finbyzerp/images/manufacturing.svg);	
-}
-/*-------- custom icon ----------*/
-.Chemical-sidebar-icon,.Rohandyes-sidebar-icon,.RoopDyes-sidebar-icon,.Evergreen-sidebar-icon{
-	background: url(/assets/finbyzerp/images/chemical.svg);
-}
-.Elkins-sidebar-icon,.Spinning-sidebar-icon{	
-	background: url(/assets/finbyzerp/images/yarn.svg);
-}
-.EIE-sidebar-icon,.Engineering-sidebar-icon{
-	background: url(/assets/finbyzerp/images/engineering.svg);
-}
-.Ceramic-sidebar-icon{
-	background: url(/assets/finbyzerp/images/ceramic.svg);
-}
+
 .desk-sidebar-item span{
 	background-repeat: no-repeat;
+}
+.icon-side-section .sidebar-item-label{
+	margin-left: 13px !important;
+}
+[data-page-route=Workspaces] .standard-sidebar-item .item-anchor{
+	padding: 8px 0 8px 8px !important;
+}
+/* .desk-icon-sidebar .full_side_bar,.list-sidebar .icon_side_bar,.icon-side-section .standard-sidebar-label{
+	display: none !important;
+} */
+.desk-icon-sidebar  {
+	height: 43px !important;
+}
+.desk-icon-sidebar .sidebar-child-item ,.desk-icon-sidebar .sidebar-item-control{
+	display: none;
+}
+/*  */
+/* .icon-side-section use,.list-sidebar use{
+	display: none;
+} */
+.sidebar-item-control use{
+	display: block !important;
+}
+.icon-side-section .standard-sidebar-label{
+	display: none !important;
 }
 /*----------- endicons------- */
 /*-------- media queries ------- */
@@ -331,3 +283,31 @@ body{
 	}
 }
 /*------- end media queries -------*/
+/* widget style oberride start */
+.widget{
+	background-color: var(--card-bg);
+	padding: 15px;
+	border-radius: var(--border-radius-md);
+	box-shadow: var(--card-shadow);
+}
+.widget.shortcut-widget-box:hover {
+    box-shadow: var(--shadow-base);
+}
+.spacer{
+	background-color: transparent ;
+	box-shadow: none ;
+}
+[data-page-route=Workspaces] .layout-main-section{
+	background-color: #F9FAFA;
+	box-shadow: none;
+	 
+}
+[data-page-route=Workspaces] .codex-editor .codex-editor__redactor .ce-block .divider{
+	border-right: none ;
+}
+/* widget style oberride end */
+.min_height_width{
+	height: 25px !important;
+	width: 25px !important;
+	object-fit: contain !important;
+}

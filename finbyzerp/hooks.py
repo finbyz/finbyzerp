@@ -47,14 +47,16 @@ from frappe.utils import dashboard
 from finbyzerp.finbyzerp.override.dashboard_override import make_records
 dashboard.make_records = make_records
 
-# install india compliance for e_invoice
 # # e_invoice overrides
-# import erpnext
-# # from finbyzerp.e_invoice_override import validate_einvoice_fields,get_transaction_details,get_item_list,make_einvoice,get_invoice_value_details,update_invoice_taxes
-# from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name, make_einvoice
+import erpnext
+import india_compliance
+from finbyzerp.e_invoice_override_14 import get_item_list, validate_einvoice_fields, validate_document_name, make_einvoice
+from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
+GSTTransactionData.get_item_list = get_item_list
 # erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
-# erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
 # erpnext.regional.india.e_invoice.utils.make_einvoice = make_einvoice
+
+# # from finbyzerp.e_invoice_override import validate_einvoice_fields,get_transaction_details,get_item_list,make_einvoice,get_invoice_value_details,update_invoice_taxes
 # # erpnext.regional.india.e_invoice.utils.get_transaction_details = get_transaction_details
 # # erpnext.regional.india.e_invoice.utils.get_invoice_value_details=get_invoice_value_details
 # # erpnext.regional.india.e_invoice.utils.update_invoice_taxes = update_invoice_taxes
@@ -79,20 +81,14 @@ from erpnext.crm.doctype.email_campaign import email_campaign
 email_campaign.send_email_to_leads_or_contacts = send_email_to_leads_or_contacts
 
 # override for workspace migration issue
-from frappe.model import sync 
-from finbyzerp.api import get_doc_files
-sync.get_doc_files = get_doc_files
-
-# install hrms module
-# from erpnext.hr.doctype.expense_claim.expense_claim import ExpenseClaim
-# from finbyzerp.finbyzerp.doc_events.expense_claim import set_status
-# ExpenseClaim.set_status = set_status
+# from frappe.model import sync 
+# from finbyzerp.api import get_doc_files
+# sync.get_doc_files = get_doc_files
 
 
-app_include_css = ["/assets/finbyzerp/css/permission.css","/assets/finbyzerp/css/finbyz-theme.css"]
+app_include_css = ["finbyzerp.bundle.css"]
 app_include_js = [
-	"/assets/js/finbyzerp.min.js",
-	#"assets/finbyzerp/js/frappe/ui/page.js"
+	"finbyzerp.bundle.js"
 ]
 
 doctype_list_js = {
@@ -139,7 +135,7 @@ override_whitelisted_methods = {
 	"erpnext.setup.doctype.company.delete_company_transactions.delete_company_transactions": "finbyzerp.finbyzerp.override.delete_company_transactions.delete_company_transactions",
 	"frappe.desk.moduleview.get_desktop_settings": "finbyzerp.api.get_desktop_settings",
 	"frappe.desk.moduleview.get_options_for_global_modules": "finbyzerp.api.get_options_for_global_modules",
-	"erpnext.regional.india.e_invoice.utils.cancel_eway_bill": "finbyzerp.e_invoice_override.cancel_eway_bill", # cancel eway bill override for enable cancel_eway_bill api
+	# "erpnext.regional.india.e_invoice.utils.cancel_eway_bill": "finbyzerp.e_invoice_override.cancel_eway_bill", # cancel eway bill override for enable cancel_eway_bill api
 	#"frappe.utils.print_format.download_pdf": "finbyzerp.print_format.download_pdf",
 }
 
@@ -249,17 +245,21 @@ from finbyzerp.finbyzerp.report.item_wise_sales_register import execute as item_
 from erpnext.accounts.report.item_wise_sales_register import item_wise_sales_register
 item_wise_sales_register.execute = item_wise_sales_register_execute
 
-from finbyzerp.finbyzerp.report.item_wise_purchase_register import execute as item_wise_purchase_register_execute
-from erpnext.accounts.report.item_wise_purchase_register import item_wise_purchase_register
-item_wise_purchase_register.execute = item_wise_purchase_register_execute
+# from finbyzerp.finbyzerp.report.item_wise_purchase_register import execute as item_wise_purchase_register_execute
+# from erpnext.accounts.report.item_wise_purchase_register import item_wise_purchase_register
+# item_wise_purchase_register.execute = item_wise_purchase_register_execute
 
-# from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
+from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
+from india_compliance.gst_india.report.gst_itemised_sales_register import gst_itemised_sales_register
 # from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
-# gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
+gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
 
-# from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
+
+from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
 # from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
-# gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
+from india_compliance.gst_india.report.gst_itemised_purchase_register import gst_itemised_purchase_register
+gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
+
 
 from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
 from erpnext.stock.report.stock_ledger import stock_ledger

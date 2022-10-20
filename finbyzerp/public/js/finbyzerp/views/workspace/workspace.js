@@ -98,7 +98,8 @@ frappe.views.Workspace = class Workspace {
 						}"
 						class="item-anchor ${item.is_editable ? "" : "block-click"}" title="${__(item.title)}"
 					>
-						<span class="sidebar-item-icon ${ item.title || "folder-normal"}-sidebar-icon" item-icon=${item.icon || "folder-normal"}>${frappe.utils.icon(item.icon || "folder-normal","md")}</span>
+					${ item.module_icon ? `<img src="${ item.module_icon }" alt="${item.title}_icon" class="min_height_width" />` : `<span class="sidebar-item-icon ${ item.title || "folder-normal"}-sidebar-icon" item-icon=${item.icon || "folder-normal"}>${frappe.utils.icon(item.icon || "folder-normal","md")}</span>`}
+						
 						<span class="sidebar-item-label">${__(item.title)}<span>
 					</a>
 					<div class="sidebar-item-control"></div>
@@ -107,32 +108,6 @@ frappe.views.Workspace = class Workspace {
 			</div>
 		`);
 	}
-	// sidebar_item_icon_container(item) {
-	// 	return $(`
-	// 		<div class="sidebar-item-container ${item.is_editable ? "is-draggable" : ""}" item-parent="${
-	// 		item.parent_page
-	// 	}" item-name="${item.title}" item-public="${item.public || 0}">
-	// 			<div class="desk-sidebar-item  standard-sidebar-item ${item.selected ? "selected" : ""}">
-	// 				<a
-	// 					href="/app/${
-	// 						item.public
-	// 							? frappe.router.slug(item.title)
-	// 							: "private/" + frappe.router.slug(item.title)
-	// 					}"
-	// 					class="item-anchor ${item.is_editable ? "" : "block-click"}" title="${__(item.title)}"
-	// 				>
-	// 					<span class="sidebar-item-icon" item-icon=${item.icon || "folder-normal"}>${frappe.utils.icon(
-	// 		item.icon || "folder-normal",
-	// 		"md"
-	// 	)}</span>
-	// 					<span class="sidebar-item-label">${__(item.title)}<span>
-	// 				</a>
-	// 				<div class="sidebar-item-control"></div>
-	// 			</div>
-	// 			<div class="sidebar-child-item nested-container"></div>
-	// 		</div>
-	// 	`);
-	// }
 
 	make_sidebar() {
 		if (this.sidebar.find(".standard-sidebar-section")[0]) {
@@ -182,18 +157,17 @@ frappe.views.Workspace = class Workspace {
 
 		$title.on("click", (e) => {
 			let icon =
-				$(e.target).find("span use").attr("href") === "#icon-small-down"
+				$(e.target).find("span use").attr("href") === "#icon-small-down-black"
 					? "#icon-right"
-					: "#icon-small-down";
+					: "#icon-small-down-black";
 			$(e.target).find("span use").attr("href", icon);
-			console.log($(e.target).parent().find(".sidebar-item-container"))
 			$(e.target).parent().find(".sidebar-item-container").toggleClass("hidden");
 		});
 		$title_icon.on("click", (e) => {
 			let icon =
-				$(e.target).find("span use").attr("href") === "#icon-small-down"
+				$(e.target).find("span use").attr("href") === "#icon-small-down-black"
 					? "#icon-right"
-					: "#icon-small-down";
+					: "#icon-small-down-black";
 			$(e.target).find("span use").attr("href", icon);
 			$(e.target).parent().find(".sidebar-item-container").toggleClass("hidden");
 		});
@@ -256,9 +230,9 @@ frappe.views.Workspace = class Workspace {
 		}
 		$drop_icon.on("click", () => {
 			let icon =
-				$drop_icon.find("use").attr("href") === "#icon-small-down"
+				$drop_icon.find("use").attr("href") === "#icon-small-down-black"
 					? "#icon-small-up"
-					: "#icon-small-down";
+					: "#icon-small-down-black";
 			$drop_icon.find("use").attr("href", icon);
 			$child_item_section.toggleClass("hidden");
 		});
@@ -605,6 +579,12 @@ frappe.views.Workspace = class Workspace {
 					fieldname: "icon",
 					default: item.icon,
 				},
+				{
+					label: __("Module Icon"),
+					fieldtype: "Attach Image",
+					fieldname: "module_icon",
+					default: item.module_icon,
+				}
 			],
 			primary_action_label: __("Update"),
 			primary_action: (values) => {
@@ -625,6 +605,7 @@ frappe.views.Workspace = class Workspace {
 						icon: values.icon || "",
 						parent: values.parent || "",
 						public: values.is_public || 0,
+						module_icon: values.module_icon || "",
 					},
 					callback: function (res) {
 						if (res.message) {
@@ -883,6 +864,12 @@ frappe.views.Workspace = class Workspace {
 					fieldname: "icon",
 					default: page.icon,
 				},
+				{
+					label: __("Module Icon"),
+					fieldtype: "Attach Image",
+					fieldname: "module_icon",
+					default: page.module_icon,
+				}
 			],
 			primary_action_label: __("Duplicate"),
 			primary_action: (values) => {
@@ -1073,6 +1060,11 @@ frappe.views.Workspace = class Workspace {
 					fieldtype: "Icon",
 					fieldname: "icon",
 				},
+				{
+					label: __("Module Icon"),
+					fieldtype: "Attach Image",
+					fieldname: "module_icon",
+				}
 			],
 			primary_action_label: __("Create"),
 			primary_action: (values) => {
@@ -1094,6 +1086,7 @@ frappe.views.Workspace = class Workspace {
 					name: name,
 					label: name,
 					title: values.title,
+					module_icon: values.module_icon,
 					public: values.is_public || 0,
 					for_user: values.is_public ? "" : frappe.session.user,
 					icon: values.icon,
