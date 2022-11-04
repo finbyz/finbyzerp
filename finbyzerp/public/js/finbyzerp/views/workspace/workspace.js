@@ -79,9 +79,8 @@ frappe.views.Workspace = class Workspace {
 			reload && this.show();
 		}
 	}
-
 	get_pages() {
-		return frappe.xcall("frappe.desk.desktop.get_workspace_sidebar_items");
+		return frappe.xcall("finbyzerp.api.get_workspace_sidebar_items");
 	}
 
 	sidebar_item_container(item) {
@@ -157,17 +156,17 @@ frappe.views.Workspace = class Workspace {
 
 		$title.on("click", (e) => {
 			let icon =
-				$(e.target).find("span use").attr("href") === "#icon-small-down-black"
+				$(e.target).find("span use").attr("href") === "#icon-small-down"
 					? "#icon-right"
-					: "#icon-small-down-black";
+					: "#icon-small-down";
 			$(e.target).find("span use").attr("href", icon);
 			$(e.target).parent().find(".sidebar-item-container").toggleClass("hidden");
 		});
 		$title_icon.on("click", (e) => {
 			let icon =
-				$(e.target).find("span use").attr("href") === "#icon-small-down-black"
+				$(e.target).find("span use").attr("href") === "#icon-small-down"
 					? "#icon-right"
-					: "#icon-small-down-black";
+					: "#icon-small-down";
 			$(e.target).find("span use").attr("href", icon);
 			$(e.target).parent().find(".sidebar-item-container").toggleClass("hidden");
 		});
@@ -230,9 +229,9 @@ frappe.views.Workspace = class Workspace {
 		}
 		$drop_icon.on("click", () => {
 			let icon =
-				$drop_icon.find("use").attr("href") === "#icon-small-down-black"
+				$drop_icon.find("use").attr("href") === "#icon-small-down"
 					? "#icon-small-up"
-					: "#icon-small-down-black";
+					: "#icon-small-down";
 			$drop_icon.find("use").attr("href", icon);
 			$child_item_section.toggleClass("hidden");
 		});
@@ -598,7 +597,7 @@ frappe.views.Workspace = class Workspace {
 				d.hide();
 
 				frappe.call({
-					method: "frappe.desk.doctype.workspace.workspace.update_page",
+					method: "finbyzerp.api.update_page",
 					args: {
 						name: old_item.name,
 						title: values.title,
@@ -876,7 +875,7 @@ frappe.views.Workspace = class Workspace {
 				if (!this.validate_page(values)) return;
 				d.hide();
 				frappe.call({
-					method: "frappe.desk.doctype.workspace.workspace.duplicate_page",
+					method: "finbyzerp.api.duplicate_page",
 					args: {
 						page_name: page.name,
 						new_page: values,
@@ -1104,9 +1103,8 @@ frappe.views.Workspace = class Workspace {
 							this.is_read_only = false;
 							await this.editor.readOnly.toggle();
 						}
-
 						frappe.call({
-							method: "frappe.desk.doctype.workspace.workspace.new_page",
+							method: "finbyzerp.api.new_page",
 							args: {
 								new_page: new_page,
 							},

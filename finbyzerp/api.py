@@ -29,6 +29,7 @@ import sys
 import time
 from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_entries
 from erpnext.controllers.sales_and_purchase_return import *
+from frappe.desk.desktop import Workspace
 
 def before_insert(self, method):
 	opening_naming_series(self)
@@ -845,3 +846,144 @@ def validate_returned_items(doc):
 
 	if not items_returned:
 		frappe.throw(_("Atleast one item should be entered with negative quantity in return document"))
+
+@frappe.whitelist()
+def new_page(new_page):
+	if not loads(new_page):
+		return
+
+	page = loads(new_page)
+
+	if page.get("public") and not is_workspace_manager():
+		return
+
+	doc = frappe.new_doc("Workspace")
+	doc.title = page.get("title")
+	doc.module_icon = page.get("module_icon")
+	doc.icon = page.get("icon")
+	doc.content = page.get("content")
+	doc.parent_page = page.get("parent_page")
+	doc.label = page.get("label")
+	doc.for_user = page.get("for_user")
+	doc.public = page.get("public")
+	doc.sequence_id = last_sequence_id(doc) + 1
+	doc.save(ignore_permissions=True)
+
+	return doc
+
+@frappe.whitelist()
+def update_page(name, title, icon, parent, public,module_icon):
+	public = frappe.parse_json(public)
+
+	doc = frappe.get_doc("Workspace", name)
+
+	filters = {"parent_page": doc.title, "public": doc.public}
+	child_docs = frappe.get_list("Workspace", filters=filters)
+
+	if doc:
+		doc.title = title
+		doc.icon = icon
+		doc.parent_page = parent
+		doc.module_icon = module_icon
+		if doc.public != public:
+			doc.sequence_id = frappe.db.count("Workspace", {"public": public}, cache=True)
+			doc.public = public
+		doc.for_user = "" if public else doc.for_user or frappe.session.user
+		doc.label = new_name = f"{title}-{doc.for_user}" if doc.for_user else title
+		doc.save(ignore_permissions=True)
+
+		if name != new_name:
+			rename_doc("Workspace", name, new_name, force=True, ignore_permissions=True)
+
+		# update new name and public in child pages
+		if child_docs:
+			for child in child_docs:
+				child_doc = frappe.get_doc("Workspace", child.name)
+				child_doc.parent_page = doc.title
+				if child_doc.public != public:
+					child_doc.public = public
+				child_doc.for_user = "" if public else child_doc.for_user or frappe.session.user
+				child_doc.label = new_child_name = (
+					f"{child_doc.title}-{child_doc.for_user}" if child_doc.for_user else child_doc.title
+				)
+				child_doc.save(ignore_permissions=True)
+
+				if child.name != new_child_name:
+					rename_doc("Workspace", child.name, new_child_name, force=True, ignore_permissions=True)
+
+	return {"name": title, "public": public, "label": new_name}
+
+@frappe.whitelist()
+def duplicate_page(page_name, new_page):
+	if not loads(new_page):
+		return
+
+	new_page = loads(new_page)
+
+	if new_page.get("is_public") and not is_workspace_manager():
+		return
+
+	old_doc = frappe.get_doc("Workspace", page_name)
+	doc = frappe.copy_doc(old_doc)
+	doc.title = new_page.get("title")
+	doc.icon = new_page.get("icon")
+	doc.module_icon = new_page.get("module_icon")
+	doc.parent_page = new_page.get("parent") or ""
+	doc.public = new_page.get("is_public")
+	doc.for_user = ""
+	doc.label = doc.title
+	doc.module = ""
+	if not doc.public:
+		doc.for_user = doc.for_user or frappe.session.user
+		doc.label = f"{doc.title}-{doc.for_user}"
+	doc.name = doc.label
+	if old_doc.public == doc.public:
+		doc.sequence_id += 0.1
+	else:
+		doc.sequence_id = last_sequence_id(doc) + 1
+	doc.insert(ignore_permissions=True)
+
+	return doc
+
+@frappe.whitelist()
+def get_workspace_sidebar_items():
+	"""Get list of sidebar items for desk"""
+	has_access = "Workspace Manager" in frappe.get_roles()
+
+	# don't get domain restricted pages
+	blocked_modules = frappe.get_doc("User", frappe.session.user).get_blocked_modules()
+	blocked_modules.append("Dummy Module")
+
+	filters = {
+		"restrict_to_domain": ["in", frappe.get_active_domains()],
+		"module": ["not in", blocked_modules],
+	}
+
+	if has_access:
+		filters = []
+
+	# pages sorted based on sequence id
+	order_by = "sequence_id asc"
+	fields = ["name", "title", "for_user", "parent_page", "content", "public", "module", "icon","module_icon"]
+	all_pages = frappe.get_all(
+		"Workspace", fields=fields, filters=filters, order_by=order_by, ignore_permissions=True
+	)
+	pages = []
+	private_pages = []
+
+	# Filter Page based on Permission
+	for page in all_pages:
+		try:
+			workspace = Workspace(page, True)
+			if has_access or workspace.is_permitted():
+				if page.public:
+					pages.append(page)
+				elif page.for_user == frappe.session.user:
+					private_pages.append(page)
+				page["label"] = _(page.get("name"))
+		except frappe.PermissionError:
+			pass
+	if private_pages:
+		pages.extend(private_pages)
+
+	return {"pages": pages, "has_access": has_access}

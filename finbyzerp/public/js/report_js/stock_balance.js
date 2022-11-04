@@ -124,8 +124,17 @@ frappe.query_reports["Stock Balance"] = {
 };
 
 frappe.provide("finbyzerp")
-finbyzerp.view_stock_ledger_report = {
-    view_stock_ledger_report: function(item_code,company, from_date, to_date, warehouse){
-        window.open(`/app/query-report/Stock Ledger/%3Fitem_code%3D${item_code}%26company%3D${company}%26from_date%3D${from_date}%26to_date%3D${to_date}%26warehouse%3D${warehouse}`,"_blank")
-    }
+finbyzerp.open_stock_ledger = {
+open_stock_ledger: function(data,item_code,warehouse) {
+
+	frappe.route_options = {
+		"company": frappe.query_report.get_filter_value('company'),
+		"from_date": frappe.query_report.get_filter_value('from_date') || data.year_start_date,
+		"to_date": frappe.query_report.get_filter_value('to_date') || data.to_date || data.year_end_date,
+		"item_code": item_code|| data.item_code || frappe.query_report.get_filter_value('item_code'),
+		"warehouse": warehouse || data.warehouse || frappe.query_report.get_filter_value('warehouse')
+	};
+
+	frappe.set_route("query-report", "Stock Ledger");
+}
 }

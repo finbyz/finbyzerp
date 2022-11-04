@@ -87,10 +87,12 @@ def execute(filters=None):
 
 				report_data.update(stock_ageing_data)
 
-			report_data['stock_ledger'] = f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #1581E1; padding: 3px 5px;border-radius: 5px;'
-				target="_blank" item_code='{report_data['item_code']}' company='{filters.get("company")}' from_date='{from_date_fiscal}' to_date='{to_date}' warehouse='{report_data['warehouse']}'
-				onClick=finbyzerp.view_stock_ledger_report.view_stock_ledger_report(this.getAttribute('item_code'),this.getAttribute('company'),this.getAttribute('from_date'),this.getAttribute('to_date'),this.getAttribute('warehouse'))>View Stock Ledger</button>"""
-
+			# report_data['stock_ledger'] = f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #1581E1; padding: 3px 5px;border-radius: 5px;'
+			# 	target="_blank" item_code='{report_data['item_code']}' company='{filters.get("company")}' from_date='{from_date_fiscal}' to_date='{to_date}' warehouse='{report_data['warehouse']}'
+			# 	onClick=finbyzerp.view_stock_ledger_report.view_stock_ledger_report(this.getAttribute('item_code'),this.getAttribute('company'),this.getAttribute('from_date'),this.getAttribute('to_date'),this.getAttribute('warehouse'))>View Stock Ledger</button>"""
+			report_data['stock_ledger'] =f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #1581E1; padding: 3px 5px;border-radius: 5px;'
+			target="_blank" data='{report_data}' item_code='{report_data['item_code']}' warehouse='{report_data['warehouse']}'
+			 	onClick=finbyzerp.open_stock_ledger.open_stock_ledger(this.getAttribute('data'),this.getAttribute('item_code'),this.getAttribute('warehouse'))>View Stock Ledger</button>"""
 			data.append(report_data)
 
 	add_additional_uom_columns(columns, data, include_uom, conversion_factors)

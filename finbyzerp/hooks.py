@@ -315,3 +315,9 @@ from erpnext.controllers import sales_and_purchase_return
 from finbyzerp.api import validate_returned_items
 sales_and_purchase_return.validate_returned_items = validate_returned_items
 
+fixtures = [
+       {
+         "dt": "Custom Field", 
+         "filters":[["name", "in", ['Workspace-module_icon']]]
+      },
+]
