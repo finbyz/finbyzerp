@@ -308,7 +308,7 @@ def get_gl_entries(filters, accounting_dimensions):
 			if d.voucher_type in ('Sales Invoice', 'Purchase Invoice','Payment Entry'):
 				if d.voucher_type == 'Payment Entry':
 					if frappe.db.get_value(d.voucher_type,d.voucher_no,'payment_type') == "Receive":
-						acc_list = ['Receive Amount']	
+						acc_list = ['Received Amount']	
 					else:
 						acc_list = ['Paid Amount']	
 					tax_table = "Payment Entry Deduction"
