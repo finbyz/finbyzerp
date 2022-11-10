@@ -305,18 +305,55 @@ def get_gl_entries(filters, accounting_dimensions):
 					dr_cr.append("Cr")
 					debit_credit_list.append(format(round(float(j), 2), '.2f'))
 			
-			d['debit_credit_list'] = "<style>.tbspace > tbody > tr > td{ padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important; }</style><table width='100%%' class='tbspace'><tbody>"
-			for x, y, z in zip(accounts_list, dr_cr, debit_credit_list):
-				if filters.get("print_with_description"):
-					d['debit_credit_list'] += """
-					<tr>
-						<td width='70%%'>{}</td>
-						<td>{}</td>
-						<td align='right'>{}</td>
-					</tr>
-					""".format(x, y, z)
+			if d.voucher_type in ('Sales Invoice', 'Purchase Invoice','Payment Entry'):
+				if d.voucher_type == 'Payment Entry':
+					if frappe.db.get_value(d.voucher_type,d.voucher_no,'payment_type') == "Receive":
+						acc_list = ['Receive Amount']	
+					else:
+						acc_list = ['Paid Amount']	
+					tax_table = "Payment Entry Deduction"
+					taxes = frappe.db.get_all(tax_table, {'parent' : d.voucher_no}, ['account', 'amount'])
+					paid_amount = frappe.db.get_value(d.voucher_type, d.voucher_no, 'paid_amount')
+					dc_list = [paid_amount]
+					for row in taxes:
+						acc_list.append(row.account)
+						dc_list.append(row.amount)
+				else:
+					acc_list = ['Net Total']
+					tax_table = "Sales Taxes and Charges" if d.voucher_type == "Sales Invoice" else "Purchase Taxes and Charges"
+					taxes = frappe.db.get_all(tax_table, {'parent' : d.voucher_no}, ['account_head', 'base_tax_amount'])
+					net_total = frappe.db.get_value(d.voucher_type, d.voucher_no, 'base_net_total')
+					dc_list = [net_total]
+					for row in taxes:
+						acc_list.append(row.account_head)
+						dc_list.append(row.base_tax_amount)
 
-			d['debit_credit_list'] += "<tbody></table>"
+			if d.voucher_type not in ('Sales Invoice', 'Purchase Invoice','Payment Entry'):
+				d['debit_credit_list'] = "<style>.remove_border > tbody > tr > td{ padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important;  } .remove_border td { border: 0px  !important;}</style><table width='100%%' class='remove_border'   ><tbody>"
+				for x, y, z in zip(accounts_list, dr_cr, debit_credit_list):
+					if filters.get("print_with_description"):
+						d['debit_credit_list'] += """
+						<tr>
+							<td width='70%%'>{}</td>
+							<td>{}</td>
+							<td align='right'>{}</td>
+						</tr>
+						""".format(x, y, z)
+
+				d['debit_credit_list'] += "<tbody></table>"
+			else:
+				d['debit_credit_list'] = "<style>.remove_border > tbody > tr > td{ padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important; } .remove_border td { border: 0px  !important;}</style><table class='remove_border' width='100%%'  ><tbody>"
+				for x, z in zip(acc_list, dc_list):
+					if filters.get("print_with_description"):
+						d['debit_credit_list'] += """
+						<tr>
+							<td width='70%%'>{}</td>
+							<td align='right'>{}</td>
+						</tr>
+						""".format(x, z)
+
+				d['debit_credit_list'] += "<tbody></table>"
+				
 		debit_credit_list = None
 		debit_list = None
 		credit_list = None
