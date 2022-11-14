@@ -1,0 +1,23 @@
+{
+ "add_total_row": 1,
+ "columns": [],
+ "creation": "2022-06-17 13:01:29.036846",
+ "disable_prepared_report": 0,
+ "disabled": 1,
+ "docstatus": 0,
+ "doctype": "Report",
+ "filters": [],
+ "idx": 0,
+ "is_standard": "Yes",
+ "letter_head": "",
+ "modified": "2022-06-24 12:02:28.339353",
+ "modified_by": "Administrator",
+ "module": "Finbyzerp",
+ "name": "HSN WISE OUTWORD SUMMARY",
+ "owner": "Administrator",
+ "prepared_report": 0,
+ "ref_doctype": "Sales Invoice",
+ "report_name": "HSN WISE OUTWORD SUMMARY",
+ "report_type": "Script Report",
+ "roles": []
+}
