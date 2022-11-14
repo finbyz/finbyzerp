@@ -25,6 +25,8 @@
   "create_payments",
   "column_break_16",
   "submit_payments",
+  "column_break_20",
+  "remove_unallocated_invoices",
   "section_break_18",
   "payment_invoice_items",
   "reconciled_transactions",
@@ -169,13 +171,23 @@
   {
    "fieldname": "total_amount",
    "fieldtype": "Currency",
-   "label": "Total Amount"
+   "label": "Total Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_20",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "remove_unallocated_invoices",
+   "fieldtype": "Button",
+   "label": "Remove Unallocated Invoices"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2021-11-13 09:54:06.365907",
+ "modified": "2022-08-06 13:41:14.627253",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Bank Statement Transaction Entry",

@@ -126,11 +126,13 @@ class CreditandDebitNote(Document):
 					target.posting_time=source.posting_time
 					target.posting_date=source.posting_date
 				if target_doctype == "Sales Invoice":
+					target.is_consolidated=0
 					target.customer = source.party
-					target.naming_series="SI-CR-.fiscal.-" if source.type=="Credit Note" else 'SI-DR-.fiscal.-'
+					target.naming_series="SI-CR-.fiscal.-.###" if source.type=="Credit Note" else 'SI-DR-.fiscal.-.###'
 				else:
 					target.supplier = source.party
-					target.naming_series=' PI-DR-.fiscal.-' if source.type=="Debit Note" else "PI-CR-.fiscal.-"
+					target.naming_series=' PI-DR-.fiscal.-.###' if source.type=="Debit Note" else "PI-CR-.fiscal.-.###"
+				target.remarks = source.remarks
 				target.series_value = source.series_value
 				target.run_method("set_missing_values")
 				target.run_method("calculate_taxes_and_totals")
@@ -158,6 +160,8 @@ class CreditandDebitNote(Document):
 						target.stock_qty = -(target.stock_qty)
 				if target_doctype == "Sales Invoice":
 					target.income_account = frappe.db.get_value("Company",source_parent.company,"default_income_account")
+				target.income_account=source.income_account
+				target.expense_account=source.expense_account
 
 			doclist = get_mapped_doc(source_doc.doctype, source_doc.name, {
 				source_doc.doctype: {
@@ -182,17 +186,27 @@ class CreditandDebitNote(Document):
 		try:
 			return_entry.flags.ignore_permissions = True
 			return_entry.save()
-			return_entry.submit()
+			return_entry.taxes_and_charges=self.get('sales_taxes_and_charges') if self.party_type == "Customer" else  self.get('purchase_taxes_and_charges')
+			return_entry.tax_category=None
+			submit=0
+			if not cint(frappe.db.get_single_value("E Invoice Settings", "enable")):
+				submit=1
+			else:
+				if not frappe.db.get_value("E Invoice User", {"company": self.get("company")}):
+					submit=1
+			if (submit and return_entry.doctype == "Sales Invoice") or return_entry.doctype == "Purchase Invoice":
+				return_entry.submit()
+			state="submitted" if submit else "Created"
 			if return_entry.doctype == "Sales Invoice":
 				self.db_set('si_ref',return_entry.name)
 				self.db_set('pi_ref',None)
 				url = get_url_to_form("Sales Invoice",return_entry.name)
-				frappe.msgprint(_("Sales Invoice <b><a href='{url}'>{name}</a></b> has been submitted!".format(url=url, name=return_entry.name)), title="Sales Invoice submitted", indicator="green")
+				frappe.msgprint(_("Sales Invoice <b><a href='{url}'>{name}</a></b> has been {state}!".format(url=url, name=return_entry.name,state=state)), title="Sales Invoice "+str(state), indicator="green")
 			else:
 				self.db_set('pi_ref',return_entry.name)
 				self.db_set('si_ref',None)
 				url = get_url_to_form("Purchase Invoice",return_entry.name)
-				frappe.msgprint(_("Purchase Invoice <b><a href='{url}'>{name}</a></b> has been submitted!".format(url=url, name=return_entry.name)), title="Purchase Invoice submitted", indicator="green")
+				frappe.msgprint(_("Purchase Invoice <b><a href='{url}'>{name}</a></b> has been {state}!".format(url=url, name=return_entry.name,state=state)), title="Purchase Invoice "+str(state), indicator="green")
 
 		except Exception as e:
 			frappe.throw(_(str(e)))
@@ -246,7 +260,7 @@ class CreditandDebitNote(Document):
 		elif tax.charge_type == "On Item Quantity":
 			current_tax_amount = tax_rate * item.qty
 
-		if not self.doc.get("is_consolidated"):
+		if not (self.doc.get("is_consolidated") or tax.get("dont_recompute_tax")):
 			self.set_item_wise_tax(item, tax, tax_rate, current_tax_amount)
 
 		return current_tax_amount
@@ -260,7 +274,7 @@ class CreditandDebitNote(Document):
 	def set_item_wise_tax(self, item, tax, tax_rate, current_tax_amount):
 		# store tax breakup for each item
 		key = item.item_code or item.item_name
-		item_wise_tax_amount = current_tax_amount*self.doc.conversion_rate
+		item_wise_tax_amount = flt(current_tax_amount*self.doc.conversion_rate,4)
 		if tax.item_wise_tax_detail.get(key):
 			item_wise_tax_amount += tax.item_wise_tax_detail[key][1]
 

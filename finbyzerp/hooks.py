@@ -44,13 +44,13 @@ dashboard.make_records = make_records
 # e_invoice overrides
 import erpnext
 # from finbyzerp.e_invoice_override import validate_einvoice_fields,get_transaction_details,get_item_list,make_einvoice,get_invoice_value_details,update_invoice_taxes
-from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name, make_einvoice
+from finbyzerp.e_invoice_override import get_item_list, validate_einvoice_fields, validate_document_name, make_einvoice,get_invoice_value_details,update_invoice_taxes
 erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
 erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
 erpnext.regional.india.e_invoice.utils.make_einvoice = make_einvoice
 # erpnext.regional.india.e_invoice.utils.get_transaction_details = get_transaction_details
-# erpnext.regional.india.e_invoice.utils.get_invoice_value_details=get_invoice_value_details
-# erpnext.regional.india.e_invoice.utils.update_invoice_taxes = update_invoice_taxes
+erpnext.regional.india.e_invoice.utils.get_invoice_value_details=get_invoice_value_details
+erpnext.regional.india.e_invoice.utils.update_invoice_taxes = update_invoice_taxes
 #erpnext.regional.india.e_invoice.utils.update_item_taxes = update_item_taxes
 #erpnext.regional.india.e_invoice.utils.get_party_details = get_party_details
 
@@ -170,14 +170,13 @@ doc_events = {
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
 			"finbyzerp.api.si_validate"
 		],
-		"before_submit":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_submit",
+		# "before_submit":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_submit",
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		"on_submit": "finbyzerp.api.sales_invoice_on_submit",
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate",
-		"before_submit":"finbyzerp.finbyzerp.doc_events.purchase_invoice.before_submit"
+		"validate": "finbyzerp.api.pi_validate"
 	},
 		"Purchase Receipt": {
 		"validate": "finbyzerp.api.pr_validate"
@@ -196,6 +195,9 @@ doc_events = {
 	"Payment Entry":{
 		"validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
 	},
+	"Delivery Note":{
+		"validate":"finbyzerp.finbyzerp.doc_events.delivery_note.validate"
+	},
 	("Purchase Order","Sales Order"):{
 		"before_cancel":"finbyzerp.api.po_so_before_cancel",
 	},
@@ -206,14 +208,20 @@ doc_events = {
 		"before_save":"finbyzerp.finbyzerp.doc_events.form_tour.before_save",
 		"on_update":"finbyzerp.finbyzerp.doc_events.form_tour.on_update"
 	},
+	("Quotation","Sales Order","Delivery Note","Sales Invoice"):{
+			"on_submit":"finbyzerp.finbyzerp.doc_events.quotation.on_submit",
+			"before_update_after_submit":"finbyzerp.finbyzerp.doc_events.quotation.before_update_after_submit",
+			"before_cancel":"finbyzerp.finbyzerp.doc_events.quotation.on_cancel",
+			"on_trash":"finbyzerp.finbyzerp.doc_events.quotation.on_trash"
+		},
 }
 
 scheduler_events = {
-	"cron":{
-		"*/5 * * * *":[
-			"finbyzerp.api.repost_transaction_entries"
-		],
-	},
+# 	"cron":{
+# 		"*/5 * * * *":[
+# 			"finbyzerp.api.repost_transaction_entries"
+# 		],
+# 	},
 	"daily":[
 		"finbyzerp.api.daily_entry_summary_mail",
 		"finbyzerp.api.daily_transaction_summary_mail"
@@ -295,3 +303,8 @@ pending_so_items_for_purchase_request.execute = pending_so_items_for_purchase_re
 from finbyzerp.finbyzerp.report.trends import get_data as trends_data
 from erpnext.controllers import trends
 trends.get_data = trends_data
+
+from erpnext.controllers import sales_and_purchase_return
+from finbyzerp.api import validate_returned_items
+sales_and_purchase_return.validate_returned_items = validate_returned_items
+

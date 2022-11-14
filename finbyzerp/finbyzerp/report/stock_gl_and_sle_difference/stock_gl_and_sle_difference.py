@@ -59,8 +59,9 @@ def get_sle_value(filters):
 
 	if filters.get("account"):
 		warehouse_list = frappe.db.get_all("Warehouse",{"account":filters.get("account")}, pluck= "name")
-		warehouse_placeholder = ', '.join(f"'{i}'" for i in warehouse_list)
-		conditions += """ and sle.warehouse in (%s)""" % warehouse_placeholder
+		if warehouse_list:
+			warehouse_placeholder = ', '.join(f"'{i}'" for i in warehouse_list)
+			conditions += f""" and sle.warehouse in (%s)""".format(warehouse_placeholder)
 
 	return frappe.db.sql("""
 			select

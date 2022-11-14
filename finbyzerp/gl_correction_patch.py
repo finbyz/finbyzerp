@@ -156,3 +156,35 @@ def get_gl_map(gl_data):
 		gl_dict = gl_map[d.voucher_no]
 		gl_dict["gl_value"] = flt(d.gl_value)
 	return gl_map
+
+
+
+# # create repost based on transaction
+# def repost_transactions():
+# 	data=get_data()
+# 	for each in data:
+# 		args={"voucher_type":each.voucher_type,"voucher_no":each.voucher_no,"company":each.company,"based_on":"Transaction"}
+# 		create_repost(args)
+
+# # Create repost Item Valuation entries based on transation items in sle
+# def repost_transaction_items():
+# 	item_warehouse_map=[]
+# 	data=get_data()
+# 	for each in data:
+# 		for each_sle in frappe.db.sql(f"""Select name,item_code,warehouse,company from `tabStock Ledger Entry` where company = '{each.company}' and voucher_type='{each.voucher_type}' and voucher_no = '{each.voucher_no}' and is_cancelled =0 """,as_dict=1):
+# 			args={"item_code":each_sle.item_code,"warehouse":each_sle.warehouse,"company":each_sle.company,"based_on":"Item and Warehouse"}
+# 			if args not in item_warehouse_map:
+# 				item_warehouse_map.append(args)
+# 	print(item_warehouse_map)
+# 	for each in item_warehouse_map:
+# 		create_repost(each)
+
+
+# def create_repost(args):
+# 	new_doc = frappe.new_doc("Repost Item Valuation")
+# 	new_doc.update(args)
+# 	new_doc.posting_date = "2022-04-01"
+# 	new_doc.posting_time = "01:01:00"
+# 	new_doc.allow_negative_stock = 0
+# 	new_doc.save()
+# 	new_doc.db_set("allow_negative_stock", 0)

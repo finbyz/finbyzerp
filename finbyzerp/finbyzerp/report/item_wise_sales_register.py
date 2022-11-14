@@ -460,6 +460,7 @@ def get_tax_accounts(item_list, columns, company_currency,
 		tuple([doctype] + list(invoice_item_row)))
 
 	for name, parent, account_head, item_wise_tax_detail, charge_type, tax_amount in tax_details:
+		original_tax_amount = tax_amount # Finbyz Changes: If Invoice is Return and tax amount is negative then show negative amount
 		account_head = handle_html(account_head)
 		if account_head not in tax_columns and tax_amount:
 			tax_columns.append(account_head)
@@ -473,6 +474,8 @@ def get_tax_accounts(item_list, columns, company_currency,
 
 					if isinstance(tax_data, list):
 						tax_rate, tax_amount = tax_data
+						if original_tax_amount < 0 and item_code == "Credit Note":
+							tax_amount = -(tax_amount) # Finbyz Changes: If Invoice is Return and tax amount is negative then show negative amount
 					else:
 						tax_rate = tax_data
 						tax_amount = 0

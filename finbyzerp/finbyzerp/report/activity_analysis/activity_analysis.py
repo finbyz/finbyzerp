@@ -17,7 +17,7 @@ def execute(filters=None):
 		return [],[]
 
 	if filters.show_details == 1:
-		columns = get_columns_details()
+		columns = get_columns_details(filters)
 		data = get_data_details(filters)
 		chart = get_chart_data_details(data, filters)
 		return columns, data, None, chart
@@ -27,16 +27,21 @@ def execute(filters=None):
 		chart = get_chart_data(data,filters)
 		return columns, data, None, chart
 
-def get_columns_details():
+def get_columns_details(filters):
 	columns = [
 		{ "label": _("Document"),"fieldname": "Document","fieldtype": "Data","width": 100},
 		{ "label": _("ID"),"fieldname": "ID","fieldtype": "Dynamic Link","options":"Document","width": 100},
 		{ "label": _("Date"),"fieldname": "Date","fieldtype": "Date","width": 100},
-		{ "label": _("Created By"),"fieldname": "Created By","fieldtype": "Link","options":"User","width": 150},
+		{ "label": _("Created By"),"fieldname": "Created By","fieldtype": "Link","options":"User","width": 100},
 		{ "label": _("Title"),"fieldname": "Title","fieldtype": "Data","width": 110},
-		{ "label": _("Item Name"),"fieldname": "Item Name","fieldtype": "Data","width": 180},
-		{ "label": _("Amount"),"fieldname": "Amount","fieldtype": "Currency","width": 150}
-	]
+		{ "label": _("Particulars"),"fieldname": "Particulars","fieldtype": "Data","width": 100},
+		{ "label": _("Item Name"),"fieldname": "Item Name","fieldtype": "Data","width": 120},
+		{ "label": _("Qty"),"fieldname": "qty","fieldtype": "float","width": 100},
+		{ "label": _("Rate"),"fieldname": "rate","fieldtype": "Currency","width": 100},
+		{ "label": _("Amount"),"fieldname": "Amount","fieldtype": "Currency","width": 150}]
+	if filters.get('show_debit_credit_wise_amount'):
+		columns += [{ "label": _("Debit"),"fieldname": "Debit","fieldtype": "Currency","width": 100},
+					{ "label": _("Credit"),"fieldname": "Credit","fieldtype": "Currency","width": 100}]
 	return columns
 
 def get_data_details(filters):
@@ -55,22 +60,33 @@ def get_data_details(filters):
 
 	if filters.get('doctype'):
 		doctype = [filters.doctype]
-		if not filters.doctype == "Stock Entry" and not filters.doctype == "Journal Entry":
-			child_doctype_list = [filters.doctype + " Item"]
-		elif filters.doctype == "Stock Entry":
+		if filters.doctype == "Stock Entry":
 			child_doctype_list = [filters.doctype + " Detail"]
 		elif filters.doctype == "Journal Entry":
 			child_doctype_list = [filters.doctype + " Account"]
+		else:
+			child_doctype_list = [filters.doctype + " Item"]
 
 	data = []
 	for idx,doc in enumerate(doctype):
 		if doc == "Payment Entry":
-			other_fields = "party_name as 'Item Name', paid_amount as 'Amount',"
+			other_fields = "party_name as 'Item Name', paid_amount as 'Amount', payment_type as 'Particulars', if(payment_type ='Receive', paid_amount, 0) as 'Credit', if(payment_type = 'Pay', paid_amount, 0) as 'Debit',"
+		elif doc == "Journal Entry":
+			other_fields = "voucher_type as 'Particulars',"
+		elif doc == "Sales Invoice":
+			other_fields = "if(is_return, 'Credit Note',Null) as 'Particulars', is_return, grand_total, "
+		elif doc == "Purchase Invoice":
+			other_fields = "if(is_return, 'Debit Note',Null) as 'Particulars', is_return, grand_total, "
 		else:
 			other_fields = ''
 		title_field = frappe.db.get_value("Property Setter",{"doc_type":doc,"property":'title_field'},'value')
 		if not title_field:
 			title_field = frappe.db.get_value("DocType",doc,'title_field')
+		if doc == "Stock Entry":
+			other_fields = f"stock_entry_type, {title_field} as 'Particulars', total_outgoing_value, total_incoming_value, "
+			if "send_to_party" in frappe.get_meta("Stock Entry").__dict__.keys():
+				title_field = f"if(send_to_party, party, {title_field})"
+
 		conditions = ''
 		if filters.based_on == "Creation Date":
 			date = 'CAST(creation AS DATE)'
@@ -100,42 +116,86 @@ def get_data_details(filters):
 		for row in d:
 			row["Document"] = doc
 			if row['Document'] in ["Payment Entry"]:
+				row['sorting_date'] = row['Date']
 				row["Owner"] = get_user_fullname(row["Created By"])
 			else:
-				id = insert_items(dt, row, child_doctype_list[idx], id+1)
+				id = insert_items(dt, row, child_doctype_list[idx], id+1, filters)
 			row["Created By"] = get_user_fullname(row["Created By"])
 
+			if filters.get('show_debit_credit_wise_amount') and row['Document'] in ["Purchase Invoice", "Sales Invoice", "Stock Entry"]:
+				if row['Document'] == "Purchase Invoice" and row['is_return']:
+					row['Debit'] = row['grand_total']
+					row['Credit'] = 0 
+				elif row['Document'] == "Purchase Invoice" and not row['is_return']:
+					row['Credit'] = row['grand_total']
+					row['Debit'] = 0 
+				elif row['Document'] == "Sales Invoice" and row['is_return']:
+					row['Credit'] = row['grand_total']
+					row['Debit'] = 0 
+				elif row['Document'] == "Sales Invoice" and not row['is_return']:
+					row['Debit'] = row['grand_total']
+					row['Credit'] = 0 
+				elif row['Document'] == "Stock Entry" and row['Particulars'] == "Material Issue":
+					row['Credit'] = row['total_outgoing_value']
+					row['Debit'] = 0 
+				elif row['Document'] == "Stock Entry" and row['Particulars'] == "Material Receipt":
+					row['Debit'] = row['total_incoming_value']
+					row['Credit'] = 0 
+ 
 		data += dt
 
-	return data
+	from operator import itemgetter
+	new_data = sorted(data, key=itemgetter('sorting_date'), reverse=True)
+	return new_data
 
-def insert_items(data, row, doc, id):
+def insert_items(data, row, doc, id, filters):
+	cr_dr_fields = ''
+
 	if doc == "Journal Entry Account":
 		items = frappe.db.sql("""
 			SELECT
-				account as 'Item Name', if(credit > 0, credit, debit) as 'Amount', owner as 'Owner'
+				account as 'Item Name', if(credit > 0, credit, debit) as 'Amount', if(credit > 0, credit, 0) as 'Credit', if(debit > 0, debit, 0) as 'Debit', owner as 'Owner', 0 as 'qty', 0 as 'rate'
 			FROM
 				`tab{0}`
 			WHERE
 				parent = '{1}' """.format(doc, row['ID']), as_dict=1)
-	else:
+
+	elif doc == "Stock Entry Detail":
 		items = frappe.db.sql("""
 			SELECT
-				item_code as 'Item Name', amount as 'Amount', owner as 'Owner'
+				item_code as 'Item Name', amount as 'Amount', owner as 'Owner', qty as 'qty', basic_rate as 'rate' {2}
 			FROM
 				`tab{0}`
 			WHERE
-				parent = "{1}" """.format(doc, row['ID']), as_dict=1)
+				parent = '{1}' """.format(doc, row['ID'], cr_dr_fields), as_dict=1)
+	
+	else:
+		items = frappe.db.sql("""
+			SELECT
+				item_code as 'Item Name', amount as 'Amount', owner as 'Owner', qty as 'qty', rate as 'rate' {0}
+			FROM
+				`tab{1}`
+			WHERE
+				parent = "{2}" """.format(cr_dr_fields, doc, row['ID']), as_dict=1)
 
 	if items:
+		row['sorting_date'] = row['Date']
 		row["Item Name"] = items[0]["Item Name"]
 		row["Amount"] = items[0]["Amount"]
 		row["Owner"] = get_user_fullname(items[0]["Owner"])
+		row['qty'] = round(items[0]['qty'], 2)
+		row['rate'] = items[0]['rate']
+		if doc == "Journal Entry Account":
+			row['Credit'] = items[0]['Credit'] or 0
+			row['Debit'] = items[0]['Debit'] or 0
 
 	for i in items[1:]:
-		data.insert(id, {'Item Name': i['Item Name'], 'Amount': i["Amount"], 'Owner': get_user_fullname(i["Owner"])})
-		id +=1
-
+		if doc != "Journal Entry Account":
+			data.insert(id, {'sorting_date': row['Date'], 'Item Name': i['Item Name'], 'Amount': i["Amount"], 'qty': round(i["qty"], 2), 'rate':i['rate'],'Owner': get_user_fullname(i["Owner"])})
+			id +=1
+		else:
+			data.insert(id, {'sorting_date': row['Date'], 'Item Name': i['Item Name'], 'Amount': i["Amount"], 'qty': round(i["qty"], 2), 'Debit':i['Debit'], 'Credit': i['Credit'], 'rate':i['rate'],'Owner': get_user_fullname(i["Owner"])})
+			id +=1
 	return id
 
 def get_chart_data_details(data, filters):
@@ -198,12 +258,12 @@ def get_data(filters):
 
 	if filters.get('doctype'):
 		doctype_list = [filters.doctype]
-		if not filters.doctype == "Stock Entry" and not filters.doctype == "Journal Entry":
-			child_doctype_list = [filters.doctype + " Item"]
-		elif filters.doctype == "Stock Entry":
+		if filters.doctype == "Stock Entry":
 			child_doctype_list = [filters.doctype + " Detail"]
 		elif filters.doctype == "Journal Entry":
 			child_doctype_list = [filters.doctype + " Account"]
+		else:
+			child_doctype_list = [filters.doctype + " Item"]
 
 	for idx,doc in enumerate(doctype_list):
 		conditions = ''
@@ -275,9 +335,10 @@ def get_data(filters):
 					items_list.append({row.owner:row.total_items})
 			else:
 				for row in dt:
-					owner_list.append(row.owner)
-					entries_list.append({row.owner:dt_map[(row.owner)]})
-					items_list.append({row.owner:int(row.total_entries)})
+					if dt_map.get(row.owner):
+						owner_list.append(row.owner)
+						entries_list.append({row.owner:dt_map[(row.owner)]})
+						items_list.append({row.owner:int(row.total_entries)})
 	entries_sum = {}
 	for d in entries_list:
 		for k in d.keys():

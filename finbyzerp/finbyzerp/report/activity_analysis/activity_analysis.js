@@ -8,7 +8,7 @@ frappe.query_reports["Activity Analysis"] = {
             "label": __("Based On"),
             "fieldtype": "Select",
             "options": ["Creation Date", "Posting Date"],
-            "default": "Creation Date"
+            "default": "Posting Date"
         },
         {
             "fieldname": "from_date",
@@ -37,13 +37,20 @@ frappe.query_reports["Activity Analysis"] = {
             "label": __("Timespan"),
             "fieldtype": "Select",
             "width": "80",
-            "options": "\nlast week\nlast month\nlast quarter\nlast 6 months\nlast year\nyesterday\ntoday\nthis week\nthis month\nthis quarter\nthis year",
-            "default": "last month"
+            "options": "\nlast year\nlast 6 month\nlast quarter\nlast month\nlast week\nyesterday\ntoday\nthis week\nthis month\nthis quarter\nthis year",
+            "default": "yesterday"
         },
         {
             "fieldname": "show_details",
             "label": __("Show Details"),
             "fieldtype": "Check",
+            "default": 1
+        },
+        {
+            "fieldname": "show_debit_credit_wise_amount",
+            "label": __("Show Debit Credit wise Amount"),
+            "fieldtype": "Check",
+            "depends_on": "eval:doc.show_details == 1"
         },
     ]
 };
