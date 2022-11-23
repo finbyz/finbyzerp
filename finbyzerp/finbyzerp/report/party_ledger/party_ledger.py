@@ -327,7 +327,7 @@ def get_gl_entries(filters, accounting_dimensions):
 					dc_list.append(row.amount)
 
 			if d.voucher_type == 'Payment Entry':
-				d['debit_credit_list'] = "<style>.remove_border > tbody > tr > td{ padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important; } .remove_border td { border: 0px  !important;}</style><table class='remove_border' width='100%%'  ><tbody>"
+				d['debit_credit_list'] = "<style>.remove_border > tbody > tr > td{ font-size: 10px !important; padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important; } .remove_border td { border: 0px  !important;}</style><table class='remove_border' width='100%%'  ><tbody>"
 				for x, z in zip(acc_list, dc_list):
 					if filters.get("print_with_description") or filters.get("print_with_item"):
 						d['debit_credit_list'] += f"""
@@ -339,7 +339,7 @@ def get_gl_entries(filters, accounting_dimensions):
 
 				d['debit_credit_list'] += "<tbody></table>"
 			elif d.voucher_type == 'Journal Entry':
-				d['debit_credit_list'] = "<style>.remove_border > tbody > tr > td{ padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important;  } .remove_border td { border: 0px  !important;}</style><table width='100%%' class='remove_border'   ><tbody>"
+				d['debit_credit_list'] = "<style>.remove_border > tbody > tr > td{ font-size: 10px !important; padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important;  } .remove_border td { border: 0px  !important;}</style><table width='100%%' class='remove_border'   ><tbody>"
 				for x, z in zip(accounts_list, debit_credit_list):
 					if filters.get("print_with_description") or filters.get("print_with_item"):
 						if acc_dict[x][0] not in ("Receivable", "Payable"):
@@ -651,7 +651,8 @@ def get_sales_purchase_invoice_data(filters):
 		}))
 		purchase_invoice__dict = purchase_invoice_map[row.name][row.item_code][row.rate]
 		purchase_invoice__dict.qty += row.qty
-		purchase_invoice__dict.item_name += row.item_name
+		if row.item_name not in purchase_invoice__dict.item_name:
+			purchase_invoice__dict.item_name += row.item_name
 		purchase_invoice__dict.discount_amount = row.discount_amount
 
 	return purchase_invoice_map,total_taxes_and_charges
