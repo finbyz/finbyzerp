@@ -40,51 +40,54 @@ def get_transactions(self, arg=None):
 		"prefixes": prefixes
 	}
 
-#finbyz
+#finbyz #do not pull
 def get_naming_series_options(doctype):
 	meta = frappe.get_meta(doctype)
-	options = meta.get_field("naming_series").options.split("\n")	
 	options_list = []
+	if meta.get_field("naming_series").get('options'):
+		options = meta.get_field("naming_series").options.split("\n")	
+		options_list = []
 
-	fields = [d.fieldname for d in meta.fields]
-	# frappe.msgprint(str(len(options)))
+		fields = [d.fieldname for d in meta.fields]
+		# frappe.msgprint(str(len(options)))
 
-	for option in options:
-		parts = option.split('.')
+		for option in options:
+			parts = option.split('.')
 
-		if parts[-1] == "#" * len(parts[-1]):
-			del parts[-1]
+			if parts[-1] == "#" * len(parts[-1]):
+				del parts[-1]
 
-		naming_str = parse_naming_series(parts)
-		series = {}
-		dynamic_field = {}
-		field_list = []
+			naming_str = parse_naming_series(parts)
+			series = {}
+			dynamic_field = {}
+			field_list = []
+			
+			for part in parts:
+				if part in fields:
+					field_list.append(part)
+					dynamic_field[part] = (frappe.db.sql_list("select distinct {field} from `tab{doctype}` where {field} is not NULL".format(field=part, doctype=doctype)))
 		
-		for part in parts:
-			if part in fields:
-				field_list.append(part)
-				dynamic_field[part] = (frappe.db.sql_list("select distinct {field} from `tab{doctype}` where {field} is not NULL".format(field=part, doctype=doctype)))
-	
-		import itertools
-		if dynamic_field.items():
-			pair = [(k, v) for k, v in dynamic_field.items()]
-			key = [item[0] for item in pair]
-			value = [item[1] for item in pair]
+			import itertools
+			if dynamic_field.items():
+				pair = [(k, v) for k, v in dynamic_field.items()]
+				key = [item[0] for item in pair]
+				value = [item[1] for item in pair]
 
-			combination = list(itertools.product(*value))
-			for item in combination:
-				name = naming_str
-				for k, v in zip(key, item):
-					name = name.replace(k, v)
+				combination = list(itertools.product(*value))
+				for item in combination:
+					name = naming_str
+					for k, v in zip(key, item):
+						name = name.replace(k, v)
 
-				options_list.append(name)
-		
+					options_list.append(name)
+			
 	return options_list
 
 from frappe.core.doctype.document_naming_settings.document_naming_settings import DocumentNamingSettings 
 from frappe.permissions import get_doctypes_with_read
 
 def _get_prefixes(self, doctypes) -> list[str]:
+	
 	"""Get all prefixes for naming series.
 
 	- For all templates prefix is evaluated considering today's date
@@ -94,7 +97,7 @@ def _get_prefixes(self, doctypes) -> list[str]:
 	for d in doctypes:
 		try:
 			options = frappe.get_meta(d).get_naming_series_options()
-			options=get_naming_series_options(doctype)
+			options=get_naming_series_options(d)
 			series_templates.update(options)
 		except frappe.DoesNotExistError:
 			frappe.msgprint(_("Unable to find DocType {0}").format(d))
