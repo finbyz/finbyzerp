@@ -276,6 +276,14 @@ def get_gl_entries(filters, accounting_dimensions):
 	# 	gl_entries = list(filter(lambda d: d.party_type == filters.get('party_type') and d.party in filters.get('party'),
 	# 				gl_entries))
 	balance, balance_in_account_currency = 0, 0
+
+	acc_lst = frappe.db.get_all("Account", ['name', 'account_name', 'account_type'])
+
+	acc_dict = {}
+
+	for row in acc_lst:
+		acc_dict.update({row.name : [row.account_type, row.account_name]})
+
 	for index, d in enumerate(gl_entries):
 		if not d.get("posting_date"):
 			balance, balance_in_account_currency = 0, 0
@@ -304,19 +312,57 @@ def get_gl_entries(filters, accounting_dimensions):
 				elif float(j) > 0.0:
 					dr_cr.append("Cr")
 					debit_credit_list.append(format(round(float(j), 2), '.2f'))
-			
-			d['debit_credit_list'] = "<style>.tbspace > tbody > tr > td{ padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important; }</style><table width='100%%' class='tbspace'><tbody>"
-			for x, y, z in zip(accounts_list, dr_cr, debit_credit_list):
-				if filters.get("print_with_description"):
-					d['debit_credit_list'] += """
-					<tr>
-						<td width='70%%'>{}</td>
-						<td>{}</td>
-						<td align='right'>{}</td>
-					</tr>
-					""".format(x, y, z)
 
-			d['debit_credit_list'] += "<tbody></table>"
+			if d.voucher_type == 'Payment Entry':
+				if frappe.db.get_value(d.voucher_type,d.voucher_no,'payment_type') == "Receive":
+					acc_list = ['Received Amount']	
+				else:
+					acc_list = ['Paid Amount']	
+				tax_table = "Payment Entry Deduction"
+				taxes = frappe.db.get_all(tax_table, {'parent' : d.voucher_no}, ['account', 'amount'])
+				paid_amount = frappe.db.get_value(d.voucher_type, d.voucher_no, 'paid_amount')
+				dc_list = [paid_amount]
+				for row in taxes:
+					acc_list.append(row.account)
+					dc_list.append(row.amount)
+
+			if d.voucher_type == 'Payment Entry':
+				d['debit_credit_list'] = "<style>.remove_border > tbody > tr > td{ font-size:10px !important; padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important; } .remove_border td { border: 0px  !important;}</style><table class='remove_border' width='100%%'  ><tbody>"
+				for x, z in zip(acc_list, dc_list):
+					if filters.get("print_with_description") or filters.get("print_with_item"):
+						d['debit_credit_list'] += f"""
+						<tr>
+							<td width='60%'>{x}</td>
+							<td align='right'>{frappe.format(z,{'fieldtype': 'Currency'})}</td>
+						</tr>
+						"""
+
+				d['debit_credit_list'] += "<tbody></table>"
+			elif d.voucher_type == 'Journal Entry':
+				d['debit_credit_list'] = "<style>.remove_border > tbody > tr > td{ font-size:10px !important; padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important;  } .remove_border td { border: 0px  !important;}</style><table width='100%%' class='remove_border'   ><tbody>"
+				for x, z in zip(accounts_list, debit_credit_list):
+					if filters.get("print_with_description") or filters.get("print_with_item"):
+						if acc_dict[x][0] not in ("Receivable", "Payable"):
+							d['debit_credit_list'] += f"""
+							<tr>
+								<td width='60%'>{acc_dict[x][1]}</td>
+								<td align='right'>{frappe.format(z,{'fieldtype': 'Currency'})}</td>
+							</tr>
+							"""
+
+				d['debit_credit_list'] += "<tbody></table>"
+			else:
+				d['debit_credit_list'] = "<style>.remove_border > tbody > tr > td{ padding: 0 2px 0 2px!important; margin:0!important; border-spacing: 0!important;  } .remove_border td { border: 0px  !important;}</style><table width='100%%' class='remove_border'   ><tbody>"
+				for x, z in zip(accounts_list, debit_credit_list):
+					d['debit_credit_list'] += f"""
+					<tr>
+						<td width='70%%'>{x}</td>
+						<td align='right'>{frappe.format(z,{'fieldtype': 'Currency'})}</td>
+					</tr>
+					"""
+
+				d['debit_credit_list'] += "<tbody></table>"
+				
 		debit_credit_list = None
 		debit_list = None
 		credit_list = None
@@ -511,17 +557,16 @@ def get_data_with_opening_closing(filters, account_details, accounting_dimension
 	# closing
 	data.append(totals.closing)
 
-	if filters.get('print_with_item'):
-		purchase_invoice_map,total_taxes_and_charges = get_sales_purchase_invoice_data(filters)
-		
-		for d in data:
-			try:
-				if d.get('name'):
-					d['si_details'] = html_sales_invoice_purchase_invoic_data(purchase_invoice_map[d.name],total_taxes_and_charges[d.name])
-				else:
-					d['si_details'] = ''
-			except KeyError:
+	purchase_invoice_map,total_taxes_and_charges = get_sales_purchase_invoice_data(filters)
+	
+	for d in data:
+		try:
+			if d.get('name'):
+				d['si_details'] = html_sales_invoice_purchase_invoic_data(purchase_invoice_map[d.name],total_taxes_and_charges[d.name], filters)
+			else:
 				d['si_details'] = ''
+		except KeyError:
+			d['si_details'] = ''
 	return data
 
 def get_sales_purchase_invoice_data(filters):
@@ -534,7 +579,7 @@ def get_sales_purchase_invoice_data(filters):
 		conditions += f"AND gle.voucher_no = '{filters.get('voucher_no')}'"
 	pi_data = frappe.db.sql(f"""
 		SELECT 
-			gle.name, pii.parent as pi_name,pii.item_name,pii.item_code, pi.total,pi.rounded_total, pii.rate, pii.qty, "Purchase Invoice" as doctype,
+			gle.name, pi.discount_amount, pii.parent as pi_name,pii.item_name,pii.item_code, pi.total,pi.rounded_total, pii.rate, pii.qty, "Purchase Invoice" as doctype,
 			pi.total_taxes_and_charges as pi_total_taxes
 		FROM
 			`tabGL Entry` as gle
@@ -546,7 +591,7 @@ def get_sales_purchase_invoice_data(filters):
 	
 	pi_data += frappe.db.sql(f"""
 		SELECT 
-			gle.name, sii.parent as si_name,sii.item_name,sii.item_code, si.total,si.rounded_total, sii.rate, sii.qty,
+			gle.name, si.discount_amount, sii.parent as si_name,sii.item_name,sii.item_code, si.total,si.rounded_total, sii.rate, sii.qty,
 			"Sales Invoice" as doctype, si.total_taxes_and_charges as si_total_taxes
 		FROM
 			`tabGL Entry` as gle
@@ -556,40 +601,59 @@ def get_sales_purchase_invoice_data(filters):
 			{conditions} AND gle.voucher_type = 'Sales Invoice'
 	""", as_dict = True)
 	
+	tax_data = frappe.db.sql(f"""
+		SELECT 
+			stc.description, stc.base_tax_amount, gle.voucher_no 
+		FROM
+			`tabGL Entry` as gle
+			JOIN `tabSales Taxes and Charges` as stc ON stc.parent=gle.voucher_no
+		WHERE
+			{conditions} AND gle.voucher_type = 'Sales Invoice'
+	""", as_dict = True)
+
+	tax_data += frappe.db.sql(f"""
+		SELECT 
+			ptc.description, ptc.base_tax_amount, gle.voucher_no, add_deduct_tax
+		FROM
+			`tabGL Entry` as gle
+			JOIN `tabPurchase Taxes and Charges` as ptc ON ptc.parent=gle.voucher_no
+		WHERE
+			{conditions} AND gle.voucher_type = 'Purchase Invoice'
+	""", as_dict = True)
+
+	tax_dict = {}
+	for row in tax_data:
+		if tax_dict.get(row.voucher_no):
+			tax_dict[row.voucher_no].append(row)
+		else:
+			tax_dict.update({row.voucher_no : [row]})
+
 	purchase_invoice_map = {}
 	total_taxes_and_charges = {}
 	for row in pi_data:
-		add_deduct_tax = ""
-		if row.doctype == "Sales Invoice":
-			tax_template = "Sales Taxes and Charges"
-		elif row.doctype == "Purchase Invoice":
-			tax_template = "Purchase Taxes and Charges"
-			add_deduct_tax = ", add_deduct_tax"
+		tax_data = tax_dict.get(row.si_name or row.pi_name)
 
-		tax_data = frappe.db.sql(f"""
-			select account_head, tax_amount {add_deduct_tax}
-			from `tab{tax_template}`
-			where parent = '{row.pi_name or row.si_name}' and included_in_print_rate = 0
-			order by idx
-		""", as_dict = 1)
 		if tax_data:
-			total_taxes_and_charges[row.name] = {"Taxes and Charges" : row.pi_total_taxes or row.si_total_taxes}
+			total_taxes_and_charges[row.name] = {}
 
-		for tax in tax_data:
-			if tax.add_deduct_tax == "Deduct":
-				total_taxes_and_charges[row.name].update({tax.account_head : (tax.tax_amount * -1)})
-			else:
-				total_taxes_and_charges[row.name].update({tax.account_head : tax.tax_amount})
+			for tax in tax_data:
+				if tax.add_deduct_tax == "Deduct":
+					total_taxes_and_charges[row.name].update({tax.description : (tax.base_tax_amount * -1)})
+				else:
+					total_taxes_and_charges[row.name].update({tax.description : tax.base_tax_amount})
 
 		purchase_invoice_map.setdefault(row.name, {})\
 		.setdefault(row.item_code, {})\
 		.setdefault(row.rate, frappe._dict({
 				"qty": 0.0,
-				"item_name": ""
+				"item_name": "",
+				"discount_amount": 0.0
 		}))
 		purchase_invoice__dict = purchase_invoice_map[row.name][row.item_code][row.rate]
 		purchase_invoice__dict.qty += row.qty
-		purchase_invoice__dict.item_name += row.item_name
+		if row.item_name not in purchase_invoice__dict.item_name:
+			purchase_invoice__dict.item_name += row.item_name
+		purchase_invoice__dict.discount_amount = row.discount_amount
 
 	return purchase_invoice_map,total_taxes_and_charges
 
@@ -746,18 +810,29 @@ def get_result_as_list(data, filters):
 	return data
 
 
-def html_sales_invoice_purchase_invoic_data(purchase_invoice_map,total_taxes_and_charges):
+def html_sales_invoice_purchase_invoic_data(purchase_invoice_map,total_taxes_and_charges, filters):
 	table = ""
+	net_total = 0 
+	discount_amount = 0
 	for item_code,value in purchase_invoice_map.items():
-			for k,v in value.items():
+		for k,v in value.items():
+			net_total += v["qty"] * k
+			discount_amount += v["discount_amount"]
+			if filters.get('print_with_item'):
 				table+= f"""
-						<p style="font-size:10px">
-							<strong>{v["item_name"]}</strong>
-						</p>
-						<p style="font-size:10px">
-							{v["qty"]} x {frappe.format(k,{'fieldtype': 'Currency'})} = <span><strong>{frappe.format(v["qty"] * k,{'fieldtype': 'Currency'})}</strong></span>
-						</p>	
-					"""
+					<p style="font-size:10px">
+						<strong>{v["item_name"]}</strong>
+					</p>
+					<p style="font-size:10px">
+						{v["qty"]} x {frappe.format(k,{'fieldtype': 'Currency'})} = <span>{frappe.format(v["qty"] * k,{'fieldtype': 'Currency'})}</span>
+					</p>
+				"""
+	table+= f"""
+			<p style="font-size:10px">
+				Net Total
+				<span style="float: right !important;">{frappe.format(net_total,{'fieldtype': 'Currency'})}</span>
+			</p>	
+		"""
 	if total_taxes_and_charges:
 		for row in total_taxes_and_charges:
 			table += f"""<p style="font-size:10px !important; overflow: hidden !important;{"font-weight:bold !important" if row == "Taxes and Charges" else "font-weight:normal !important"}">
@@ -768,6 +843,13 @@ def html_sales_invoice_purchase_invoic_data(purchase_invoice_map,total_taxes_and
 					{frappe.format(total_taxes_and_charges[row],{'fieldtype': 'Currency'})}
 				</span>
 			</p>"""
+	if discount_amount != 0:
+		table+= f"""
+			<p style="font-size:10px">
+				Discount Amount
+				<span style="float: right !important;">{frappe.format(discount_amount,{'fieldtype': 'Currency'})}</span>
+			</p>
+		"""
 	return table
 
 def list_to_sql(lst):

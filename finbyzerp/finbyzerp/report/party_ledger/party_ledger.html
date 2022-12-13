@@ -1,3 +1,11 @@
+<style>
+	td{
+		font-size: 12px !important;
+	}
+	.text-size{
+		font-size: 10px !important;
+	}
+</style>
 <h2 class="text-center">{%= __("Statement of Account") %}</h2>
 <h4 class="text-center">
 	{% if (filters.party_name) { %}
@@ -38,15 +46,20 @@
 			{% if(data[i].posting_date) { %}
 				<td>{%= frappe.datetime.str_to_user(data[i].posting_date) %}</td>
 				<td>{%= data[i].voucher_type %}
-					<br>{%= data[i].voucher_no %}</td>
-				<td>
-					<strong>{%= data[i].party || data[i].account %}</strong>
-					{% if (filters.print_with_item == 1) { %}
-						{{ data[i].si_details }}
-					{% } %}
-					<p>{%= data[i].debit_credit_list%}</p>
+					<br>{%= data[i].voucher_no %}
 					{% if(data[i].bill_no) { %}
 						<p>{%= __("Supplier Invoice No") %}: {%= data[i].bill_no %}</p>
+					{% } %}
+				</td>
+					
+				<td>
+					<strong>{%= data[i].party || data[i].account %}</strong>
+					{% if (filters.print_with_item || filters.print_with_description) { %}
+						{% if (data[i].voucher_type == 'Sales Invoice' || data[i].voucher_type == 'Purchase Invoice') { %}
+							<p class= "text-size">{{ data[i].si_details }}</p>
+						{% } else { %}
+							<p class= "text-size">{%= data[i].debit_credit_list%}</p>
+						{% } %}
 					{% } %}
 					</td>
 					<td style="text-align: right">
