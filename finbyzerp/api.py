@@ -23,6 +23,7 @@ from frappe.desk.doctype.notification_log.notification_log import make_notificat
 from frappe.utils.background_jobs import enqueue
 from frappe.model.workflow import get_workflow_name, send_email_alert
 from frappe.desk.notifications import clear_doctype_notifications
+from frappe.workflow.doctype.workflow_action.workflow_action import create_workflow_actions_for_roles
 
 import json
 import os
