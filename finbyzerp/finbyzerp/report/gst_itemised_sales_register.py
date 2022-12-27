@@ -11,9 +11,9 @@ def execute(filters=None):
 		dict(fieldtype='Data', label='Billing Address GSTIN', fieldname="billing_address_gstin", width=140),
 		dict(fieldtype='Data', label='Company GSTIN', fieldname="company_gstin", width=120),
 		dict(fieldtype='Data', label='Place of Supply', fieldname="place_of_supply", width=120),
-		dict(fieldtype='Data', label='Reverse Charge', fieldname="reverse_charge", width=120),
+		dict(fieldtype='Data', label='Is Reverse Charge', fieldname="is_reverse_charge", width=120),
 		dict(fieldtype='Data', label='GST Category', fieldname="gst_category", width=120),
-		dict(fieldtype='Data', label='Export Type', fieldname="export_type", width=120),
+		dict(fieldtype='Data', label='Is Export With GST', fieldname="is_export_with_gst", width=120),
 		dict(fieldtype='Data', label='E-Commerce GSTIN', fieldname="ecommerce_gstin", width=130),
 		dict(fieldtype='Data', label='HSN Code', fieldname="gst_hsn_code", width=120)
 	], additional_query_columns=[
@@ -21,9 +21,9 @@ def execute(filters=None):
 		'billing_address_gstin',
 		'company_gstin',
 		'place_of_supply',
-		'reverse_charge',
+		'is_reverse_charge',
 		'gst_category',
-		'export_type',
+		'is_export_with_gst',
 		'ecommerce_gstin',
 		'gst_hsn_code'
 	])
