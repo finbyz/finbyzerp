@@ -15,7 +15,7 @@ def create_unallocate_payment_field():
     doc.save(ignore_permissions=True)
 
 def create_qty_as_per_bom_for_se():
-    if not frappe.db.exists("Custom Field", {'label': 'Qty as Per BOM', 'fieldname': 'qty_as_per_bom'})
+    if not frappe.db.exists("Custom Field", {'label': 'Qty as Per BOM', 'fieldname': 'qty_as_per_bom'}):
         doc = frappe.new_doc("Custom Field")
         doc.dt = "Stock Entry"
         doc.label = "Qty as Per BOM"
