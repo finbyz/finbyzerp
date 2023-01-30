@@ -230,17 +230,18 @@ def set_address_details(out, party, party_type):
 
 def set_contact_details(out, party, party_type):
 
-	if party_type == "Lead":
-		if not party.organization_lead:
-			out.update({
-				"contact_person": None,
-				"contact_display": party.lead_name,
-				"contact_email": party.email_id,
-				"contact_mobile": party.mobile_no,
-				"contact_phone": party.phone,
-			})
-			return
-	elif party_type == "Opportunity":
+	# organization_lead removed in V14
+	# if party_type == "Lead":
+	# 	if not party.organization_lead:
+	# 		out.update({
+	# 			"contact_person": None,
+	# 			"contact_display": party.lead_name,
+	# 			"contact_email": party.email_id,
+	# 			"contact_mobile": party.mobile_no,
+	# 			"contact_phone": party.phone,
+	# 		})
+	# 		return
+	if party_type == "Opportunity":
 		out.update({
 				"contact_display": party.party_name,
 				"contact_person": party.contact_person,
