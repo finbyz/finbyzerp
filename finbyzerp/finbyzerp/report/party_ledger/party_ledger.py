@@ -574,7 +574,7 @@ def get_sales_purchase_invoice_data(filters):
 	conditions += f" AND gle.`posting_date` >= '{filters.from_date}'"	
 	conditions += f" AND gle.`posting_date` <= '{filters.to_date}'"
 	conditions += f" AND gle.`party_type` = '{filters.party_type}'" if filters.get('party_type') else f" AND gle.`party_type` in ('Customer', 'Supplier')"
-	conditions += f" AND gle.`party` = {list_to_sql(filters.get('party'))}" if filters.get('party') else ''
+	conditions += f" AND gle.`party` in {list_to_sql(filters.get('party'))}" if filters.get('party') else ''
 	if filters.get('voucher_no'):
 		conditions += f"AND gle.voucher_no = '{filters.get('voucher_no')}'"
 	pi_data = frappe.db.sql(f"""
