@@ -28,6 +28,20 @@ frappe.ui.form.on('Meeting Schedule', {
 			frm.set_value('scheduled_to',frappe.datetime.get_datetime_as_string(frappe.datetime.str_to_obj(frm.doc.scheduled_from).setHours(frappe.datetime.str_to_obj(frm.doc.scheduled_from).getHours() + 1)))
 		}
 	},
+	email_template:function(frm){
+		frm.call({
+			method:"frappe.email.doctype.email_template.email_template.get_email_template",
+			args:{
+				template_name:frm.doc.email_template,
+				doc:frm.doc
+			},
+			callback: function(r){
+				
+				frm.set_value("invitation_message", r.message.message)
+
+			}
+		})
+	},
 	validate: function(frm){
 		frm.trigger("set_link_documents");
 		frm.trigger("contact_person_name")
