@@ -23,6 +23,7 @@
   "meeting_agenda",
   "description",
   "cc_to",
+  "email_template",
   "invitation_message",
   "send_invitation",
   "amended_from",
@@ -170,6 +171,12 @@
    "options": "Opportunity"
   },
   {
+    "fieldname": "email_template",
+    "fieldtype": "Link",
+    "label": "email template",
+    "options": "Email Template"
+   },
+  {
    "fieldname": "company",
    "fieldtype": "Link",
    "label": "Company",
@@ -207,6 +214,7 @@
    "share": 1,
    "write": 1
   }
+  
  ],
  "search_fields": "organisation,contact_person_name",
  "sort_field": "modified",
