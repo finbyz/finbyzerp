@@ -4,4 +4,4 @@
 *.swp
 tags
 finbyzerp/docs/current
-finbyzerp/public/dist/*
+finbyzerp/public/dist
