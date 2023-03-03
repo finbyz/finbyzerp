@@ -123,6 +123,10 @@ website_context = {
 	"splash_image": "/assets/finbyzerp/images/FinbyzLogo.svg"
 }
 
+override_doctype_class = {
+	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity"
+}
+
 override_whitelisted_methods = {
 	"frappe.core.page.permission_manager.permission_manager.get_roles_and_doctypes": "finbyzerp.permission.get_roles_and_doctypes",
 	"frappe.core.page.permission_manager.permission_manager.get_permissions": "finbyzerp.permission.get_permissions",
