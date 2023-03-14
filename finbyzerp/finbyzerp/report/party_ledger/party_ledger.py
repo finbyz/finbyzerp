@@ -829,9 +829,16 @@ def html_sales_invoice_purchase_invoic_data(purchase_invoice_map,total_taxes_and
 				"""
 	table+= f"""
 			<p style="font-size:10px">
-				Net Total
+				Total
 				<span style="float: right !important;">{frappe.format(net_total,{'fieldtype': 'Currency'})}</span>
 			</p>	
+		"""
+	if discount_amount != 0:
+		table+= f"""
+			<p style="font-size:10px">
+				Discount Amount
+				<span style="float: right !important;">{frappe.format(discount_amount,{'fieldtype': 'Currency'})}</span>
+			</p>
 		"""
 	if total_taxes_and_charges:
 		for row in total_taxes_and_charges:
@@ -843,13 +850,6 @@ def html_sales_invoice_purchase_invoic_data(purchase_invoice_map,total_taxes_and
 					{frappe.format(total_taxes_and_charges[row],{'fieldtype': 'Currency'})}
 				</span>
 			</p>"""
-	if discount_amount != 0:
-		table+= f"""
-			<p style="font-size:10px">
-				Discount Amount
-				<span style="float: right !important;">{frappe.format(discount_amount,{'fieldtype': 'Currency'})}</span>
-			</p>
-		"""
 	return table
 
 def list_to_sql(lst):
