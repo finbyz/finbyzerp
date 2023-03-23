@@ -135,6 +135,7 @@ class BankStatementTransactionEntry(Document):
 										where posting_date='{0}' and total_credit={1} and cheque_no='{2}' and docstatus != 2
 									""".format(entry.transaction_date, abs(entry.amount), frappe.safe_decode(entry.description)), as_dict=True)
 			if (len(vouchers) == 1):
+				entry.reference_type = "Journal Entry"
 				entry.reference_name = vouchers[0].name
 	
 	@frappe.whitelist()
