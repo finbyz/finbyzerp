@@ -7,3 +7,4 @@ import "./finbyzerp/views/workspace/workspace.js";
 import "./finbyzerp/views/container.js";
 import "./frappe/request.js";
 import "./report_js/stock_balance.js";
+import "./frappe/report/query_report.js";
