@@ -1,6 +1,10 @@
 import frappe, json, re
 from frappe import _, bold
 from frappe.utils import cstr, cint, flt, getdate, format_date
+import base64
+import os
+from urllib.parse import urlencode, urljoin
+from frappe.utils.data import time_diff_in_seconds
 # from erpnext.regional.india.e_invoice.utils import (GSPConnector,raise_document_name_too_long_error,read_json,
 # 	validate_mandatory_fields,get_doc_details,get_return_doc_reference,
 # 	get_eway_bill_details,validate_totals,show_link_to_error_log,santize_einvoice_fields,safe_json_load,get_payment_details,
@@ -261,3 +265,117 @@ def get_port_address_details(address_name, skip_gstin_validation):
 def cancel_eway_bill(doctype, docname, eway_bill, reason, remark):
 	gsp_connector = GSPConnector(doctype, docname)
 	gsp_connector.cancel_eway_bill(eway_bill, reason, remark)
+
+
+# E invoice Override for custom API integration
+from frappe.integrations.utils import make_request
+from frappe.utils.password import get_decrypted_password
+
+def einvoice_setup(self, doc=None, *, company_gstin=None):
+	self.BASE_PATH = "enriched/ei/api"
+	if not self.settings.enable_e_waybill:
+		frappe.throw(_("Please enable e-Waybill features in GST Settings first"))
+	self.gst_settings = frappe.get_cached_doc("GST Settings")
+	if doc:
+		company_gstin = doc.company_gstin
+		self.default_log_values.update(
+			reference_doctype=doc.doctype,
+			reference_name=doc.name,
+		)
+
+	if self.sandbox_mode:
+		company_gstin = "05AAACG2115R1ZN"
+		self.username = "05AAACG2115R1ZN"
+		self.password = "abc123@@"
+
+	elif not company_gstin:
+		frappe.throw(_("Company GSTIN is required to use the e-Waybill API"))
+
+	else:
+		self.fetch_credentials(company_gstin, "e-Waybill / e-Invoice")
+
+	self.default_headers.update(
+		{
+			"authorization": get_auth_token(self),
+			"gstin": company_gstin,
+			"user_name": self.username,
+			"password": self.password,
+			"requestid": str(base64.b64encode(os.urandom(18))),
+		}
+	)
+	
+def ewaybill_setup(self, doc=None, *, company_gstin=None):
+	self.BASE_PATH = "enriched/ewb/ewayapi/getewaybill"
+	if not self.settings.enable_e_waybill:
+		frappe.throw(_("Please enable e-Waybill features in GST Settings first"))
+
+	if doc:
+		company_gstin = doc.company_gstin
+		self.default_log_values.update(
+			reference_doctype=doc.doctype,
+			reference_name=doc.name,
+		)
+
+	if self.sandbox_mode:
+		company_gstin = "05AAACG2115R1ZN"
+		self.username = "05AAACG2115R1ZN"
+		self.password = "abc123@@"
+
+	elif not company_gstin:
+		frappe.throw(_("Company GSTIN is required to use the e-Waybill API"))
+
+	else:
+		self.fetch_credentials(company_gstin, "e-Waybill / e-Invoice")
+
+	self.default_headers.update(
+		{
+			"authorization": get_auth_token(self),
+			"gstin": company_gstin,
+			"user_name": self.username,
+			"password": self.password,
+			"requestid": str(base64.b64encode(os.urandom(18))),
+		}
+	)
+
+def get_auth_token(self):
+	if time_diff_in_seconds(self.gst_settings.token_expiry, now_datetime()) < 150.0:
+		fetch_auth_token(self)
+
+	return self.gst_settings.auth_token
+	
+def get_client_details(self):
+	if self.gst_settings.get('client_id') and self.gst_settings.get('client_secret'):
+		return self.gst_settings.get('client_id'), get_decrypted_password(self.gst_settings.get("client_secret"))
+	
+	return frappe.conf.einvoice_client_id, frappe.conf.einvoice_client_secret
+
+def fetch_auth_token(self):
+	client_id, client_secret = get_client_details(self)
+	headers = {"gspappid": client_id, "gspappsecret": client_secret}
+	res = {}
+	url = "https://gsp.adaequare.com/gsp/authenticate?grant_type=token"\
+
+	res = make_request("post", url, headers = headers)
+	self.gst_settings.auth_token = "{} {}".format(
+		res.get("token_type"), res.get("access_token")
+	)
+
+	self.gst_settings.token_expiry = add_to_date(None, seconds=res.get("expires_in"))
+	self.gst_settings.save(ignore_permissions=True)
+	self.gst_settings.reload()
+
+from india_compliance.gst_india.api_classes.base import BaseAPI
+
+# class CustomBaseAPI(BaseAPI):
+# 	base_url = "https://gsp.adaequare.com"
+def get_url(self, *parts):
+	self.base_url = "https://gsp.adaequare.com"
+	parts = list(parts)
+
+	if self.BASE_PATH:
+		parts.insert(0, self.BASE_PATH)
+
+	if self.sandbox_mode:
+		parts.insert(0, "test")
+
+	return urljoin(self.base_url, "/".join(part.strip("/") for part in parts))

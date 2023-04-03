@@ -325,3 +325,15 @@ fixtures = [
          "filters":[["name", "in", ['Workspace-module_icon']]]
       },
 ]
+
+from india_compliance.gst_india.api_classes.e_invoice import EInvoiceAPI
+from finbyzerp.e_invoice_override_14 import einvoice_setup
+EInvoiceAPI.setup = einvoice_setup
+
+from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
+from finbyzerp.e_invoice_override_14 import ewaybill_setup
+EWaybillAPI.setup = ewaybill_setup
+
+from india_compliance.gst_india.api_classes.base import BaseAPI
+from finbyzerp.e_invoice_override_14 import get_url
+BaseAPI.get_url = get_url
