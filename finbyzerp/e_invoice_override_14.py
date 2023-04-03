@@ -318,7 +318,7 @@ def einvoice_setup(self, doc=None, *, company_gstin=None):
 	
 def ewaybill_setup(self, doc=None, *, company_gstin=None):
 	self.gst_settings = frappe.get_cached_doc("GST Settings")
-	self.BASE_PATH = "enriched/ewb/ewayapi/getewaybill"
+	self.BASE_PATH = "enriched/ewb/ewayapi"
 	if not self.settings.enable_e_waybill:
 		frappe.throw(_("Please enable e-Waybill features in GST Settings first"))
 
@@ -344,7 +344,7 @@ def ewaybill_setup(self, doc=None, *, company_gstin=None):
 		{
 			"authorization": get_auth_token(self),
 			"gstin": company_gstin,
-			"user_name": self.username,
+			"username": self.username,
 			"password": self.password,
 			"requestid": str(base64.b64encode(os.urandom(18))),
 		}
