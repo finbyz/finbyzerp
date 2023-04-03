@@ -3,9 +3,18 @@ from frappe import _, bold
 from frappe.utils import cstr, cint, flt, getdate, format_date
 import base64
 import os
+import jwt
 from frappe.utils import now_datetime
 from urllib.parse import urlencode, urljoin
 from frappe.utils.data import time_diff_in_seconds
+from india_compliance.gst_india.utils import load_doc
+from india_compliance.gst_india.utils.e_waybill import (
+    _cancel_e_waybill,
+    log_and_process_e_waybill_generation,
+)
+from india_compliance.gst_india.utils.e_invoice import log_e_invoice
+from india_compliance.gst_india.utils.e_invoice import EInvoiceData
+from india_compliance.gst_india.api_classes.e_invoice import EInvoiceAPI
 # from erpnext.regional.india.e_invoice.utils import (GSPConnector,raise_document_name_too_long_error,read_json,
 # 	validate_mandatory_fields,get_doc_details,get_return_doc_reference,
 # 	get_eway_bill_details,validate_totals,show_link_to_error_log,santize_einvoice_fields,safe_json_load,get_payment_details,
