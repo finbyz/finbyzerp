@@ -383,7 +383,7 @@ def get_url(self, *parts):
 
 
 @frappe.whitelist()
-def generate_e_invoice(docname, throw=True):
+def custom_generate_e_invoice(docname, throw=True):
     doc = load_doc("Sales Invoice", docname, "submit")
     try:
         data = EInvoiceData(doc).get_data()
