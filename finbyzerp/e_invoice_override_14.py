@@ -3,6 +3,7 @@ from frappe import _, bold
 from frappe.utils import cstr, cint, flt, getdate, format_date
 import base64
 import os
+from frappe.utils import now_datetime
 from urllib.parse import urlencode, urljoin
 from frappe.utils.data import time_diff_in_seconds
 # from erpnext.regional.india.e_invoice.utils import (GSPConnector,raise_document_name_too_long_error,read_json,
@@ -273,7 +274,7 @@ from frappe.utils.password import get_decrypted_password
 
 def einvoice_setup(self, doc=None, *, company_gstin=None):
 	self.BASE_PATH = "enriched/ei/api"
-	if not self.settings.enable_e_waybill:
+	if not self.settings.enable_e_invoice:
 		frappe.throw(_("Please enable e-Waybill features in GST Settings first"))
 	self.gst_settings = frappe.get_cached_doc("GST Settings")
 	if doc:
@@ -379,3 +380,128 @@ def get_url(self, *parts):
 		parts.insert(0, "test")
 
 	return urljoin(self.base_url, "/".join(part.strip("/") for part in parts))
+
+
+@frappe.whitelist()
+def generate_e_invoice(docname, throw=True):
+    doc = load_doc("Sales Invoice", docname, "submit")
+    try:
+        data = EInvoiceData(doc).get_data()
+        api = EInvoiceAPI(doc)
+        result = api.generate_irn(data)
+
+        # Handle Duplicate IRN
+        if result.InfCd == "DUPIRN":
+            response = api.get_e_invoice_by_irn(result.Desc.Irn)
+
+            # Handle error 2283:
+            # IRN details cannot be provided as it is generated more than 2 days ago
+            result = result.Desc if response.error_code == "2283" else response
+
+    except frappe.ValidationError as e:
+        if throw:
+            raise e
+
+        frappe.clear_last_message()
+        frappe.msgprint(
+            _(
+                "e-Invoice auto-generation failed with error:<br>{0}<br><br>"
+                "Please rectify this issue and generate e-Invoice manually."
+            ).format(str(e)),
+            _("Warning"),
+            indicator="yellow",
+        )
+        return
+
+    doc.db_set(
+        {
+            "irn": result.Irn,
+            "einvoice_status": "Generated",
+            "signed_qr_code": result.SignedQRCode #finbyz changes
+        }
+    )
+
+    invoice_data = None
+    if result.SignedInvoice:
+        decoded_invoice = json.loads(
+            jwt.decode(result.SignedInvoice, options={"verify_signature": False})[
+                "data"
+            ]
+        )
+        invoice_data = frappe.as_json(decoded_invoice, indent=4)
+
+    log_e_invoice(
+        doc,
+        {
+            "irn": doc.irn,
+            "sales_invoice": docname,
+            "acknowledgement_number": result.AckNo,
+            "acknowledged_on": parse_datetime(result.AckDt),
+            "signed_invoice": result.SignedInvoice,
+            "signed_qr_code": result.SignedQRCode,
+            "invoice_data": invoice_data,
+        },
+    )
+    #finbyz changes
+    is_qrcode_file_attached = doc.qrcode_image and frappe.db.exists(
+        "File",
+        {
+            "attached_to_doctype": doc.doctype,
+            "attached_to_name": doc.name,
+            "file_url": doc.qrcode_image,
+            "attached_to_field": "qrcode_image",
+        },
+    )
+
+    if not is_qrcode_file_attached:
+        if doc.signed_qr_code:
+            attach_qrcode_image(doc)
+    #finbyz changes end
+    if result.EwbNo:
+        log_and_process_e_waybill_generation(doc, result, with_irn=True)
+
+    if not frappe.request:
+        return
+
+    frappe.msgprint(
+        _("e-Invoice generated successfully"),
+        indicator="green",
+        alert=True,
+    )
+
+    return send_updated_doc(doc)
+
+#finbyz changes start
+import os
+import io
+from pyqrcode import create as qrcreate
+
+def attach_qrcode_image(doc):
+    qrcode = doc.signed_qr_code
+    qr_image = io.BytesIO()
+    url = qrcreate(qrcode, error="L")
+    url.png(qr_image, scale=2, quiet_zone=1)
+    qrcode_file = create_qr_code_file(doc, qr_image.getvalue())
+    doc.db_set({
+        "qrcode_image" : qrcode_file.file_url
+    })
+
+def create_qr_code_file(doc, qr_image):
+    doctype = doc.doctype
+    docname = doc.name
+    filename = "QRCode_{}.png".format(docname).replace(os.path.sep, "__")
+
+    _file = frappe.get_doc(
+        {
+            "doctype": "File",
+            "file_name": filename,
+            "attached_to_doctype": doctype,
+            "attached_to_name": docname,
+            "attached_to_field": "qrcode_image",
+            "is_private": 0,
+            "content": qr_image,
+        }
+    )
+    _file.save()
+    frappe.db.commit()
+    return _file
