@@ -517,3 +517,12 @@ def create_qr_code_file(doc, qr_image):
     _file.save()
     frappe.db.commit()
     return _file
+
+def get_gstin_info(self, gstin):
+	self.BASE_PATH = "enriched/commonapi"
+	self.gst_settings = frappe.get_cached_doc("GST Settings")
+	self.default_headers = {
+			"authorization": get_auth_token(self),
+			"requestid": str(base64.b64encode(os.urandom(18))),
+		}
+	return self.get("search", params={"action": "TP", "gstin": gstin})

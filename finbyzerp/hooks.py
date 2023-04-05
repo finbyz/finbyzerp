@@ -338,3 +338,7 @@ EWaybillAPI.setup = ewaybill_setup
 from india_compliance.gst_india.api_classes.base import BaseAPI
 from finbyzerp.e_invoice_override_14 import get_url
 BaseAPI.get_url = get_url
+
+from india_compliance.gst_india.api_classes.public import PublicAPI
+from finbyzerp.e_invoice_override_14 import get_gstin_info
+PublicAPI.get_gstin_info = get_gstin_info 
