@@ -7,7 +7,7 @@ from frappe import _
 from frappe.utils import flt, formatdate, now_datetime, getdate
 from datetime import date
 from six import iteritems
-from erpnext.regional.doctype.gstr_3b_report.gstr_3b_report import get_period
+from india_compliance.gst_india.doctype.gstr_3b_report.gstr_3b_report import get_period
 from india_compliance.gst_india.utils import get_gst_accounts_by_type
 
 def execute(filters=None):
@@ -29,11 +29,11 @@ class Gstr1Report(object):
 			COALESCE(NULLIF(customer_gstin,''), NULLIF(billing_address_gstin, '')) as customer_gstin,
 			place_of_supply,
 			ecommerce_gstin,
-			reverse_charge,
+			is_reverse_charge,
 			return_against,
 			is_return,
 			gst_category,
-			export_type,
+			is_export_with_gst,
 			port_code,
 			shipping_bill_number,
 			shipping_bill_date,
@@ -42,7 +42,7 @@ class Gstr1Report(object):
 
 	def run(self):
 		self.get_columns()
-		self.gst_accounts = get_gst_accounts_by_type(self.filters.company)
+		self.gst_accounts = get_gst_accounts_by_type(self.filters.company , "Output")
 		self.get_invoice_data()
 
 		if self.invoices:
@@ -132,9 +132,9 @@ class Gstr1Report(object):
 				row.append(invoice_details.base_rounded_total or invoice_details.base_grand_total)
 			elif fieldname in ('posting_date', 'shipping_bill_date'):
 				row.append(formatdate(invoice_details.get(fieldname), 'dd-MMM-YY'))
-			elif fieldname == "export_type":
-				export_type = "WPAY" if invoice_details.get(fieldname)=="With Payment of Tax" else "WOPAY"
-				row.append(export_type)
+			elif fieldname == "is_export_with_gst":
+				is_export_with_gst = "WPAY" if invoice_details.get(fieldname)=="With Payment of Tax" else "WOPAY"
+				row.append(is_export_with_gst)
 			else:
 				row.append(invoice_details.get(fieldname))
 		taxable_value = 0
@@ -304,7 +304,7 @@ class Gstr1Report(object):
 		# Build itemised tax for export invoices where tax table is blank
 		for invoice, items in iteritems(self.invoice_items):
 			if invoice not in self.items_based_on_tax_rate \
-				and frappe.db.get_value(self.doctype, invoice, "export_type") == "Without Payment of Tax":
+				and frappe.db.get_value(self.doctype, invoice, "is_export_with_gst") == "Without Payment of Tax":
 					self.items_based_on_tax_rate.setdefault(invoice, {}).setdefault(0, items.keys())
 
 	def get_columns(self):
@@ -364,7 +364,7 @@ class Gstr1Report(object):
 					"width":100
 				},
 				{
-					"fieldname": "reverse_charge",
+					"fieldname": "is_reverse_charge",
 					"label": "Reverse Charge",
 					"fieldtype": "Data"
 				},
@@ -542,7 +542,7 @@ class Gstr1Report(object):
 		elif self.filters.get("type_of_business") ==  "EXPORT":
 			self.invoice_columns = [
 				{
-					"fieldname": "export_type",
+					"fieldname": "is_export_with_gst",
 					"label": "Export Type",
 					"fieldtype": "Data",
 					"width":120
@@ -619,7 +619,7 @@ def get_json(filters, report_name, data):
 
 	elif filters["type_of_business"] == "EXPORT":
 		for item in report_data[:-1]:
-			res.setdefault(item["export_type"], []).append(item)
+			res.setdefault(item["is_export_with_gst"], []).append(item)
 
 		out = get_export_json(res)
 		gst_json["exp"] = out
@@ -645,7 +645,7 @@ def get_b2b_json(res, gstin):
 			inv_item = get_basic_invoice_detail(invoice[0])
 			if invoice[0]["place_of_supply"]:
 				inv_item["pos"] = "%02d" % int(invoice[0]["place_of_supply"].split('-')[0])
-			inv_item["rchrg"] = invoice[0]["reverse_charge"]
+			inv_item["rchrg"] = invoice[0]["is_reverse_charge"]
 			inv_item["inv_typ"] = inv_type.get(invoice[0].get("gst_category", ""),"")
 
 			if inv_item["pos"]=="00": continue
