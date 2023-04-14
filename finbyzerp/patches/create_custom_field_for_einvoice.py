@@ -12,7 +12,6 @@ def create_custom_field_for_einvoice():
         doc.fieldname = "client_secret"
         doc.insert_after = "column_break_4"
         doc.fieldtype = "Password"
-        doc.read_only == 1 
         doc.depends_on = "eval: doc.enable_api"
         doc.save(ignore_permissions=True)
 
@@ -21,9 +20,8 @@ def create_custom_field_for_einvoice():
         doc.dt = "GST Settings"
         doc.label = "Client Id"
         doc.fieldname = "client_id"
-        doc.insert_after = "General"
+        doc.insert_after = "generat_tab"
         doc.fieldtype = "Data"
-        doc.read_only == 1 
         doc.depends_on = "eval: doc.enable_api"
         doc.save(ignore_permissions=True)
    
@@ -42,7 +40,7 @@ def create_custom_field_for_einvoice():
         doc.dt = "GST Settings"
         doc.label = "Auth Token"
         doc.fieldname = "auth_token"
-        doc.insert_after = "API Secret"
+        doc.insert_after = "api_secret"
         doc.fieldtype = "Data"
         doc.read_only == 1 
         doc.save(ignore_permissions=True)
