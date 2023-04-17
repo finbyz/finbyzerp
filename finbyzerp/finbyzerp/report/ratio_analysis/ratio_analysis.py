@@ -110,30 +110,31 @@ def get_data(filters):
 					closing_dict[row][filters.get('end_year')] = (-1) * closing_dict[row][filters.get('end_year')]
 
 	for key, value in account_dict.items():
-		fiscal_year1, fiscal_year2 = 0, 0
-		account_lst = [closing_dict[value[i]]['account'] for i in range(len(value))]
-		numerator_denominator = ",".join(account_lst)
-		if key not in ["quick_ratio_section", "net_profit_ratio_section"]:
-			if closing_dict[value[1]][filters.get('start_year')] != 0:
-				fiscal_year1 = closing_dict[value[0]][filters.get('start_year')] / (closing_dict[value[1]][filters.get('start_year')])
-			if closing_dict[value[1]][filters.get('end_year')] != 0:
-				fiscal_year2 = closing_dict[value[0]][filters.get('end_year')] / (closing_dict[value[1]][filters.get('end_year')])
-		
-		elif key == "quick_ratio_section":
-			if closing_dict[value[2]][filters.get('start_year')] != 0:
-				fiscal_year1 = (closing_dict[value[0]][filters.get('start_year')] - closing_dict[value[1]][filters.get('start_year')] - closing_dict[value[3]][filters.get('start_year')]) / (closing_dict[value[2]][filters.get('start_year')] or 1)
-			if closing_dict[value[2]][filters.get('end_year')] != 0:
-				fiscal_year2 = (closing_dict[value[0]][filters.get('end_year')] - closing_dict[value[1]][filters.get('end_year')] - closing_dict[value[3]][filters.get('end_year')]) / (closing_dict[value[2]][filters.get('end_year')] or 1)
+		if closing_dict:
+			fiscal_year1, fiscal_year2 = 0, 0
+			account_lst = [closing_dict[value[i]]['account'] for i in range(len(value))]
+			numerator_denominator = ",".join(account_lst)
+			if key not in ["quick_ratio_section", "net_profit_ratio_section"]:
+				if closing_dict[value[1]][filters.get('start_year')] != 0:
+					fiscal_year1 = closing_dict[value[0]][filters.get('start_year')] / (closing_dict[value[1]][filters.get('start_year')])
+				if closing_dict[value[1]][filters.get('end_year')] != 0:
+					fiscal_year2 = closing_dict[value[0]][filters.get('end_year')] / (closing_dict[value[1]][filters.get('end_year')])
+			
+			elif key == "quick_ratio_section":
+				if closing_dict[value[2]][filters.get('start_year')] != 0:
+					fiscal_year1 = (closing_dict[value[0]][filters.get('start_year')] - closing_dict[value[1]][filters.get('start_year')] - closing_dict[value[3]][filters.get('start_year')]) / (closing_dict[value[2]][filters.get('start_year')] or 1)
+				if closing_dict[value[2]][filters.get('end_year')] != 0:
+					fiscal_year2 = (closing_dict[value[0]][filters.get('end_year')] - closing_dict[value[1]][filters.get('end_year')] - closing_dict[value[3]][filters.get('end_year')]) / (closing_dict[value[2]][filters.get('end_year')] or 1)
 
-		elif key == "net_profit_ratio_section":
-			if closing_dict[value[1]][filters.get('start_year')] != 0:
-				fiscal_year1 = closing_dict[value[0]][filters.get('start_year')] / (closing_dict[value[1]][filters.get('start_year')] or 1) * 100
-			if closing_dict[value[1]][filters.get('end_year')] != 0:
-				fiscal_year2 = closing_dict[value[0]][filters.get('end_year')] / (closing_dict[value[1]][filters.get('end_year')] or 1) * 100
-		
-		variance = 0
-		if round(fiscal_year1, 2) != 0:
-			variance = ((round(fiscal_year2, 2) - round(fiscal_year1, 2)) / round(fiscal_year1, 2)) * 100
-		data.append({'ratio' : frappe.unscrub(key.replace('_section', '')), 'numerator_denominator': numerator_denominator, filters.get('start_year') : fiscal_year1, filters.get('end_year') : fiscal_year2, 'variance' : variance})
+			elif key == "net_profit_ratio_section":
+				if closing_dict[value[1]][filters.get('start_year')] != 0:
+					fiscal_year1 = closing_dict[value[0]][filters.get('start_year')] / (closing_dict[value[1]][filters.get('start_year')] or 1) * 100
+				if closing_dict[value[1]][filters.get('end_year')] != 0:
+					fiscal_year2 = closing_dict[value[0]][filters.get('end_year')] / (closing_dict[value[1]][filters.get('end_year')] or 1) * 100
+			
+			variance = 0
+			if round(fiscal_year1, 2) != 0:
+				variance = ((round(fiscal_year2, 2) - round(fiscal_year1, 2)) / round(fiscal_year1, 2)) * 100
+			data.append({'ratio' : frappe.unscrub(key.replace('_section', '')), 'numerator_denominator': numerator_denominator, filters.get('start_year') : fiscal_year1, filters.get('end_year') : fiscal_year2, 'variance' : variance})
 
 	return  data
