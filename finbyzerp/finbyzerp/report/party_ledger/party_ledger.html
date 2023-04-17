@@ -2,6 +2,9 @@
 	td{
 		font-size: 12px !important;
 	}
+	.text-size{
+		font-size: 10px !important;
+	}
 </style>
 <h2 class="text-center">{%= __("Statement of Account") %}</h2>
 <h4 class="text-center">
@@ -53,9 +56,9 @@
 					<strong>{%= data[i].party || data[i].account %}</strong>
 					{% if (filters.print_with_item || filters.print_with_description) { %}
 						{% if (data[i].voucher_type == 'Sales Invoice' || data[i].voucher_type == 'Purchase Invoice') { %}
-							{{ data[i].si_details }}
+							<p class= "text-size">{{ data[i].si_details }}</p>
 						{% } else { %}
-							{%= data[i].debit_credit_list%}
+							<p class= "text-size">{%= data[i].debit_credit_list%}</p>
 						{% } %}
 					{% } %}
 					</td>

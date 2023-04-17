@@ -351,6 +351,9 @@ def get_conditions(filters):
 	if filters.get("item_group"):
 		conditions +=  """and ifnull(`tabSales Invoice Item`.item_group, '') = %(item_group)s"""
 
+	if filters.get("gst_category"):
+		conditions +=  """and `tabSales Invoice`.gst_category = '{}'""".format(filters.get("gst_category"))
+	
 	if not filters.get("group_by"):
 		conditions += "ORDER BY `tabSales Invoice`.posting_date desc, `tabSales Invoice Item`.item_group desc"
 	else:
