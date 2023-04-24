@@ -69,7 +69,9 @@ GSTTransactionData.get_item_list = get_item_list
 #from erpnext.regional.india.e_invoice.utils import GSPConnector
 #GSPConnector.set_einvoice_data = set_einvoice_data
 
-
+from frappe.core.report.permitted_documents_for_user import permitted_documents_for_user
+from finbyzerp.api import execute
+permitted_documents_for_user.execute = execute
 # import erpnext
 # from finbyzerp.e_invoice_override import get_item_list,validate_einvoice_fields
 # erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
@@ -117,6 +119,7 @@ doctype_js = {
 	"Payment Reconciliation":"public/js/doctype_js/payment_reconciliation.js",
 	"BOM":"public/js/doctype_js/bom.js",
 	"Form Tour": "public/js/doctype_js/form_tour.js",
+    "Quotation": "public/js/doctype_js/quotation.js"
 }
 website_context = {
 	"favicon": 	"/assets/finbyzerp/images/favicon.ico",
