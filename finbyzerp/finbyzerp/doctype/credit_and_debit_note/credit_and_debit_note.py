@@ -87,6 +87,7 @@ class CreditandDebitNote(Document):
 		self.taxes_and_charges = self.sales_taxes_and_charges if sales == 1 else self.purchase_taxes_and_charges
 		self.doc = self
 		self.discount_amount_applied = False
+		self._items = self.items
 
 		frappe.flags.round_off_applicable_accounts = []
 		calculate_taxes_and_totals.validate_conversion_rate(self)
