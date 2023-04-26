@@ -281,7 +281,7 @@ class CreditandDebitNote(Document):
 			return_entry.taxes_and_charges=self.get('sales_taxes_and_charges') if self.party_type == "Customer" else  self.get('purchase_taxes_and_charges')
 			return_entry.tax_category=None
 			submit=0
-			if not cint(frappe.db.get_single_value("E Invoice Settings", "enable")):
+			if not cint(frappe.db.get_single_value("GST Settings", "enable_api")):
 				submit=1
 			else:
 				if not frappe.db.get_value("E Invoice User", {"company": self.get("company")}):
