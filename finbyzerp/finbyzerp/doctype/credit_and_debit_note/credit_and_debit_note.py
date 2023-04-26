@@ -96,7 +96,7 @@ class CreditandDebitNote(Document):
 		calculate_taxes_and_totals.calculate_item_values(self)
 		calculate_taxes_and_totals.validate_item_tax_template(self)
 		calculate_taxes_and_totals.initialize_taxes(self)
-		calculate_taxes_and_totals.determine_exclusive_rate(self)
+		self.determine_exclusive_rate()
 		calculate_taxes_and_totals.calculate_net_total(self)
 		calculate_taxes_and_totals.calculate_taxes(self)
 
@@ -110,7 +110,96 @@ class CreditandDebitNote(Document):
 		self.calculate_totals()
 
 
-	# Create Purchase Or Sales Invoice Entry based on customer and supplier.
+	def determine_exclusive_rate(self):
+		if not any(cint(tax.included_in_print_rate) for tax in self.doc.get("taxes")):
+			return
+
+		for item in self._items:
+			item_tax_map = self._load_item_tax_rate(item.item_tax_rate)
+			cumulated_tax_fraction = 0
+			total_inclusive_tax_amount_per_qty = 0
+			for i, tax in enumerate(self.doc.get("taxes")):
+				(
+					tax.tax_fraction_for_current_item,
+					inclusive_tax_amount_per_qty,
+				) = self.get_current_tax_fraction(tax, item_tax_map)
+
+				if i == 0:
+					tax.grand_total_fraction_for_current_item = 1 + tax.tax_fraction_for_current_item
+				else:
+					tax.grand_total_fraction_for_current_item = (
+						self.doc.get("taxes")[i - 1].grand_total_fraction_for_current_item
+						+ tax.tax_fraction_for_current_item
+					)
+
+				cumulated_tax_fraction += tax.tax_fraction_for_current_item
+				total_inclusive_tax_amount_per_qty += inclusive_tax_amount_per_qty * flt(item.qty)
+
+			if (
+				not self.discount_amount_applied
+				and item.qty
+				and (cumulated_tax_fraction or total_inclusive_tax_amount_per_qty)
+			):
+				amount = flt(item.amount) - total_inclusive_tax_amount_per_qty
+
+				item.net_amount = flt(amount / (1 + cumulated_tax_fraction))
+				item.net_rate = flt(item.net_amount / item.qty, item.precision("net_rate"))
+				item.discount_percentage = flt(item.discount_percentage, item.precision("discount_percentage"))
+
+				self._set_in_company_currency(item, ["net_rate", "net_amount"])
+	
+	def _load_item_tax_rate(self, item_tax_rate):
+		return json.loads(item_tax_rate) if item_tax_rate else {}
+
+
+	def get_current_tax_fraction(self, tax, item_tax_map):
+		"""
+		Get tax fraction for calculating tax exclusive amount
+		from tax inclusive amount
+		"""
+		current_tax_fraction = 0
+		inclusive_tax_amount_per_qty = 0
+
+		if cint(tax.included_in_print_rate):
+			tax_rate = self._get_tax_rate(tax, item_tax_map)
+
+			if tax.charge_type == "On Net Total":
+				current_tax_fraction = tax_rate / 100.0
+
+			elif tax.charge_type == "On Previous Row Amount":
+				current_tax_fraction = (tax_rate / 100.0) * self.doc.get("taxes")[
+					cint(tax.row_id) - 1
+				].tax_fraction_for_current_item
+
+			elif tax.charge_type == "On Previous Row Total":
+				current_tax_fraction = (tax_rate / 100.0) * self.doc.get("taxes")[
+					cint(tax.row_id) - 1
+				].grand_total_fraction_for_current_item
+
+			elif tax.charge_type == "On Item Quantity":
+				inclusive_tax_amount_per_qty = flt(tax_rate)
+
+		if getattr(tax, "add_deduct_tax", None) and tax.add_deduct_tax == "Deduct":
+			current_tax_fraction *= -1.0
+			inclusive_tax_amount_per_qty *= -1.0
+
+		return current_tax_fraction, inclusive_tax_amount_per_qty
+
+	def _get_tax_rate(self, tax, item_tax_map):
+		if tax.account_head in item_tax_map:
+			return flt(item_tax_map.get(tax.account_head), self.doc.precision("rate", tax))
+		else:
+			return tax.rate
+
+	def _set_in_company_currency(self, doc, fields):
+		"""set values in base currency"""
+		for f in fields:
+			val = flt(
+				flt(doc.get(f), doc.precision(f)) * self.doc.conversion_rate, doc.precision("base_" + f)
+			)
+			doc.set("base_" + f, val)
+
+# Create Purchase Or Sales Invoice Entry based on customer and supplier.
 	def create_debit_credit_entry(self):
 		def get_entry(source_name,target_doc=None):
 			source_doc = frappe.get_doc("Credit and Debit Note",source_name)

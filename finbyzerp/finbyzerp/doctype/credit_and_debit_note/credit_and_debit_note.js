@@ -557,7 +557,44 @@ function determine_exclusive_rate(frm) {
 
 			set_in_company_currency(frm,item, ["net_rate", "net_amount"]);
 		}
+
+		
 	});
+
+	
+}
+function get_current_tax_fraction(tax, item_tax_map){
+	var current_tax_fraction = 0.0;
+		var inclusive_tax_amount_per_qty = 0;
+
+		if(cint(tax.included_in_print_rate)) {
+			var tax_rate = _get_tax_rate(tax, item_tax_map);
+
+			if(tax.charge_type == "On Net Total") {
+				current_tax_fraction = (tax_rate / 100.0);
+
+			} else if(tax.charge_type == "On Previous Row Amount") {
+				current_tax_fraction = (tax_rate / 100.0) *
+					this.frm.doc["taxes"][cint(tax.row_id) - 1].tax_fraction_for_current_item;
+
+			} else if(tax.charge_type == "On Previous Row Total") {
+				current_tax_fraction = (tax_rate / 100.0) *
+					this.frm.doc["taxes"][cint(tax.row_id) - 1].grand_total_fraction_for_current_item;
+			} else if (tax.charge_type == "On Item Quantity") {
+				inclusive_tax_amount_per_qty = flt(tax_rate);
+			}
+		}
+
+		if(tax.add_deduct_tax && tax.add_deduct_tax == "Deduct") {
+			current_tax_fraction *= -1;
+			inclusive_tax_amount_per_qty *= -1;
+		}
+		return [current_tax_fraction, inclusive_tax_amount_per_qty];
+}
+
+function _get_tax_rate(tax, item_tax_map) {
+	return (Object.keys(item_tax_map).indexOf(tax.account_head) != -1) ?
+		flt(item_tax_map[tax.account_head], precision("rate", tax)) : tax.rate;
 }
 
 
