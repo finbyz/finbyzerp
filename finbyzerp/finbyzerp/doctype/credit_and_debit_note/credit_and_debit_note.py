@@ -10,7 +10,9 @@ from frappe.utils import flt,cint,round_based_on_smallest_currency_fraction
 from erpnext.controllers.taxes_and_totals import calculate_taxes_and_totals
 from erpnext.stock.get_item_details import get_item_tax_map
 from frappe.model.mapper import get_mapped_doc
+from erpnext.controllers.accounts_controller import AccountsController
 
+# from erpnext.controllers.accounts_controller import is_rounded_total_disabled
 
 @frappe.whitelist()
 def check_is_return(self):
@@ -323,7 +325,7 @@ class CreditandDebitNote(Document):
 
 	def set_rounded_total(self):
 		if self.doc.meta.get_field("rounded_total"):
-			if self.doc.is_rounded_total_disabled():
+			if AccountsController.is_rounded_total_disabled(self.doc):
 				self.doc.rounded_total = self.doc.base_rounded_total = 0
 				return
 
