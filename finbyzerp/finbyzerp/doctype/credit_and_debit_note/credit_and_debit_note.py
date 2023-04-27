@@ -238,6 +238,7 @@ class CreditandDebitNote(Document):
 					doc.item_group="All Item Groups"
 					doc.save()
 				target.item_code=frappe.db.get_value("Item",target.item_name,"item_code")
+				# frappe.throw(str(target.item_code))
 				target.uom = frappe.db.get_value("Stock Settings",None,"stock_uom")
 				target.description = source.item_name
 				target.concentration = 100
