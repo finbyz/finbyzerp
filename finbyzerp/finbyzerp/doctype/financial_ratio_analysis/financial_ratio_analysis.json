@@ -1,0 +1,324 @@
+{
+ "actions": [],
+ "autoname": "field:company",
+ "creation": "2023-04-17 10:33:22.528761",
+ "default_view": "List",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "company",
+  "current_ratio_section",
+  "current_assets",
+  "column_break_y9t8w",
+  "current_liabilities",
+  "quick_ratio_section",
+  "current_assets_1",
+  "stock_in_hand",
+  "column_break_yybii",
+  "current_liabilities_1",
+  "prepaid_expeses",
+  "debt_equity_ratio_section",
+  "total_liabilities",
+  "column_break_alv4n",
+  "total_share_holders",
+  "debt_service_ratio_section",
+  "net_operative_income",
+  "column_break_mq0cd",
+  "debt_service",
+  "capital_turnover_ratio_section",
+  "total_sales",
+  "column_break_lclrj",
+  "share_holder_equity",
+  "stock_turnover_ratio_section",
+  "cost_of_good_sold",
+  "column_break_nno33",
+  "stock_in_hand_1",
+  "debtor_turnover_ratio_section",
+  "net_sales",
+  "column_break_iviq1",
+  "accounts_receivable",
+  "creditor_turnover_ratio_section",
+  "net_purchase",
+  "column_break_z1qbj",
+  "accounts_payable",
+  "net_profit_ratio_section",
+  "net_profit",
+  "column_break_ooobo",
+  "net_sales_1"
+ ],
+ "fields": [
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "current_ratio_section",
+   "fieldtype": "Section Break",
+   "label": "Current  Ratio ( Current Asset / Current Liabilities )"
+  },
+  {
+   "fieldname": "current_assets",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Current Assets",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_y9t8w",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "current_liabilities",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Current Liabilities",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "quick_ratio_section",
+   "fieldtype": "Section Break",
+   "label": "Quick Ratio (Current Assets - Stock in Hand - Prepaid Expenses / Current Liabilities) "
+  },
+  {
+   "fieldname": "current_assets_1",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Current Assets",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "stock_in_hand",
+   "fieldtype": "Link",
+   "label": "Stock in Hand",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_yybii",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "current_liabilities_1",
+   "fieldtype": "Link",
+   "label": "Current Liabilities",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "prepaid_expeses",
+   "fieldtype": "Link",
+   "label": "Prepaid Expeses",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "debt_equity_ratio_section",
+   "fieldtype": "Section Break",
+   "label": "Debt Equity Ratio (Total Liabilities / Total Share Holders )"
+  },
+  {
+   "fieldname": "total_liabilities",
+   "fieldtype": "Link",
+   "label": "Total Liabilities",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_alv4n",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_share_holders",
+   "fieldtype": "Link",
+   "label": "Total Share Holders",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "debt_service_ratio_section",
+   "fieldtype": "Section Break",
+   "label": "Debt Service Ratio ( Net Operative Income / Debt Service )"
+  },
+  {
+   "fieldname": "net_operative_income",
+   "fieldtype": "Link",
+   "label": "Net Operative Income",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_mq0cd",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "debt_service",
+   "fieldtype": "Link",
+   "label": "Debt Service",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "capital_turnover_ratio_section",
+   "fieldtype": "Section Break",
+   "label": "Capital Turnover Ratio (Total Sales / Shareholder Equity)"
+  },
+  {
+   "fieldname": "total_sales",
+   "fieldtype": "Link",
+   "label": "Total Sales",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_lclrj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "share_holder_equity",
+   "fieldtype": "Link",
+   "label": "Share Holder Equity",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "stock_turnover_ratio_section",
+   "fieldtype": "Section Break",
+   "label": "Stock Turnover Ratio (Cost of Good Sold / Stock In Hand )"
+  },
+  {
+   "fieldname": "cost_of_good_sold",
+   "fieldtype": "Link",
+   "label": "Cost of Good Sold",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_nno33",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stock_in_hand_1",
+   "fieldtype": "Link",
+   "label": "Stock In Hand",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "debtor_turnover_ratio_section",
+   "fieldtype": "Section Break",
+   "label": "Debtor Turnover Ratio ( Net Credit Sales / Accounts Receivable )"
+  },
+  {
+   "fieldname": "net_sales",
+   "fieldtype": "Link",
+   "label": "Net Sales",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_iviq1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "accounts_receivable",
+   "fieldtype": "Link",
+   "label": "Accounts Receivable ",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "creditor_turnover_ratio_section",
+   "fieldtype": "Section Break",
+   "label": "Creditor Turnover Ratio (Net Purchase / Accounts Payable)"
+  },
+  {
+   "fieldname": "net_purchase",
+   "fieldtype": "Link",
+   "label": "Net Purchase",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_z1qbj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "accounts_payable",
+   "fieldtype": "Link",
+   "label": "Accounts Payable",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "net_profit_ratio_section",
+   "fieldtype": "Section Break",
+   "label": "Net Profit Ratio (Net Profit / Net Sales ) * 100"
+  },
+  {
+   "fieldname": "net_profit",
+   "fieldtype": "Link",
+   "label": "Net Profit",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_ooobo",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "net_sales_1",
+   "fieldtype": "Link",
+   "label": "Net Sales",
+   "options": "Account",
+   "reqd": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2023-04-17 10:33:22.528761",
+ "modified_by": "Administrator",
+ "module": "Finbyzerp",
+ "name": "Financial Ratio Analysis",
+ "name_case": "Title Case",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "company"
+}
