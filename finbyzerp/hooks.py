@@ -77,6 +77,12 @@ permitted_documents_for_user.execute = execute
 # erpnext.regional.india.e_invoice.utils.validate_einvoice_fields = validate_einvoice_fields
 # erpnext.regional.india.e_invoice.utils.get_item_list = get_item_list
 
+#Override for customdocperm permition
+from frappe import permissions
+from finbyzerp.api import add_permission
+permissions.add_permission = add_permission
+
+
 # email Campaign override
 from finbyzerp.finbyzerp.doc_events.email_campaign import send_email_to_leads_or_contacts
 from erpnext.crm.doctype.email_campaign import email_campaign
@@ -161,7 +167,8 @@ override_doctype_dashboards = {
 doc_events = {
 	"Customer": {
 		"validate":"finbyzerp.api.customer_validate",
-		"before_rename": "finbyzerp.finbyzerp.doc_events.customer.before_rename"
+		"before_rename": "finbyzerp.finbyzerp.doc_events.customer.before_rename",
+		"on_update": "finbyzerp.finbyzerp.doc_events.customer.make_contact"
 	},
 	"Supplier": {
 		"validate":"finbyzerp.api.supplier_validate",
