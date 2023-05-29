@@ -129,7 +129,6 @@ def check_counter_series(name,company_series = None, date = None):
 		return int(frappe.db.get_value('Series', name, 'current', order_by="name")) + 1
 	
 def opening_naming_series(self):
-	frappe.msgprint("hi")
 	if not self.name and self.is_opening == "Yes":
 		self.naming_series = "O" + self.naming_series
 		if self.naming_series.find("Ofiscal") != -1:
