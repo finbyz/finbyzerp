@@ -210,9 +210,9 @@ doc_events = {
 	"Journal Entry":{
 		"before_insert": "finbyzerp.api.before_insert",
 	},
-	"Payment Entry":{
-		"validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
-	},
+	# "Payment Entry":{
+	# 	# "validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
+	# },
 	"Delivery Note":{
 		"validate":"finbyzerp.finbyzerp.doc_events.delivery_note.validate"
 	},
