@@ -25,7 +25,7 @@ frappe.query_reports["General Ledger"] = {
 		if(party){
 			setTimeout(()=>{
 				frappe.query_report.set_filter_value('party', party);
-			},150)
+			},200)
 		}
 	},
 	"filters": [
@@ -213,6 +213,11 @@ frappe.query_reports["General Ledger"] = {
 		{
 			"fieldname": "show_net_values_in_party_account",
 			"label": __("Show Net Values in Party Account"),
+			"fieldtype": "Check"
+		},
+		{
+			"fieldname": "fx_account",
+			"label": __("Fx Account"),
 			"fieldtype": "Check"
 		}
 	]
