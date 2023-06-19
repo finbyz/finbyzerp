@@ -556,7 +556,7 @@ def update_transaction_tax_details(self):
 			frappe.msgprint(str(key))
 		current_total += self.transaction_details.get(key)
 		if frappe.session.user =="Administrator":
-			frappe.msgprint(str("current_total" +" " +current_total))
+			frappe.msgprint(str("current_total" +" " +str(current_total)))
 	current_total -= self.transaction_details.discount_amount
 	other_charges = self.transaction_details.grand_total - current_total
 	if frappe.session.user =="Administrator":
