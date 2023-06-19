@@ -569,3 +569,5 @@ def update_transaction_tax_details(self):
 		)
 	else:
 		self.transaction_details.other_charges = self.rounded(other_charges)
+	if frappe.session.user =="Administrator":
+		frappe.throw(str("finish"))
