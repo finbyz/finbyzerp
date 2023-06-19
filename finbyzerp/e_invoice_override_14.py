@@ -552,12 +552,15 @@ def update_transaction_tax_details(self):
 	# Other Charges
 	current_total = 0
 	for key in ("total", "rounding_adjustment", *tax_total_keys):
+		if frappe.session.user =="Administrator":
+			frappe.msgprint(str(key))
 		current_total += self.transaction_details.get(key)
-
+		if frappe.session.user =="Administrator":
+			frappe.msgprint(str("current_total" +" " +other_charges))
 	current_total -= self.transaction_details.discount_amount
 	other_charges = self.transaction_details.grand_total - current_total
 	if frappe.session.user =="Administrator":
-		frappe.throw(str(other_charges))
+		frappe.msgprint(str(other_charges))
 	if 0 > other_charges > -0.1:
 		# other charges cannot be negative
 		# handle cases where user has higher precision than 2
