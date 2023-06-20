@@ -532,4 +532,24 @@ def get_gstin_info(self, gstin):
 		}
 	return self.get("search", params={"action": "TP", "gstin": gstin})
 
+def update_transaction_tax_details(self):
+	tax_total_keys = tuple(f"total_{tax}_amount" for tax in GST_TAX_TYPES)
 
+	for key in tax_total_keys:
+		self.transaction_details[key] = 0
+	# Finbyz Changes Start
+	reverse_charge_account = frappe.db.get_value("GST Account", {'company': self.doc.company, "account_type" : "Output"}, "export_reverse_charge_account")
+
+	reverse_charge_amount = 0
+
+	for row in self.doc.taxes:
+		if reverse_charge_account == row.account_head:
+			reverse_charge_amount = row.base_tax_amount_after_discount_amount
+		# Finbyz Changes End
+		if not row.tax_amount or row.account_head not in self.gst_accounts:
+			continue
+
+		tax = self.gst_accounts[row.account_head][:-8]
+		self.transaction_details[f"total_{tax}_amount"] = abs(
+			self.rounded(row.base_tax_amount_after_discount_amount)
+		)
