@@ -66,9 +66,7 @@ GSTTransactionData.get_item_list = get_item_list
 
 # from erpnext.regional.india import utils
 # utils.validate_document_name = validate_document_name
-from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
-from finbyzerp.api  import update_transaction_tax_details
-GSTTransactionData.update_transaction_tax_details = update_transaction_tax_details
+
 #from erpnext.regional.india.e_invoice.utils import GSPConnector
 #GSPConnector.set_einvoice_data = set_einvoice_data
 
