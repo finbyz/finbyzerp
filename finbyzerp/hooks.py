@@ -63,6 +63,7 @@ GSTTransactionData.get_item_list = get_item_list
 # #erpnext.regional.india.e_invoice.utils.update_item_taxes = update_item_taxes
 # #erpnext.regional.india.e_invoice.utils.get_party_details = get_party_details
 
+
 # from erpnext.regional.india import utils
 # utils.validate_document_name = validate_document_name
 
@@ -352,3 +353,7 @@ BaseAPI.get_url = get_url
 from india_compliance.gst_india.api_classes.public import PublicAPI
 from finbyzerp.e_invoice_override_14 import get_gstin_info
 PublicAPI.get_gstin_info = get_gstin_info 
+
+from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
+from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as new_update_transaction_tax_details
+GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
