@@ -17,7 +17,7 @@ frappe.query_reports["New GSTR-1"] = {
 			"fieldtype": "Link",
 			"options": "Address",
 			"get_query": function () {
-				var company = frappe.query_report.get_filter_value('company');
+				const company = frappe.query_report.get_filter_value('company');
 				if (company) {
 					return {
 						"query": 'frappe.contacts.doctype.address.address.address_query',
@@ -27,11 +27,20 @@ frappe.query_reports["New GSTR-1"] = {
 			}
 		},
 		{
+			"fieldname": "company_gstin",
+			"label": __("Company GSTIN"),
+			"fieldtype": "Autocomplete",
+			"get_query": function () {
+				const company = frappe.query_report.get_filter_value('company');
+				return india_compliance.get_gstin_query(company);
+			}
+		},
+		{
 			"fieldname": "from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",
 			"reqd": 1,
-			"default": frappe.datetime.add_months(frappe.datetime.get_today(), -1),
+			"default": frappe.datetime.add_months(frappe.datetime.get_today(), -3),
 			"width": "80"
 		},
 		{
@@ -46,7 +55,16 @@ frappe.query_reports["New GSTR-1"] = {
 			"label": __("Type of Business"),
 			"fieldtype": "Select",
 			"reqd": 1,
-			"options": ["B2B", "B2C Large", "B2C Small", "CDNR", "EXPORT"],
+			"options": [
+				{ "value": "B2B", "label": __("B2B Invoices - 4A, 4B, 4C, 6B, 6C") },
+				{ "value": "B2C Large", "label": __("B2C(Large) Invoices - 5A, 5B") },
+				{ "value": "B2C Small", "label": __("B2C(Small) Invoices - 7") },
+				{ "value": "CDNR-REG", "label": __("Credit/Debit Notes (Registered) - 9B") },
+				{ "value": "CDNR-UNREG", "label": __("Credit/Debit Notes (Unregistered) - 9B") },
+				{ "value": "EXPORT", "label": __("Export Invoice - 6A") },
+				{ "value": "Advances", "label": __("Tax Liability (Advances Received) - 11A(1), 11A(2)") },
+				{ "value": "NIL Rated", "label": __("NIL RATED/EXEMPTED Invoices") }
+			],
 			"default": "B2B"
 		}
 	],
