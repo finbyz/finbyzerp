@@ -71,7 +71,9 @@ def execute(filters=None):
 	if filters.get("account"):
 		for row in res:
 			if row.get('voucher_no'):
-				row.update({'bill_no':frappe.db.get_value(row.voucher_type , row.voucher_no , 'bill_no')})
+				meta = frappe.get_meta(row.voucher_type)
+				if meta.has_field('status'):
+					row.update({'bill_no':frappe.db.get_value(row.voucher_type , row.voucher_no , 'bill_no')})
 				
 
 	return columns, res
