@@ -72,7 +72,7 @@ def execute(filters=None):
 		for row in res:
 			if row.get('voucher_no'):
 				meta = frappe.get_meta(row.voucher_type)
-				if meta.has_field('status'):
+				if meta.has_field('bill_no'):
 					row.update({'bill_no':frappe.db.get_value(row.voucher_type , row.voucher_no , 'bill_no')})
 				
 
