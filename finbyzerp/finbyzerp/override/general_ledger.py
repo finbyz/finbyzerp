@@ -72,7 +72,7 @@ def execute(filters=None):
 		for row in res:
 			if row.get('voucher_no'):
 				row.update({'bill_no':frappe.db.get_value(row.voucher_type , row.voucher_no , 'bill_no')})
-				frappe.msgprint(str(row.get('bill_no')))
+				
 
 	return columns, res
 
