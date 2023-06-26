@@ -63,6 +63,7 @@ GSTTransactionData.get_item_list = get_item_list
 # #erpnext.regional.india.e_invoice.utils.update_item_taxes = update_item_taxes
 # #erpnext.regional.india.e_invoice.utils.get_party_details = get_party_details
 
+
 # from erpnext.regional.india import utils
 # utils.validate_document_name = validate_document_name
 
@@ -168,7 +169,6 @@ doc_events = {
 	"Customer": {
 		"validate":"finbyzerp.api.customer_validate",
 		"before_rename": "finbyzerp.finbyzerp.doc_events.customer.before_rename",
-		"on_update": "finbyzerp.finbyzerp.doc_events.customer.make_contact"
 	},
 	"Supplier": {
 		"validate":"finbyzerp.api.supplier_validate",
@@ -307,8 +307,14 @@ from finbyzerp.api import process_workflow_actions
 workflow_action.process_workflow_actions = process_workflow_actions
 
 from erpnext.accounts import general_ledger
-from finbyzerp.finbyzerp.override.general_ledger import check_freezing_date
+from finbyzerp.finbyzerp.override.general_ledger import check_freezing_date , get_result_as_list
 general_ledger.check_freezing_date = check_freezing_date
+
+
+from erpnext.accounts.report.general_ledger  import  general_ledger
+from finbyzerp.finbyzerp.override.general_ledger import execute
+general_ledger.execute = execute
+general_ledger.get_result_as_list  = get_result_as_list
 
 from erpnext.stock.doctype.stock_ledger_entry.stock_ledger_entry import StockLedgerEntry
 from finbyzerp.finbyzerp.override.stock_ledger_entry import check_stock_frozen_date
@@ -352,3 +358,7 @@ BaseAPI.get_url = get_url
 from india_compliance.gst_india.api_classes.public import PublicAPI
 from finbyzerp.e_invoice_override_14 import get_gstin_info
 PublicAPI.get_gstin_info = get_gstin_info 
+
+from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
+from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as new_update_transaction_tax_details
+GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
