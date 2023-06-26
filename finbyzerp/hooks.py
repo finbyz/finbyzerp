@@ -169,7 +169,6 @@ doc_events = {
 	"Customer": {
 		"validate":"finbyzerp.api.customer_validate",
 		"before_rename": "finbyzerp.finbyzerp.doc_events.customer.before_rename",
-		"on_update": "finbyzerp.finbyzerp.doc_events.customer.make_contact"
 	},
 	"Supplier": {
 		"validate":"finbyzerp.api.supplier_validate",
