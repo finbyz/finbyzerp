@@ -92,14 +92,12 @@ def before_naming(self, method):
 					frappe.db.sql("insert into tabSeries (name, current) values ('{}', 0)".format(name))
 
 				frappe.db.sql("update `tabSeries` set current = {} where name = '{}'".format(cint(self.series_value) - 1, name))
-				
-		
+
 def naming_series_name(name, fiscal = None, company_series=None):
 	if fiscal == None:
 		fiscal = ''
 	if company_series:
 		name = name.replace('company_series', str(company_series))
-	
 	name = name.replace('YYYY', str(datetime.date.today().year))
 	name = name.replace('YY', str(datetime.date.today().year)[2:])
 	name = name.replace('MM', '{0:0=2d}'.format(datetime.date.today().month))
@@ -110,15 +108,17 @@ def naming_series_name(name, fiscal = None, company_series=None):
 	return name
 
 @frappe.whitelist()
-def check_counter_series(name,company_series = None, date = None):
+def check_counter_series(name, company_series = None, date = None):
 	
 	if not date:
 		date = datetime.date.today()
 	
-	fiscal = get_fiscal(date)
-	name = naming_series_name(name, fiscal, company_series)
-	check = frappe.db.get_value('Series', name, 'current', order_by="name")
 	
+	fiscal = get_fiscal(date)
+	
+	name = naming_series_name(name, fiscal, company_series)
+	
+	check = frappe.db.get_value('Series', name, 'current', order_by="name")
 	
 	if check == 0:
 		return 1
@@ -127,17 +127,15 @@ def check_counter_series(name,company_series = None, date = None):
 		return 1
 	else:
 		return int(frappe.db.get_value('Series', name, 'current', order_by="name")) + 1
-	
+
 def opening_naming_series(self):
 	if not self.name and self.is_opening == "Yes":
 		self.naming_series = "O" + self.naming_series
 		if self.naming_series.find("Ofiscal") != -1:
 			self.naming_series = self.naming_series.replace("Ofiscal", "O.fiscal")
-			
-		   
+		
 		if self.naming_series.find("Ocompany_series") != -1:
 			self.naming_series = self.naming_series.replace("Ocompany_series", "O.company_series")
-			
 
 @frappe.whitelist()
 def get_desktop_settings():

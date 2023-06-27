@@ -389,7 +389,6 @@ def get_url(self, *parts):
 		parts = []
 	else:
 		parts = list(parts)
-
 	if self.BASE_PATH:
 		parts.insert(0, self.BASE_PATH)
 
@@ -531,6 +530,7 @@ def get_gstin_info(self, gstin):
 			"requestid": str(base64.b64encode(os.urandom(18))),
 		}
 	return self.get("search", params={"action": "TP", "gstin": gstin})
+
 
 from india_compliance.gst_india.constants import GST_TAX_TYPES
 def update_transaction_tax_details(self):
