@@ -287,6 +287,7 @@ class BankStatementTransactionEntry(Document):
 	def create_payment_entry(self, pe):
 		payment = frappe.new_doc("Payment Entry")
 		payment.posting_date = pe.transaction_date
+		payment.company = self.company
 		payment.payment_type = "Receive" if pe.party_type == "Customer" else "Pay"
 		payment.mode_of_payment = "Wire Transfer"
 		payment.party_type = pe.party_type
