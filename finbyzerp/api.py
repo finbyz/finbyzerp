@@ -1083,3 +1083,23 @@ def add_permission(doctype, role, permlevel=0, ptype=None):
 
 	validate_permissions_for_doctype(doctype)
 	return custom_docperm.name
+
+
+def patch_for_system():
+
+	item_data = frappe.db.sql("""
+		SELECT item_code, warehouse, company from `tabStock Ledger Entry` where batch_no is NOT NULL GROUP BY item_code, warehouse
+	""", as_dict = 1)
+
+	for row in item_data:
+		print(row.item_code,row.warehouse)
+		doc = frappe.new_doc("Repost Item Valuation")
+		doc.based_on = "Item and Warehouse"
+		doc.item_code = row.item_code
+		doc.warehouse = row.warehouse
+		doc.posting_date = "2023-04-01"
+		doc.company = row.company
+		doc.status = "Queued"
+		doc.save()
+		doc.submit()
+		print(doc.name)
