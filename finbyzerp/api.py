@@ -849,6 +849,10 @@ def validate_returned_items(doc):
 	if not items_returned:
 		frappe.throw(_("Atleast one item should be entered with negative quantity in return document"))
 
+
+def is_workspace_manager():
+	return "Workspace Manager" in frappe.get_roles()
+
 @frappe.whitelist()
 def new_page(new_page):
 	if not loads(new_page):
@@ -872,6 +876,21 @@ def new_page(new_page):
 	doc.save(ignore_permissions=True)
 
 	return doc
+
+def last_sequence_id(doc):
+	doc_exists = frappe.db.exists(
+		{"doctype": "Workspace", "public": doc.public, "for_user": doc.for_user}
+	)
+
+	if not doc_exists:
+		return 0
+
+	return frappe.get_all(
+		"Workspace",
+		fields=["sequence_id"],
+		filters={"public": doc.public, "for_user": doc.for_user},
+		order_by="sequence_id desc",
+	)[0].sequence_id
 
 @frappe.whitelist()
 def update_page(name, title, icon, parent, public,module_icon):
