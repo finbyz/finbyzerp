@@ -32,10 +32,11 @@ def calculate_gst_taxable_value(self):
 
 def tcs_deduction(self):
     fiscal_year, fiscal_start_date, fiscal_end_date = get_fiscal(self.posting_date)
+    frappe.throw(str(fiscal_start_date) + '-' + str(fiscal_end_date))
     payment_query = frappe.db.sql("""
         select sum(paid_amount)
         from `tabPayment Entry`
-        where docstatus = 1 and party = '{}' and company ='{}' and posting_date between '{}' AND '{}'
+        where docstatus = 1 and party = "{}" and company ="{}" and posting_date between '{}' AND '{}'
         group by party
         order by posting_date
     """.format(self.customer,self.company,fiscal_start_date,fiscal_end_date))
@@ -43,7 +44,7 @@ def tcs_deduction(self):
     invoice_query = frappe.db.sql("""
         select sum(grand_total)
         from `tabSales Invoice`
-        where docstatus = 1 and customer = '{}' and company ='{}' and posting_date between '{}' AND '{}'
+        where docstatus = 1 and customer = "{}" and company ="{}" and posting_date between '{}' AND '{}'
         group by customer
         order by posting_date
     """.format(self.customer,self.company,fiscal_start_date,fiscal_end_date))
