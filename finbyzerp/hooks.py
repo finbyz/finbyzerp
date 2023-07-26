@@ -362,3 +362,7 @@ PublicAPI.get_gstin_info = get_gstin_info
 from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
 from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as new_update_transaction_tax_details
 GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
+
+from erpnext.controllers import taxes_and_totals 
+from finbyzerp.api import get_rounded_tax_amount
+taxes_and_totals.get_rounded_tax_amount = get_rounded_tax_amount
