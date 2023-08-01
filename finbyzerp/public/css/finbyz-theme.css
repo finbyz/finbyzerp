@@ -83,7 +83,7 @@ input.input-with-feedback.form-control,
 .frappe-control[data-fieldtype=SmallText].form-control,
 .multiselect-list.dropdown .form-control,
 .form-grid .grid-body .form-control {
-	background-color: #fff !important;
+	/* background-color: #fff !important; */
 	border: 1px solid rgb(104 113 120 / 25%);
 }
 
