@@ -10,7 +10,7 @@ def get_gl_data(from_date,to_date,company,account, get_opening_closing_data):
     gl_opening_entries = frappe.db.sql("""
         select sum(debit-credit) as balance
         from `tabGL Entry`
-        where company = '{company}' and account = '{account}' and posting_date < '{from_date}'
+        where company = '{company}' and account = '{account}' and posting_date < '{from_date}' AND is_cancelled=0
     """.format(company=company,account=account,from_date=from_date))
 
     date_wise_balance = []
@@ -25,7 +25,7 @@ def get_gl_data(from_date,to_date,company,account, get_opening_closing_data):
     gl_entries = frappe.db.sql("""
         select debit, credit, posting_date
         from `tabGL Entry`
-        where company = '{company}' and account = '{account}' and posting_date BETWEEN '{from_date}' AND '{to_date}'
+        where company = '{company}' and account = '{account}' and posting_date BETWEEN '{from_date}' AND '{to_date}' AND is_cancelled=0
         order by posting_date asc    
     """.format(company=company,account=account,from_date=from_date,to_date=to_date),as_dict=1)
 
