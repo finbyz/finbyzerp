@@ -383,7 +383,12 @@ from india_compliance.gst_india.api_classes.base import BaseAPI
 # 	base_url = "https://gsp.adaequare.com"
 def get_url(self, *parts):
 	self.base_url = "https://gsp.adaequare.com"
-	parts = [i for i in parts if i != '']
+	if parts and not list(parts)[-1]:
+		parts = list(parts)[:-1]
+	elif not parts:
+		parts = []
+	else:
+		parts = list(parts)
 
 	if self.BASE_PATH:
 		parts.insert(0, self.BASE_PATH)
