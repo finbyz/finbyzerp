@@ -3,7 +3,8 @@ import frappe
 
 def execute():
     create_disable_invoice_name_length_check_field()
-
+    create_comment()
+    
 def create_disable_invoice_name_length_check_field():
     doc = frappe.new_doc("Custom Field")
     doc.dt = "System Settings"
@@ -12,3 +13,12 @@ def create_disable_invoice_name_length_check_field():
     doc.insert_after = "enable_onboarding"
     doc.fieldtype = "Check"
     doc.save(ignore_permissions=True)
+
+def create_comment():
+    doc = frappe.new_doc("Custom Field")
+    doc.dt = "System Settings"
+    doc.label = "Create Comments"
+    doc.fieldname = "create_comments"
+    doc.insert_after = "Disable Invoice Length Check"
+    doc.fieldtype = "Check"
+    doc.save(ignore_permissions = True)
