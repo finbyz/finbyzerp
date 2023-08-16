@@ -66,8 +66,7 @@ def cancellation_comment(self):
         status_change_comment(self)
 
 def delete_comment(self, delete_pre_ref=None):
-    doc1 = frappe.db.get_single_value("System Settings","create_comments")
-    if doc1 == 1:
+      if frappe.db.get_single_value("System Settings","create_comments"):
         if self.doctype == "Quotation":
             reference_doctype = self.quotation_to
             reference_name = self.party_name
