@@ -282,6 +282,7 @@ class BankStatementTransactionEntry(Document):
 				payment_entry.account = self.receivable_account if payment_entry.party_type == "Customer" else self.payable_account
 			payment_entry.reference_name = payment.name
 			payment_entry.reference_type = payment.doctype
+			payment_entry.db_update()
 		frappe.msgprint(_("Successfully created payment entries"))
 
 	def create_payment_entry(self, pe):
@@ -324,12 +325,16 @@ class BankStatementTransactionEntry(Document):
 		je.cheque_date = pe.transaction_date
 		je.remark = pe.description
 		je.posting_date = pe.transaction_date
+		default_cost_center = frappe.db.get_value("Company", self.company, "cost_center")
 		if (pe.amount < 0):
 			je.append("accounts", {"account": pe.party, "debit_in_account_currency": abs(pe.amount)})
 			je.append("accounts", {"account": self.bank_account, "credit_in_account_currency": abs(pe.amount)})
+			je.append("accounts", {"cost_center":default_cost_center})
 		else:
 			je.append("accounts", {"account": pe.party, "credit_in_account_currency": pe.amount})
 			je.append("accounts", {"account": self.bank_account, "debit_in_account_currency": pe.amount})
+			je.append("accounts", {"cost_center":default_cost_center})
+
 		je.save()
 		return je
 

@@ -14,7 +14,6 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Mapped Header",
-   "read_only": 1,
    "reqd": 1
   },
   {
@@ -28,7 +27,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-08-25 18:01:58.835589",
+ "modified": "2023-07-19 12:05:15.513290",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Bank Statement Settings Item",
@@ -37,5 +36,6 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

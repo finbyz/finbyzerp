@@ -210,9 +210,9 @@ doc_events = {
 	"Journal Entry":{
 		"before_insert": "finbyzerp.api.before_insert",
 	},
-	"Payment Entry":{
-		"validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
-	},
+	# "Payment Entry":{
+	# 	# "validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
+	# },
 	"Delivery Note":{
 		"validate":"finbyzerp.finbyzerp.doc_events.delivery_note.validate"
 	},
@@ -362,3 +362,4 @@ PublicAPI.get_gstin_info = get_gstin_info
 from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
 from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as new_update_transaction_tax_details
 GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
+

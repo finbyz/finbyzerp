@@ -87,7 +87,7 @@ def get_data(filters, show_party_name):
 		
 		row['party_ledger'] = f"""<button style='margin-left:5px;border:none;color: #fff; background-color: #5e64ff; padding: 3px 5px;border-radius: 5px;'
 				target="_blank" company='{filters.get("company")}' from_date='{filters.get('from_date')}' to_date='{filters.get('to_date')}' account='{filters.get('account')}' party_type= '{filters.get('party_type')}' party = '{party.name}'
-				onClick = finbyzerp.view_party_ledger_report.view_party_ledger_report(this.getAttribute('company'),this.getAttribute('from_date'),this.getAttribute('to_date'),this.getAttribute('account'),this.getAttribute('party_type'),this.getAttribute('party'))>View Party Ledger</button>"""
+				OnClick = finbyzerp.view_party_ledger_report.view_party_ledger_report(this.getAttribute('company'),this.getAttribute('from_date'),this.getAttribute('to_date'),this.getAttribute('account'),this.getAttribute('party_type'),this.getAttribute('party'))>View Party Ledger</button>"""
 
 	# Add total row
 
