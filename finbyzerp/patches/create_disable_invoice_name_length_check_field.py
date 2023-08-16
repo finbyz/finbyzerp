@@ -19,6 +19,6 @@ def create_comment():
     doc.dt = "System Settings"
     doc.label = "Create Comments"
     doc.fieldname = "create_comments"
-    doc.insert_after = "Disable Invoice Length Check"
+    doc.insert_after = "disable_invoice_length_check"
     doc.fieldtype = "Check"
     doc.save(ignore_permissions = True)
