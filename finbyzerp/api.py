@@ -29,7 +29,7 @@ import json
 import os
 import sys
 import time
-from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import repost_entries
+from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import execute_repost_item_valuation
 from erpnext.controllers.sales_and_purchase_return import *
 from frappe.desk.desktop import Workspace
 
@@ -693,7 +693,7 @@ def po_so_before_cancel(self,method):
 
 @frappe.whitelist()
 def repost_transaction_entries():
-	repost_entries()
+	execute_repost_item_valuation()
 
 def process_workflow_actions(doc, state):
 	workflow = get_workflow_name(doc.get("doctype"))
