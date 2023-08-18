@@ -3,3 +3,4 @@ finbyzerp.patches.create_custom_fields
 finbyzerp.patches.create_disable_invoice_name_length_check_field
 finbyzerp.patches.create_form_tour_fields_with_steps
 finbyzerp.patches.create_custom_field_for_einvoice
+finbyzerp.patches.create_comment_fields
