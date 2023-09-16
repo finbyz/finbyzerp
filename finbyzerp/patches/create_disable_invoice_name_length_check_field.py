@@ -17,7 +17,7 @@ def create_disable_invoice_name_length_check_field():
 def create_comment():
     doc = frappe.new_doc("Custom Field")
     doc.dt = "System Settings"
-    doc.label = "Create Comments"
+    doc.label = "Disable Timeline of Document Creation"
     doc.fieldname = "create_comments"
     doc.insert_after = "disable_invoice_length_check"
     doc.fieldtype = "Check"
