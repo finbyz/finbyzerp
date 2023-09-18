@@ -20,6 +20,9 @@ def get_data(filters):
 			qi.report_date, 
 			qi.name,
 			qi.lot_number,
+			qi.type_of_quality,
+			qi.type_of_report,
+			qi.shade,
 			qi.item_code,
 			qi.item_group,
 			qi.status,
@@ -42,6 +45,9 @@ def get_data(filters):
 			{"label": _("Item Code"), "fieldname": "item_code", "fieldtype": "Link","options":"Item", "width": 150},
 			{"label": _("Item Group"), "fieldname": "item_group", "fieldtype": "Link","options":"Item Group", "width": 120},
 			{"label": _("Lot No"), "fieldname": "lot_no", "fieldtype": "Data", "width": 100},
+			{"label": _("Type Of Quality"), "fieldname": "type_of_quality", "fieldtype": "Data", "width": 100},
+			{"label": _("Type Of Report"), "fieldname": "type_of_report", "fieldtype": "Data", "width": 100},
+			{"label": _("Shade "), "fieldname": "shade", "fieldtype": "Data", "width": 100},
 			{"label": _("Reference Type"), "fieldname": "ref_type", "fieldtype": "Data", "width": 150},
 			{"label": _("Reference Name"), "fieldname": "ref_name", "fieldtype": "Data","width": 150},\
 		]
@@ -59,7 +65,7 @@ def get_data(filters):
 			unique_data[row.name].update({
 				"name": row.name,
 				"report_date": row.report_date, "lot_no": row.lot_number, "item_code": row.item_code, "item_group": row.item_group, 
-				"status": row.status, "ref_type": row.reference_type, "ref_name": row.reference_name, row.specification : row.reading_value
+				"status": row.status,"type_of_quality": row.type_of_quality, "type_of_report": row.type_of_report, "shade": row.shade, "ref_type": row.reference_type, "ref_name": row.reference_name, row.specification : row.reading_value
 			})
 
 	data = []
