@@ -207,7 +207,8 @@ class BankStatementTransactionEntry(Document):
 					continue
 			added_payments += [payment]
 			entry.reference_type = payment.reference_type
-			entry.reference_name = payment.reference_name
+			if not entry.reference_name:
+				entry.reference_name = payment.reference_name
 			entry.mode_of_payment = "Wire Transfer"
 			entry.outstanding_amount = min(amount, 0)
 			if (entry.payment_reference is None):
@@ -320,6 +321,7 @@ class BankStatementTransactionEntry(Document):
 	def create_journal_entry(self, pe):
 		je = frappe.new_doc("Journal Entry")
 		je.is_opening = "No"
+		je.company = self.company
 		je.voucher_type = "Bank Entry"
 		je.cheque_no = pe.description
 		je.cheque_date = pe.transaction_date
@@ -327,14 +329,13 @@ class BankStatementTransactionEntry(Document):
 		je.posting_date = pe.transaction_date
 		default_cost_center = frappe.db.get_value("Company", self.company, "cost_center")
 		if (pe.amount < 0):
-			je.append("accounts", {"account": pe.party, "debit_in_account_currency": abs(pe.amount)})
-			je.append("accounts", {"account": self.bank_account, "credit_in_account_currency": abs(pe.amount)})
-			je.append("accounts", {"cost_center":default_cost_center})
+			je.append("accounts", {"account": pe.party, "debit_in_account_currency": abs(pe.amount), "cost_center": default_cost_center})
+			je.append("accounts", {"account": self.bank_account, "credit_in_account_currency": abs(pe.amount), "cost_center": default_cost_center})
+			# je.append("accounts", {"cost_center":default_cost_center})
 		else:
-			je.append("accounts", {"account": pe.party, "credit_in_account_currency": pe.amount})
-			je.append("accounts", {"account": self.bank_account, "debit_in_account_currency": pe.amount})
-			je.append("accounts", {"cost_center":default_cost_center})
-
+			je.append("accounts", {"account": pe.party, "credit_in_account_currency": pe.amount, "cost_center": default_cost_center})
+			je.append("accounts", {"account": self.bank_account, "debit_in_account_currency": pe.amount, "cost_center": default_cost_center})
+			# je.append("accounts", {"cost_center":default_cost_center})
 		je.save()
 		return je
 

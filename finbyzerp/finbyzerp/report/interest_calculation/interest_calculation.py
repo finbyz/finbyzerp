@@ -44,12 +44,13 @@ def get_interest_amount(filters,account):
 			FROM
 				`tabGL Entry`
 			WHERE
-				posting_date <= '{filters.get('to_date')}' and account ='{account}'
+				posting_date <= '{filters.get('to_date')}' and account ='{account}' and is_cancelled=0
 		""")[0][0] or 0
 	data={'interest_amount':0.0,'interest_days':0,"account":account,'opening_bal':0,'interest_rate':interest_rate,"closing_bal":closing_details}
+	if gl_data:
+		data['opening_bal'] = gl_data[0]['balance']
 	for each in gl_data:
 		data['interest_amount']+=(each.get('balance') * each.get("days") * interest_rate / (365 * 100))
 		data['interest_days']+= each.get("days")
-		data['opening_bal']+= each.get("balance")
-
+	
 	return data
