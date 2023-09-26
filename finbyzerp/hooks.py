@@ -363,3 +363,7 @@ from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
 from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as new_update_transaction_tax_details
 GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
 
+# Override Trends Reports
+from erpnext.accounts.report.sales_invoice_trends import sales_invoice_trends
+from finbyzerp.sales_invoice_trends import execute
+sales_invoice_trends.execute = execute
