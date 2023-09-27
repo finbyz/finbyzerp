@@ -78,6 +78,16 @@ def execute(filters=None):
 		"width": 150
 	}]
 
+	if filters.get('show_only_purchase_n_delivery_data'):
+		columns +=[
+		{
+			"fieldname": "stock_adjustment",
+			"label": ("Stock Adjustment"),
+			"fieldtype": "Currency",
+			"width": 150
+		}
+	]
+
 	data = get_data(filters)
 	chart = get_chart_data(data,filters)
 	return columns, data, None, chart
@@ -105,6 +115,9 @@ def get_data(filters):
 	if filters.get("item_code"):
 		conditions += " and sle.item_code = %s" % frappe.db.escape(filters.get("item_code"))
 		group_by_cond = 'sle.item_code'
+
+	if filters.get("show_only_purchase_n_delivery_data"):
+		conditions += 'and sle.voucher_type not in ("Stock Entry", "Stock Reconciliation")'
 
 	date_range = get_period_date_ranges(filters.get('period'),getdate(filters.get('from_date')),getdate(filters.get('to_date')))
 	#months = get_period_month_ranges(filters.get('period'),getdate(filters.get('from_date')),getdate(filters.get('to_date')))
@@ -194,6 +207,10 @@ def get_data(filters):
 			}]
 	
 	data += [{**u, **v, **m } for u, v, m in zip_longest(in_data, out_data, close_data, fillvalue={})]
+	for idx, row in enumerate(data):
+		if idx > 0:
+			# Stock Adjustment = Closing stock - Opening Stock  + Outward Stock - Inward Stock
+			row['stock_adjustment'] = row['closing_value'] - data[idx -1]['closing_value'] + row['outward_value'] - row['inward_value']
 	return data
 	
 def get_chart_data(data,filters):

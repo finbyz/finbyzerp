@@ -57,6 +57,19 @@ frappe.query_reports["Monthly Stock Summary"] = {
 			"label": __("Show Profit"),
 			"fieldtype": "Check"
 		},
+		{
+			"fieldname":"show_only_purchase_n_delivery_data",
+			"label": __("Show Only Purchase & Delivery Data"),
+			"fieldtype": "Check",
+			"on_change": function(){
+				if (frappe.query_report.get_filter_value('show_only_purchase_n_delivery_data') == 1){
+					frappe.query_report.get_filter('item_group').toggle(false)
+				} else {
+					frappe.query_report.get_filter('item_group').toggle(true)
+				}
+				frappe.query_report.refresh();
+			}
+		},
 	],
 	"formatter": function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
