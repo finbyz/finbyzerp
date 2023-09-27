@@ -2,7 +2,7 @@ import frappe
 from frappe import _
 from erpnext.controllers.trends import get_columns
 
-def execute(filters=None):
+def sales_invoice_trends_execute(filters=None):
 	if not filters:
 		filters = {}
 	data = []

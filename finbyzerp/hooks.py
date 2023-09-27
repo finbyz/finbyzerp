@@ -364,6 +364,14 @@ from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as ne
 GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
 
 # Override Trends Reports
+from erpnext.selling.report.sales_order_trends import sales_order_trends
+from finbyzerp.sales_order_trends import sales_order_trends_execute
+sales_order_trends.execute = sales_order_trends_execute
+
+from erpnext.stock.report.delivery_note_trends import delivery_note_trends
+from finbyzerp.delivery_note_trends import delivery_note_trends_execute
+delivery_note_trends.execute = delivery_note_trends_execute
+
 from erpnext.accounts.report.sales_invoice_trends import sales_invoice_trends
-from finbyzerp.sales_invoice_trends import execute
-sales_invoice_trends.execute = execute
+from finbyzerp.sales_invoice_trends import sales_invoice_trends_execute
+sales_invoice_trends.execute = sales_invoice_trends_execute
