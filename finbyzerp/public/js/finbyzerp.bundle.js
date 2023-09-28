@@ -11,3 +11,6 @@ import "./report_js/trial_balance_for_party.js";
 import "./report_js/sales_order_trends.js";
 import "./report_js/delivery_note_trends.js";
 import "./report_js/sales_invoice_trends.js";
+import "./report_js/purchase_order_trends.js"
+import "./report_js/purchase_receipt_trends.js"
+import "./report_js/purchase_invoice_trends.js";

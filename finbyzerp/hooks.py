@@ -375,3 +375,15 @@ delivery_note_trends.execute = delivery_note_trends_execute
 from erpnext.accounts.report.sales_invoice_trends import sales_invoice_trends
 from finbyzerp.sales_invoice_trends import sales_invoice_trends_execute
 sales_invoice_trends.execute = sales_invoice_trends_execute
+
+from erpnext.buying.report.purchase_order_trends import purchase_order_trends
+from finbyzerp.purchase_order_trends import purchse_order_trends_execute
+purchase_order_trends.execute = purchse_order_trends_execute
+
+from erpnext.stock.report.purchase_receipt_trends import purchase_receipt_trends
+from finbyzerp.purchase_receipt_trends import purchase_receipt_trends_execute
+purchase_receipt_trends.execute = purchase_receipt_trends_execute
+
+from erpnext.accounts.report.purchase_invoice_trends import purchase_invoice_trends
+from finbyzerp.purchase_invoice_trends import purchase_invoice_trends_execute
+purchase_invoice_trends.execute = purchase_invoice_trends_execute
