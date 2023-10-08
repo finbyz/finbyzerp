@@ -194,10 +194,14 @@ doc_events = {
 	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate"
+		"validate": ["finbyzerp.api.pi_validate",
+					"finbyzerp.finbyzerp.doc_events.purchase_invoice.validate"
+		]
 	},
 		"Purchase Receipt": {
-		"validate": "finbyzerp.api.pr_validate"
+		"validate":[ "finbyzerp.api.pr_validate",
+					"finbyzerp.finbyzerp.doc_events.purchase_receipt.validate"
+		]
 	},
 	"Stock Entry": {
 		"validate": [
@@ -232,6 +236,9 @@ doc_events = {
 			"before_cancel":"finbyzerp.finbyzerp.doc_events.quotation.on_cancel",
 			"on_trash":"finbyzerp.finbyzerp.doc_events.quotation.on_trash"
 		},
+    "Stock Settings":{
+        "validate":"finbyzerp.api.create_property_setter"
+	}
 }
 
 scheduler_events = {
@@ -339,7 +346,7 @@ sales_and_purchase_return.validate_returned_items = validate_returned_items
 fixtures = [
        {
          "dt": "Custom Field", 
-         "filters":[["name", "in", ['Workspace-module_icon']]]
+         "filters":[["name", "in", ['Workspace-module_icon','Stock Settings-calculate_conversion_factor_based_on_stock_quantity_and_quantity']]]
       },
 ]
 
