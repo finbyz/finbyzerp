@@ -1,6 +1,8 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.utils import flt
+from erpnext.accounts.general_ledger import make_reverse_gl_entries
+from erpnext.accounts.utils import create_payment_ledger_entry
 
 # def validate(self,method):
 # 	update_jv_exchange_rate(self)
@@ -28,15 +30,22 @@ from frappe.utils import flt
 
 
 @frappe.whitelist()
-def unallocate_payment(child_doc_name,parent_doc_name,reference_doctype,reference_name):
+def unallocate_payment(child_doc_name,parent_doc_name,reference_doctype,reference_name,adv_adj=False, update_outstanding="Yes"):
 	if reference_doctype in ['Sales Invoice','Purchase Invoice']:
+		doc = frappe.get_doc("Payment Entry",parent_doc_name)
+		gl_map = doc.build_gl_map()
+		create_payment_ledger_entry(gl_map, cancel = 1, adv_adj = adv_adj)
 		frappe.db.sql(f"delete from `tabPayment Entry Reference` where name = '{child_doc_name}'")
 		doc = frappe.get_doc("Payment Entry",parent_doc_name)
 		doc.set_amounts()
-
 		doc.db_update()
-		doc.make_gl_entries(cancel=1)
-		doc.make_gl_entries(cancel=0)	
+		gl_map = doc.build_gl_map()
+		create_payment_ledger_entry(gl_map, cancel = 0, adv_adj = adv_adj)
+
+		# doc.make_gl_entries(cancel=1)
+		# doc.make_gl_entries(cancel=0)	
+		
+		# make_reverse_gl_entries()
 
 		update_outstanding_amt(
 			doc.paid_from if doc.payment_type == "Receive" else doc.paid_to,
