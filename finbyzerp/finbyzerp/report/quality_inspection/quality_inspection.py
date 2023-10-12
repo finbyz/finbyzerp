@@ -15,6 +15,23 @@ def execute(filters=None):
 
 
 def get_data(filters):
+	conditions = ""
+
+	if filters.get("item_code"):
+		conditions += f"and qi.item_code = {frappe.db.escape(filters.get('item_code'))}"
+	
+	if filters.get("item_group"):
+		conditions += f"and qi.item_group = {frappe.db.escape(filters.get('item_group'))}"
+	
+	if filters.get("status"):
+		conditions += f"and qi.status = {frappe.db.escape(filters.get('status'))}"
+	
+	if filters.get("docstatus"):
+		if filters.get("docstatus") == "Draft":
+			conditions += " and qi.docstatus = 0"
+		if filters.get("docstatus") == "Submitted":
+			conditions += " and qi.docstatus = 1"
+
 	quality_inspection_data = frappe.db.sql(f"""
 		SELECT 
 			qi.report_date, 
@@ -33,7 +50,11 @@ def get_data(filters):
 			`tabQuality Inspection Reading` as qir
 		LEFT JOIN 
 			`tabQuality Inspection` as qi ON qir.parent = qi.name
-	""", as_dict = 1)
+		WHERE
+			qi.report_date between %s AND %s
+			{conditions}
+	""", (filters['from_date'], filters['to_date']), as_dict=True)
+
 
 	data = []
 	unique_data = {}
