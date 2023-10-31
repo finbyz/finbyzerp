@@ -4,7 +4,6 @@
 from __future__ import unicode_literals
 import frappe
 import collections, functools, operator
-from past.builtins import cmp
 from frappe import _
 from frappe.utils import flt
 from finbyzerp.finbyzerp.report.item_wise_purchase_register import _execute as purchase_execute
@@ -15,6 +14,10 @@ def execute(filters=None):
 	columns = get_columns(filters) 
 	data = get_data(filters)
 	return columns, data
+
+def cmp(x, y):
+   return (x > y) - (x < y)
+
 
 def get_data(filters):
 	item_group = get_item_group(filters)
