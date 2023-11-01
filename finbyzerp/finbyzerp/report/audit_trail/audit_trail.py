@@ -8,7 +8,7 @@ def execute(filters=None):
 	columns, data = [], []
 	data = get_data(filters)
 	columns = get_columns()
-	return  columns,data
+	return  columns , data
 
 def get_data(filters):
 	user_dict = {}
