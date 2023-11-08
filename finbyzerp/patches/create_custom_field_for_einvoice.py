@@ -4,11 +4,7 @@ import frappe
 def execute():
     create_custom_field_for_einvoice()
 
-<<<<<<< HEAD
 def create_custom_field_for_einvoice():
-=======
-def create_custom_field_for_einvoice():  
->>>>>>> a8d541c44805ca69c01b5621108cdc9f23d841d9
     if not frappe.db.exists("Custom Field", "GST Settings-token_expiry"):
         doc = frappe.new_doc("Custom Field")
         doc.dt = "GST Settings"
