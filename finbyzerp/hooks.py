@@ -197,14 +197,18 @@ doc_events = {
 		"validate": "finbyzerp.api.pi_validate"
 	},
 		"Purchase Receipt": {
-		"validate": "finbyzerp.api.pr_validate"
+		"validate": "finbyzerp.api.pr_validate",
+		"on_submit": "finbyzerp.finbyzerp.doc_events.purchase_receipt.set_batch_in_qc"
 	},
 	"Stock Entry": {
 		"validate": [
 			"finbyzerp.api.stock_entry_validate",
 			"finbyzerp.finbyzerp.doc_events.stock_entry.validate",
 		],
-		"on_submit": "finbyzerp.api.stock_entry_on_submit",
+		"on_submit": [
+			"finbyzerp.api.stock_entry_on_submit",
+			"finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
+		],
 		"before_insert": "finbyzerp.api.before_insert",
 	},
 	"Journal Entry":{
