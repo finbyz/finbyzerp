@@ -41,5 +41,12 @@ frappe.query_reports["Quality Inspection"] = {
 			"options": [" ", "Accepted", "Rejected"],
 			"width": "80",
 		},
+		{
+			"fieldname":"docstatus",
+			"label": __("Doc Status"),
+			"fieldtype": "Select",
+			"options": [" ", "Draft", "Submitted"],
+			"width": "80",
+		}
 	]
 };

@@ -199,16 +199,18 @@ doc_events = {
 		]
 	},
 		"Purchase Receipt": {
-		"validate":[ "finbyzerp.api.pr_validate",
-					"finbyzerp.finbyzerp.doc_events.purchase_receipt.validate"
-		]
+		"validate": "finbyzerp.api.pr_validate",
+		"on_submit": "finbyzerp.finbyzerp.doc_events.purchase_receipt.set_batch_in_qc"
 	},
 	"Stock Entry": {
 		"validate": [
 			"finbyzerp.api.stock_entry_validate",
 			"finbyzerp.finbyzerp.doc_events.stock_entry.validate",
 		],
-		"on_submit": "finbyzerp.api.stock_entry_on_submit",
+		"on_submit": [
+			"finbyzerp.api.stock_entry_on_submit",
+			"finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
+		],
 		"before_insert": "finbyzerp.api.before_insert",
 	},
 	"Journal Entry":{
@@ -223,7 +225,7 @@ doc_events = {
 	("Purchase Order","Sales Order"):{
 		"before_cancel":"finbyzerp.api.po_so_before_cancel",
 	},
-	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice","Mould Trail Request", "Work Order Master", "Leave Application" , "Contract Term"): {
+	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice","Mould Trail Request", "Work Order Master", "Asset", "Leave Application" , "Contract Term"): {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
 	"Form Tour": {

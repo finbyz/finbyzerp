@@ -8,7 +8,15 @@ def execute(filters=None):
 	columns, data = [], []
 	data = get_data(filters)
 	columns = get_columns()
+<<<<<<< HEAD
 	return  columns , data
+=======
+<<<<<<< HEAD
+	return  columns,data
+=======
+	return  columns , data
+>>>>>>> a8d541c44805ca69c01b5621108cdc9f23d841d9
+>>>>>>> b9f4bb7ff923061248276574124a8461d74eab15
 
 def get_data(filters):
 	user_dict = {}
