@@ -397,7 +397,6 @@ from erpnext.accounts.report.purchase_invoice_trends import purchase_invoice_tre
 from finbyzerp.purchase_invoice_trends import purchase_invoice_trends_execute
 purchase_invoice_trends.execute = purchase_invoice_trends_execute
 
-
-# from erpnext.controllers.buying_controller import BuyingController
-# from finbyzerp.api import set_qty_as_per_stock_uom
-# BuyingController.set_qty_as_per_stock_uom = set_qty_as_per_stock_uom
+from erpnext.controllers.buying_controller import BuyingController
+from finbyzerp.api import set_qty_as_per_stock_uom
+BuyingController.set_qty_as_per_stock_uom = set_qty_as_per_stock_uom
