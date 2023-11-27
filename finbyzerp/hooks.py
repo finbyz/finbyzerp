@@ -134,7 +134,8 @@ website_context = {
 }
 
 override_doctype_class = {
-	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity"
+	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity",
+    "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride"
 }
 
 override_whitelisted_methods = {
