@@ -193,14 +193,14 @@ doc_events = {
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		"on_submit": "finbyzerp.api.sales_invoice_on_submit",
 	},
+     ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
+		"validate":"finbyzerp.finbyzerp.override.override_conversion_factor.validate_conversion",
+	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": ["finbyzerp.api.pi_validate",
-					"finbyzerp.finbyzerp.doc_events.purchase_invoice.validate"
-		]
+		"validate": "finbyzerp.api.pi_validate",
 	},
-		"Purchase Receipt": {
-		"validate": "finbyzerp.api.pr_validate",
+	"Purchase Receipt": {
 		"on_submit": "finbyzerp.finbyzerp.doc_events.purchase_receipt.set_batch_in_qc"
 	},
 	"Stock Entry": {
@@ -349,7 +349,7 @@ sales_and_purchase_return.validate_returned_items = validate_returned_items
 fixtures = [
        {
          "dt": "Custom Field", 
-         "filters":[["name", "in", ['Workspace-module_icon','Stock Settings-calculate_conversion_factor_based_on_stock_quantity_and_quantity']]]
+         "filters":[["module", "in", ['Finbyzerp']]]
       },
 ]
 
