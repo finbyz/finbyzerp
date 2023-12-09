@@ -58,28 +58,18 @@ def get_data(filters):
 	if filters.user:
 		where_clause += " and co.owner = '%s' " % filters.user
 
-	# data = frappe.db.sql("""
-	# 	SELECT
-	# 		co.reference_doctype as "Ref DocType", co.reference_name as "Ref DocName", co.owner as "User" , co.creation as "Date", co.content as "Comment", co.comment_email
-	# 	FROM
-	# 		`tabComment` as co
-	# 	WHERE
-	# 		co.comment_type="Comment"
-	# 		%s
-	# 	ORDER BY
-	# 		co.creation DESC"""%where_clause, as_dict=1)
-
 	data = frappe.db.sql("""
 		SELECT
-			co.parenttype as "Ref DocType", op.parent as "Ref DocName", op.owner as "User" , co.creation as "Date", co.content as "Comment", co.comment_email
+			co.reference_doctype as "Ref DocType", co.reference_name as "Ref DocName", co.owner as "User" , co.creation as "Date", co.content as "Comment", co.comment_email
 		FROM
-			`tabCRM Note` as co
-	    INNER JOIN `tabOpportunity` as op on co.parent=op.name
+			`tabComment` as co
 		WHERE
 			co.comment_type="Comment"
 			%s
 		ORDER BY
 			co.creation DESC"""%where_clause, as_dict=1)
+
+
 
 			
 	for row in data:
