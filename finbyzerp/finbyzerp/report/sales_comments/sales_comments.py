@@ -45,41 +45,37 @@ def get_columns():
 
 def get_data(filters):
 
-	where_clause = ''
-	where_clause += " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
+    where_clause = ''
+    where_clause += " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
 
-	if not filters.doctype:
-		ref_doctypes = ["'Lead'", "'Customer'", "'Quotation'", "'Opportunity'", "'Sales Order'", "'Sales Invoice'", "'Delivery Note'"]
-	else:
-		ref_doctypes = ["'"+filters.doctype+"'"]
-		
-	where_clause += " and co.reference_doctype in (%s)" % ",".join(ref_doctypes)
+    if not filters.doctype:
+        ref_doctypes = ["'Lead'", "'Customer'", "'Quotation'", "'Opportunity'", "'Sales Order'", "'Sales Invoice'", "'Delivery Note'"]
+    else:
+        ref_doctypes = ["'"+filters.doctype+"'"]
+        
+    where_clause += " and co.parenttype in (%s)" % ",".join(ref_doctypes)
 
-	if filters.user:
-		where_clause += " and co.owner = '%s' " % filters.user
+    if filters.user:
+        where_clause += " and co.added_by = '%s' " % filters.user
 
-	data = frappe.db.sql("""
-		SELECT
-			co.reference_doctype as "Ref DocType", co.reference_name as "Ref DocName", co.owner as "User" , co.creation as "Date", co.content as "Comment", co.comment_email
-		FROM
-			`tabComment` as co
-		WHERE
-			co.comment_type="Comment"
-			%s
-		ORDER BY
-			co.creation DESC"""%where_clause, as_dict=1)
+    data = frappe.db.sql(f"""
+        SELECT
+            co.parenttype as "Ref DocType", co.parent as "Ref DocName", co.added_by as "User", co.creation as "Date", co.note as "Comment", co.added_by as comment_email
+        FROM
+            `tabCRM Note` as co
+        WHERE
+            1=1 {where_clause}
+        ORDER BY
+            co.creation DESC""", as_dict=1)
 
-
-
-			
-	for row in data:
-		row["Next Contact Date"] = get_next_contact_date(row, filters)
-		row["Mobile"] = get_contact(row, filters)
-		row["Organization"] = get_organization(row, filters)
-		row["Person"] = get_contact_display(row, filters)
-		row["Caller"] = get_fullname(row['comment_email'])
-	
-	return data
+    for row in data:
+        row["Next Contact Date"] = get_next_contact_date(row, filters)
+        row["Mobile"] = get_contact(row, filters)
+        row["Organization"] = get_organization(row, filters)
+        row["Person"] = get_contact_display(row, filters)
+        row["Caller"] = get_fullname(row['comment_email'])
+    
+    return data
 	
 def get_contact(row, filters):
 
