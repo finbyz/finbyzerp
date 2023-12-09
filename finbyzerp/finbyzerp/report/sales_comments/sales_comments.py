@@ -45,37 +45,100 @@ def get_columns():
 
 def get_data(filters):
 
-    where_clause = ''
-    where_clause += " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
+	where_clause = ''
+	where_clause_for_comment=''
+	where_clause += " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
+	where_clause_for_comment+= " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
 
-    if not filters.doctype:
-        ref_doctypes = ["'Lead'", "'Customer'", "'Quotation'", "'Opportunity'", "'Sales Order'", "'Sales Invoice'", "'Delivery Note'"]
-    else:
-        ref_doctypes = ["'"+filters.doctype+"'"]
-        
-    where_clause += " and co.parenttype in (%s)" % ",".join(ref_doctypes)
+	if not filters.doctype:
+		ref_doctypes = ["'Lead'", "'Customer'", "'Quotation'", "'Opportunity'", "'Sales Order'", "'Sales Invoice'", "'Delivery Note'"]
+	else:
+		ref_doctypes = ["'"+filters.doctype+"'"]
+		
+	where_clause += " and co.parenttype in (%s)" % ",".join(ref_doctypes)
+	where_clause_for_comment+=" and co.reference_doctype in (%s)" % ",".join(ref_doctypes)
 
-    if filters.user:
-        where_clause += " and co.added_by = '%s' " % filters.user
+	if filters.user:
+		where_clause += " and co.added_by = '%s' " % filters.user
+		where_clause_for_comment+=" and co.owner = '%s' " % filters.user
 
-    data = frappe.db.sql(f"""
-        SELECT
-            co.parenttype as "Ref DocType", co.parent as "Ref DocName", co.added_by as "User", co.creation as "Date", co.note as "Comment", co.added_by as comment_email
-        FROM
-            `tabCRM Note` as co
-        WHERE
-            1=1 {where_clause}
-        ORDER BY
-            co.creation DESC""", as_dict=1)
 
-    for row in data:
-        row["Next Contact Date"] = get_next_contact_date(row, filters)
-        row["Mobile"] = get_contact(row, filters)
-        row["Organization"] = get_organization(row, filters)
-        row["Person"] = get_contact_display(row, filters)
-        row["Caller"] = get_fullname(row['comment_email'])
-    
-    return data
+
+	# data_for_crm_notes = frappe.db.sql(f"""
+	# 	SELECT
+	# 		co.parenttype as "Ref DocType", co.parent as "Ref DocName", co.added_by as "User", co.creation as "Date", co.note as "Comment", co.added_by as comment_email
+	# 	FROM
+	# 		`tabCRM Note` as co
+	# 	WHERE
+	# 		1=1 {where_clause}
+	# 	ORDER BY
+	# 		co.creation DESC""", as_dict=1)
+	
+	# data_for_comments = frappe.db.sql("""
+	# 	SELECT
+	# 		co.reference_doctype as "Ref DocType", co.reference_name as "Ref DocName", co.owner as "User" , co.creation as "Date", co.content as "Comment", co.comment_email
+	# 	FROM
+	# 		`tabComment` as co
+	# 	WHERE
+	# 		co.comment_type="Comment"
+	# 		%s
+	# 	ORDER BY
+	# 		co.creation DESC"""%where_clause, as_dict=1)
+
+	# data_for_crm_notes.extend(data_for_comments) 
+
+	data_for_crm_notes = frappe.db.sql(f"""
+		SELECT
+			co.parenttype as "Ref DocType", co.parent as "Ref DocName", co.added_by as "User", co.creation as "Date", co.note as "Comment", co.added_by as comment_email
+		FROM
+			`tabCRM Note` as co
+		WHERE
+			1=1 {where_clause}
+		ORDER BY
+			co.creation DESC""", as_dict=1)
+
+	data_for_comments = frappe.db.sql("""
+		SELECT
+			co.reference_doctype as "Ref DocType", co.reference_name as "Ref DocName", co.owner as "User" , co.creation as "Date", co.content as "Comment", co.comment_email
+		FROM
+			`tabComment` as co
+		WHERE
+			co.comment_type="Comment"
+			%s
+		ORDER BY
+			co.creation DESC""" % where_clause_for_comment, as_dict=1)
+
+	# Combine data into a dictionary with (Ref DocType, Ref DocName) as the key
+	combined_data = {}
+
+	# Append data from data_for_crm_notes
+	for row in data_for_crm_notes:
+		key = (row["Ref DocType"], row["Ref DocName"])
+		if key not in combined_data:
+			combined_data[key] = []
+		combined_data[key].append(row)
+
+	# Append data from data_for_comments
+	for row in data_for_comments:
+		key = (row["Ref DocType"], row["Ref DocName"])
+		if key not in combined_data:
+			combined_data[key] = []
+		combined_data[key].append(row)
+
+	# Convert the dictionary values into a flat list
+	final_data = [item for sublist in combined_data.values() for item in sublist]
+
+	
+
+
+	for row in final_data:
+		row["Next Contact Date"] = get_next_contact_date(row, filters)
+		row["Mobile"] = get_contact(row, filters)
+		row["Organization"] = get_organization(row, filters)
+		row["Person"] = get_contact_display(row, filters)
+		row["Caller"] = get_fullname(row['comment_email'])
+	
+	return final_data
 	
 def get_contact(row, filters):
 
