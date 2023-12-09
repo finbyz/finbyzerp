@@ -64,28 +64,6 @@ def get_data(filters):
 
 
 
-	# data_for_crm_notes = frappe.db.sql(f"""
-	# 	SELECT
-	# 		co.parenttype as "Ref DocType", co.parent as "Ref DocName", co.added_by as "User", co.creation as "Date", co.note as "Comment", co.added_by as comment_email
-	# 	FROM
-	# 		`tabCRM Note` as co
-	# 	WHERE
-	# 		1=1 {where_clause}
-	# 	ORDER BY
-	# 		co.creation DESC""", as_dict=1)
-	
-	# data_for_comments = frappe.db.sql("""
-	# 	SELECT
-	# 		co.reference_doctype as "Ref DocType", co.reference_name as "Ref DocName", co.owner as "User" , co.creation as "Date", co.content as "Comment", co.comment_email
-	# 	FROM
-	# 		`tabComment` as co
-	# 	WHERE
-	# 		co.comment_type="Comment"
-	# 		%s
-	# 	ORDER BY
-	# 		co.creation DESC"""%where_clause, as_dict=1)
-
-	# data_for_crm_notes.extend(data_for_comments) 
 
 	data_for_crm_notes = frappe.db.sql(f"""
 		SELECT
