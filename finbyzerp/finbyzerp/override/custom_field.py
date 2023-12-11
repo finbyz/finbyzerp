@@ -1,4 +1,5 @@
 import frappe
+from frappe import _
 from frappe.utils import cstr, random_string
 
 from frappe.custom.doctype.custom_field.custom_field import CustomField
