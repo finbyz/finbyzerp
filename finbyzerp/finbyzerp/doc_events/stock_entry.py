@@ -56,29 +56,36 @@ def check_rate_diff(doctype,docname):
 		# 	wide = True)
 
 def create_quality_inspection_entry(self, method):
-    for inspection_item in self.items:
-        item = frappe.get_doc("Item", inspection_item.item_code)
-        if self.purpose == "Manufacture" or self.purpose == "Repack":
-            if item.inspection_required_after_stock_entry and inspection_item.is_finished_item:
-                if inspection_item.t_warehouse:
-                    quality_inspection = frappe.new_doc("Quality Inspection")
-                    quality_inspection.naming_series = 'MAT-IS-.YYYY.-'
-                    quality_inspection.item_code = inspection_item.item_code
-                    quality_inspection.ref_itm = inspection_item.name
-                    quality_inspection.inspection_type = "Outgoing"
-                    quality_inspection.reference_type = "Stock Entry"
-                    quality_inspection.reference_name = self.name
-                    quality_inspection.sample_size = inspection_item.quantity
-                    quality_inspection.description = inspection_item.description
-                    quality_inspection.remarks = self.remarks
-                    quality_inspection.inspected_by = self.modified_by
-                    quality_inspection.sample_size_uom = inspection_item.uom
-                    quality_inspection.batch_no = inspection_item.batch_no
-                    quality_inspection.quality_inspection_template = frappe.db.get_value("Item", inspection_item.item_code, 'quality_inspection_template')
-                    try:
-                        quality_inspection.save(ignore_permissions=True)
-                    except Exception as e:
-                        frappe.throw(str(e))
-                    else:
-                        frappe.db.set_value(inspection_item.doctype, inspection_item.name, 'quality_inspection', quality_inspection.name)
-                        frappe.msgprint("Quality Inspection {} is Created".format(get_link_to_form('Quality Inspection', quality_inspection.name)))
+	for inspection_item in self.items:
+		item = frappe.get_doc("Item", inspection_item.item_code)
+		if self.purpose == "Manufacture" or self.purpose == "Repack":
+			if item.inspection_required_after_stock_entry and inspection_item.is_finished_item:
+				if inspection_item.t_warehouse:
+					quality_inspection = frappe.new_doc("Quality Inspection")
+					quality_inspection.naming_series = 'MAT-IS-.YYYY.-'
+					quality_inspection.item_code = inspection_item.item_code
+					quality_inspection.ref_itm = inspection_item.name
+					quality_inspection.inspection_type = "Outgoing"
+					quality_inspection.reference_type = "Stock Entry"
+					quality_inspection.reference_name = self.name
+					quality_inspection.sample_size = inspection_item.quantity
+					quality_inspection.description = inspection_item.description
+					quality_inspection.remarks = self.remarks
+					quality_inspection.inspected_by = self.modified_by
+					quality_inspection.sample_size_uom = inspection_item.uom
+					quality_inspection.batch_no = inspection_item.batch_no
+					quality_inspection.quality_inspection_template = frappe.db.get_value("Item", inspection_item.item_code, 'quality_inspection_template')
+					try:
+						quality_inspection.save(ignore_permissions=True)
+					except Exception as e:
+						frappe.throw(str(e))
+					else:
+						frappe.db.set_value(inspection_item.doctype, inspection_item.name, 'quality_inspection', quality_inspection.name)
+						frappe.msgprint("Quality Inspection {} is Created".format(get_link_to_form('Quality Inspection', quality_inspection.name)))
+
+def on_submit(self, method):
+	doc = frappe.db.exists("Quality Inspection",{'reference_name':self.name,'docstatus': 0})
+	if doc:
+		qi_doc = frappe.get_doc("Quality Inspection",doc)
+		if qi_doc.docstatus == 0:
+			frappe.throw("Quality Inspection Is Not Submited <br> Please Submit Quality Inspection {}".format(get_link_to_form("Quality Inspection",doc)))
