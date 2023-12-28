@@ -107,5 +107,44 @@ frappe.ui.form.on('Meeting', {
 		if ((frappe.meta.get_docfield("Meeting", "total_kms")) && (frappe.meta.get_docfield("Meeting", "rate_per_km"))){
 			frm.set_value('local_travel_expense',flt(frm.doc.total_kms) * flt(frm.doc.rate_per_km))
 		}			
-	}
+	},
+    meeting_arranged_by: function(frm) {
+        if (frm.doc.__islocal) {
+            frappe.db.get_value("Employee", {"user_id": frm.doc.meeting_arranged_by}, ["name"], function(value) {
+                if (value && value.name) {
+                    // Check if a row with the specified condition already exists
+                    let row_exists = false;
+                    $.each(frm.doc.meeting_company_representative || [], function(i, row) {
+                        if (row.employee === value.name) {
+                            row_exists = true;
+                            return false; // Exit the loop
+                        }
+                    });
+
+                    // If the row doesn't exist, add a new row
+                    if (!row_exists) {
+                        let row = frm.add_child("meeting_company_representative");
+                        frappe.model.set_value(row.doctype, row.name, 'employee', value.name);
+                        frm.refresh_field('meeting_company_representative');
+                    }
+                }
+            });
+        }
+    },
+    contact_person: function(frm) {
+        if (frm.doc.__islocal) {
+            let row_exists = false;
+            $.each(frm.doc.meeting_party_representative || [], function(i, row) {
+                if (row.contact === frm.doc.contact_person) {
+                    row_exists = true;
+                    return false; // Exit the loop
+                }
+            });
+            if (!row_exists) {
+                let row = frm.add_child("meeting_party_representative");
+                frappe.model.set_value(row.doctype, row.name, 'contact', frm.doc.contact_person);
+                frm.refresh_field('meeting_party_representative');
+            }
+        }
+    }
 });
