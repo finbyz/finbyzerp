@@ -401,6 +401,6 @@ BuyingController.set_qty_as_per_stock_uom = set_qty_as_per_stock_uom
 
 
 # Report Stock Balance Override
-from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
+from finbyzerp.finbyzerp.override.report.stock_balance import execute as stock_balance_execute
 from erpnext.stock.report.stock_balance import stock_balance
 stock_balance.execute = stock_balance_execute

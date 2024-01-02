@@ -1,4 +1,3 @@
-import frappe
 from typing import Optional
 
 from erpnext.stock.report.stock_balance.stock_balance import StockBalanceFilter, StockBalanceReport
