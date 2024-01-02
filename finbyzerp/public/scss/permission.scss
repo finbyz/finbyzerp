@@ -1,0 +1,14 @@
+div[data-user-role="System Manager"] {
+    display: none;
+}
+option[value="System Manager"]{
+    display: none;
+}
+tr:has([data-role="System Manager"]){
+    display: none;
+}
+div span[data-unit="System Manager"],div input[data-unit="System Manager"]{
+    display: none !important;
+}   
+
+

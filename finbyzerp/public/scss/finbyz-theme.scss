@@ -1,0 +1,52 @@
+body {
+	&.full-width {
+		.container {
+			width: 98%;
+		}
+	}
+}
+
+.shortcut-widget-box {
+	.widget-head {
+		padding-top: 10px;
+		padding-bottom: 10px;
+	}
+}
+
+.onboarding-widget-box {
+	padding-top: 15px;
+}
+
+[data-theme="light"] {
+	[data-page-route=Workspaces] {
+		.layout-main-section {
+			background-color: #f9f9f9;
+			box-shadow: none;
+		}
+
+		.widget.spacer {
+			background-color: #f9f9f9;
+		}
+	}
+}
+
+[data-theme="dark"] {
+	[data-page-route=Workspaces] {
+		.layout-main-section {
+			background-color: #1a1a1a;
+			box-shadow: none;
+		}
+
+		.widget.spacer {
+			background-color: #1a1a1a;
+		}
+	}
+}
+
+.report-button {
+	margin-left:5px;
+	border:none;
+	padding: 3px 5px;
+	border-radius: 5px; 
+	font-size:10px;
+}

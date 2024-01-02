@@ -95,10 +95,8 @@ email_campaign.send_email_to_leads_or_contacts = send_email_to_leads_or_contacts
 # sync.get_doc_files = get_doc_files
 
 
-app_include_css = ["finbyzerp.bundle.css"]
-app_include_js = [
-	"finbyzerp.bundle.js"
-]
+app_include_js = "finbyzerp.bundle.js"
+app_include_css = "finbyzerp.bundle.css"
 
 doctype_list_js = {
 	"Batch" : "public/js/doctype_js/batch_list.js",
@@ -294,11 +292,6 @@ from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_exec
 from erpnext.stock.report.stock_ledger import stock_ledger
 stock_ledger.execute = stock_ledger_execute
 
-from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
-from erpnext.stock.report.stock_balance import stock_balance
-stock_balance.execute = stock_balance_execute
-
-
 from finbyzerp.finbyzerp.report.trial_balance_for_party import execute as trial_balance_for_party_execute
 from erpnext.accounts.report.trial_balance_for_party import trial_balance_for_party
 trial_balance_for_party.execute = trial_balance_for_party_execute
@@ -405,3 +398,9 @@ purchase_invoice_trends.execute = purchase_invoice_trends_execute
 from erpnext.controllers.buying_controller import BuyingController
 from finbyzerp.api import set_qty_as_per_stock_uom
 BuyingController.set_qty_as_per_stock_uom = set_qty_as_per_stock_uom
+
+
+# Report Stock Balance Override
+from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
+from erpnext.stock.report.stock_balance import stock_balance
+stock_balance.execute = stock_balance_execute
