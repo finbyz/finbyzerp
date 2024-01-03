@@ -5,12 +5,12 @@ frappe.ui.form.on('Stock Entry', {
 	
 		};
 		// uncomment below code for display valuation rate diff between current entry and ledger entry
-		// below function will work only if s_warehouse is exists in item table.
+		// below function will work only if source_warehouse is exists in item table.
 
 		// if(frm.doc.docstatus == 1){
 		// 	frm.add_custom_button(__("Rate Diff"), function(){
 		// 		frappe.call({
-		// 			method:"finbyzerp.finbyzerp.doc_events.stock_entry.check_rate_diff",
+		// 			method:"finbyzerp.finbyzerp.doc_events.stock_entry.check_rate_difference",
 		// 			args:{
 		// 				"doctype":frm.doc.doctype,
 		// 				"docname":frm.doc.name

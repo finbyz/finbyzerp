@@ -1,0 +1,41 @@
+from erpnext.controllers.trends import get_columns, get_data
+from frappe import _
+
+
+def execute(filters=None):
+	if not filters:
+		filters = {}
+	data = []
+	conditions = get_columns(filters, "Sales Invoice")
+	data = get_data(filters, conditions)
+	chart_data = get_chart_data(data, filters)
+	return conditions["columns"], data, None, chart_data
+
+def get_chart_data(data, filters):
+	if not data:
+		return []
+
+	labels, datapoints = [], []
+
+	if filters.get("group_by"):
+		# consider only consolidated row
+		data = [row for row in data if row[0]]
+
+	data = sorted(data, key=lambda i: i[-1], reverse=True)
+
+	if len(data) > 10:
+		# get top 10 if data too long
+		data = data[:10]
+
+	for row in data:
+		labels.append(row[0])
+		datapoints.append(row[-1])
+
+	return {
+		"data": {
+			"labels": labels,
+			"datasets": [{"name": _("Total Invoice Amount"), "values": datapoints}],
+		},
+		"type": "bar",
+		"fieldtype": "Currency",
+	}

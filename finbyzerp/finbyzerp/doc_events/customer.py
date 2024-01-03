@@ -1,5 +1,7 @@
 import frappe
 from frappe import _
+from finbyzerp.api import set_party_account_based_on_currency
+
 
 def before_rename(self, method, old, new, merge=False):
 	fiscal_year_frozen_till_date = frappe.db.get_value("Accounts Settings", None, "fiscal_year_frozen_till_date")

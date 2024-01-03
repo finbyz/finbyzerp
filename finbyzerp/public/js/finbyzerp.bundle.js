@@ -1,5 +1,6 @@
 // import "./finbyzerp/ui/toolbar/about.js";
-import "./report_js/stock_balance.js";
+import "./finbyzerp.js";
+import "./report_js/trends.js";
 // import "./finbyzerp/ui/toolbar/navbar.html";
 // import "./finbyzerp/ui/page.html";
 // import "./finbyzerp/finbyz-theme.js";
