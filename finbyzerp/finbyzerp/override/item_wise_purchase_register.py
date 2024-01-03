@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 import frappe, erpnext
 from frappe import _
 from frappe.utils import flt
-from finbyzerp.finbyzerp.report.item_wise_sales_register import (get_tax_accounts,
+from finbyzerp.finbyzerp.override.item_wise_sales_register import (get_tax_accounts,
 	get_grand_total, add_total_row, get_display_value, get_group_by_and_display_fields, add_sub_total_row,
 	get_group_by_conditions)
 from erpnext.selling.report.item_wise_sales_history.item_wise_sales_history import get_item_details

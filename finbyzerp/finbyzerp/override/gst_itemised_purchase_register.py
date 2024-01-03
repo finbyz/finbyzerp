@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 
-from finbyzerp.finbyzerp.report.item_wise_purchase_register import _execute
+from finbyzerp.finbyzerp.override.item_wise_purchase_register import _execute
 
 def execute(filters=None):
 	return _execute(filters, additional_table_columns=[

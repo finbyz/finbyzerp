@@ -6,8 +6,8 @@ import frappe
 import collections, functools, operator
 from frappe import _
 from frappe.utils import flt
-from finbyzerp.finbyzerp.report.item_wise_purchase_register import _execute as purchase_execute
-from finbyzerp.finbyzerp.report.item_wise_sales_register import _execute as sales_execute
+from finbyzerp.finbyzerp.override.item_wise_purchase_register import _execute as purchase_execute
+from finbyzerp.finbyzerp.override.item_wise_sales_register import _execute as sales_execute
 
 def execute(filters=None):
 	columns, data = [], []
