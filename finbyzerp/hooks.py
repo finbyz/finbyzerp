@@ -65,11 +65,11 @@ app_email = "info@finbyz.com"
 app_license = "GPL 3.0"
 app_version = app_version
 app_logo_url = "/assets/finbyzerp/images/FinbyzLogo.svg"
-after_install = "finbyzerp.install.after_install"
+# after_install = "finbyzerp.install.after_install"
 
 app_include_js = "finbyzerp.bundle.js"
 app_include_css = "finbyzerp.bundle.css"
-before_install = "finbyzerp.install.before_install"
+# before_install = "finbyzerp.install.before_install"
 
 website_context = {
     "favicon": "/assets/finbyzerp/images/favicon.ico",
@@ -105,7 +105,6 @@ doctype_js = {
 doc_events = {
     (
         "Pick List",
-        "Expense Claim",
         "Sales Invoice",
         "Purchase Invoice",
         "Payment Request",
@@ -121,20 +120,8 @@ doc_events = {
         "Delivery Note",
         "Purchase Receipt",
         "Packing Slip",
-        "Jobwork Challan",
-        "Jobwork Finish",
-        "Outward Sample",
-        "Inward Sample",
-        "Manufacturing Consumption",
         "Credit and Debit Note",
-        "Outward Tracking",
-        "Sample Requirement",
-        "Proforma Invoice",
-        "Mould Trail Request",
-        "Work Order Master",
         "Asset",
-        "Leave Application",
-        "Contract Term",
     ): {
         "before_naming": "finbyzerp.finbyzerp.doc_events.naming_series.before_naming",
     },

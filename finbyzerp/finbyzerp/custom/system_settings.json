@@ -187,30 +187,6 @@
  "custom_perms": [],
  "doctype": "System Settings",
  "links": [],
- "property_setters": [
-  {
-   "_assign": null,
-   "_comments": null,
-   "_liked_by": null,
-   "_user_tags": null,
-   "creation": "2024-01-03 12:02:10.707267",
-   "default_value": null,
-   "doc_type": "System Settings",
-   "docstatus": 0,
-   "doctype_or_field": "DocType",
-   "field_name": null,
-   "idx": 0,
-   "is_system_generated": 0,
-   "modified": "2024-01-03 12:02:10.707267",
-   "modified_by": "info@finbyz.tech",
-   "module": null,
-   "name": "System Settings-main-field_order",
-   "owner": "info@finbyz.tech",
-   "property": "field_order",
-   "property_type": "Data",
-   "row_name": null,
-   "value": "[\"localization\", \"app_name\", \"country\", \"language\", \"column_break_3\", \"time_zone\", \"enable_onboarding\", \"setup_complete\", \"disable_document_sharing\", \"date_and_number_format\", \"date_format\", \"time_format\", \"number_format\", \"first_day_of_the_week\", \"column_break_7\", \"float_precision\", \"currency_precision\", \"rounding_method\", \"permissions\", \"apply_strict_user_permissions\", \"column_break_21\", \"allow_older_web_view_links\", \"custom_settings\", \"enable_whatsapp\", \"create_comments\", \"security_tab\", \"security\", \"session_expiry\", \"document_share_key_expiry\", \"column_break_txqh\", \"deny_multiple_sessions\", \"disable_user_pass_login\", \"login_methods_section\", \"allow_login_using_mobile_number\", \"allow_login_using_user_name\", \"column_break_uhqk\", \"login_with_email_link\", \"login_with_email_link_expiry\", \"brute_force_security\", \"allow_consecutive_login_attempts\", \"column_break_34\", \"allow_login_after_fail\", \"two_factor_authentication\", \"enable_two_factor_auth\", \"bypass_2fa_for_retricted_ip_users\", \"bypass_restrict_ip_check_if_2fa_enabled\", \"two_factor_method\", \"lifespan_qrcode_image\", \"otp_issuer_name\", \"password_tab\", \"password_settings\", \"logout_on_password_reset\", \"force_user_to_reset_password\", \"reset_password_link_expiry_duration\", \"password_reset_limit\", \"column_break_31\", \"enable_password_policy\", \"minimum_password_score\", \"email_tab\", \"email\", \"email_footer_address\", \"email_retry_limit\", \"column_break_18\", \"disable_standard_email_footer\", \"hide_footer_in_auto_email_reports\", \"attach_view_link\", \"welcome_email_template\", \"reset_password_template\", \"files_tab\", \"files_section\", \"max_file_size\", \"allow_guests_to_upload_files\", \"force_web_capture_mode_for_uploads\", \"strip_exif_metadata_from_uploaded_images\", \"column_break_uqma\", \"allowed_file_extensions\", \"updates_tab\", \"system_updates_section\", \"disable_system_update_notification\", \"disable_change_log_notification\", \"backups_tab\", \"sec_backup_limit\", \"backup_limit\", \"encrypt_backup\", \"advanced_tab\", \"prepared_report_section\", \"max_auto_email_report_per_user\", \"background_workers\", \"enable_scheduler\", \"dormant_days\", \"telemetry_section\", \"allow_error_traceback\", \"enable_telemetry\"]"
-  }
- ],
+ "property_setters": [],
  "sync_on_migrate": 1
 }

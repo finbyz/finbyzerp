@@ -84,9 +84,10 @@
   "more_information_section",
   "si_ref",
   "pi_ref",
-  "fiscal",
   "amended_from",
-  "remarks"
+  "remarks",
+  "company_series",
+  "fiscal"
  ],
  "fields": [
   {
@@ -576,9 +577,10 @@
   },
   {
    "fieldname": "fiscal",
-   "fieldtype": "Small Text",
+   "fieldtype": "Data",
    "hidden": 1,
-   "label": "Fiscal"
+   "label": "Fiscal",
+   "length": 10
   },
   {
    "fieldname": "amended_from",
@@ -629,15 +631,24 @@
    "fieldname": "remarks",
    "fieldtype": "Small Text",
    "label": "Remarks"
+  },
+  {
+   "fetch_from": "company.company_series",
+   "fieldname": "company_series",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Company Series",
+   "length": 10
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2022-04-15 11:36:18.720328",
+ "modified": "2024-01-04 11:34:56.935258",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Credit and Debit Note",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
@@ -685,5 +696,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }
