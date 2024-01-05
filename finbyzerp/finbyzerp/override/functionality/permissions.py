@@ -44,7 +44,7 @@ def has_permission(
 		doc = doctype
 		doctype = doc.doctype
 	
-	if doctype in ["Customize Form", "Client Script", "Server Script", "DocType", "Custom Field"] and user != "Administrator":
+	if user != "Administrator" and doctype in ["Customize Form", "Client Script", "Server Script", "DocType", "Custom Field"]:
 		return False
 
 	if frappe.is_table(doctype):
