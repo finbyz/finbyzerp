@@ -1,187 +1,112 @@
 import frappe
 from frappe import _
-from frappe.core.doctype.access_log.access_log import make_access_log
-from frappe.core.doctype.doctype.doctype import clear_permissions_cache, validate_permissions_for_doctype
-from frappe.modules.import_file import get_file_path, read_doc_from_file
-from frappe.permissions import add_permission, get_all_perms, get_linked_doctypes, reset_perms, setup_custom_perms, update_permission_property
-from frappe.translate import send_translations
-from frappe.utils.response import send_private_file
-from werkzeug.exceptions import Forbidden
-
-not_allowed_in_permission_manager = [
-    "DocType",
-    "DocField",
-    "DocPerm",
-    "System Manager",
-    "Has Role",
-    "Page",
-    "Module Def",
-    "Print Format",
-    "Report",
-    "Customize Form",
-    "DocShare",
-    "Customize Form Field",
-    "Property Setter",
-    "Custom Field",
-    "Custom Script",
-    "Patch Log",
-    "Transaction Log",
-]
+from frappe.permissions import get_doc_name, get_doc_permissions, get_role_permissions, has_child_permission, print_has_permission_check_logs, push_perm_check_log
+from frappe.utils import cint
 
 
-def add_permission(doctype, role, permlevel=0, ptype=None):
-    """Add a new permission rule to the given doctype
-    for the given Role and Permission Level"""
+@print_has_permission_check_logs
+def has_permission(
+	doctype,
+	ptype="read",
+	doc=None,
+	user=None,
+	raise_exception=True,
+	*,
+	parent_doctype=None,
+):
+	"""Returns True if user has permission `ptype` for given `doctype`.
+	If `doc` is passed, it also checks user, share and owner permissions.
 
-    setup_custom_perms(doctype)
-    if frappe.db.get_value(
-        "Custom DocPerm",
-        dict(parent=doctype, role=role, permlevel=permlevel, if_owner=1),
-    ):
-        return
+	:param doctype: DocType to check permission for
+	:param ptype: Permission Type to check
+	:param doc: Check User Permissions for specified document.
+	:param user: User to check permission for. Defaults to current user.
+	:param raise_exception:
+			DOES NOT raise an exception.
+			If not False, will display a message using frappe.msgprint
+					which explains why the permission check failed.
 
-    if not ptype:
-        ptype = "read"
+	:param parent_doctype:
+			Required when checking permission for a child DocType (unless doc is specified)
+	"""
 
-    custom_docperm = frappe.get_doc(
-        {
-            "doctype": "Custom DocPerm",
-            "__islocal": 1,
-            "parent": doctype,
-            "parenttype": "DocType",
-            "parentfield": "permissions",
-            "role": role,
-            "permlevel": permlevel,
-            ptype: 1,
-        }
-    )
-    custom_docperm.flags.ignore_permissions = True
-    custom_docperm.save()
+	if not user:
+		user = frappe.session.user
 
-    validate_permissions_for_doctype(doctype)
-    return custom_docperm.name
+	if user == "Administrator":
+		return True
 
+	if ptype == "share" and frappe.get_system_settings("disable_document_sharing"):
+		return False
 
-def download_backup(path):
-    try:
-        frappe.only_for(("System Manager", "Administrator", "Local Admin"))
-        make_access_log(report_name="Backup")
-    except frappe.PermissionError:
-        raise Forbidden(_("You need to be logged in and have System Manager Role to be able to access backups."))
+	if not doc and hasattr(doctype, "doctype"):
+		# first argument can be doc or doctype
+		doc = doctype
+		doctype = doc.doctype
+	
+	if doctype in ["Customize Form", "Client Script", "Server Script", "DocType", "Custom Field"] and user != "Administrator":
+		return False
 
-    return send_private_file(path)
+	if frappe.is_table(doctype):
+		return has_child_permission(doctype, ptype, doc, user, raise_exception, parent_doctype)
 
+	meta = frappe.get_meta(doctype)
 
-@frappe.whitelist()
-def get_roles_and_doctypes():
-    frappe.only_for(("System Manager", "Local Admin"))
-    send_translations(frappe.get_lang_dict("doctype", "DocPerm"))
+	if doc:
+		if isinstance(doc, (str, int)):
+			doc = frappe.get_doc(meta.name, doc)
+		perm = get_doc_permissions(doc, user=user, ptype=ptype).get(ptype)
+		if not perm:
+			msg = _("User {0} does not have access to this document").format(frappe.bold(user))
+			if frappe.has_permission(doc.doctype):
+				msg += f": {_(doc.doctype)} - {doc.name}"
+			push_perm_check_log(msg)
+	else:
+		if ptype == "submit" and not cint(meta.is_submittable):
+			push_perm_check_log(_("Document Type is not submittable"))
+			return False
 
-    active_domains = frappe.get_active_domains()
+		if ptype == "import" and not cint(meta.allow_import):
+			push_perm_check_log(_("Document Type is not importable"))
+			return False
 
-    doctypes = frappe.get_all(
-        "DocType",
-        filters={
-            "istable": 0,
-            "name": ("not in", ",".join(not_allowed_in_permission_manager)),
-        },
-        or_filters={"ifnull(restrict_to_domain, '')": "", "restrict_to_domain": ("in", active_domains)},
-        fields=["name"],
-    )
+		role_permissions = get_role_permissions(meta, user=user)
+		perm = role_permissions.get(ptype)
 
-    roles = frappe.get_all(
-        "Role",
-        filters={
-            "name": ("not in", "Administrator", "System Manager"),
-            "disabled": 0,
-        },
-        or_filters={"ifnull(restrict_to_domain, '')": "", "restrict_to_domain": ("in", active_domains)},
-        fields=["name"],
-    )
+		if not perm:
+			push_perm_check_log(
+				_("User {0} does not have doctype access via role permission for document {1}").format(
+					frappe.bold(user), frappe.bold(doctype)
+				)
+			)
 
-    doctypes_list = [{"label": _(d.get("name")), "value": d.get("name")} for d in doctypes]
-    roles_list = [{"label": _(d.get("name")), "value": d.get("name")} for d in roles if d.get("name") != "System Manager"]
+	def false_if_not_shared():
+		if ptype in ("read", "write", "share", "submit", "email", "print"):
 
-    return {"doctypes": sorted(doctypes_list, key=lambda d: d["label"]), "roles": sorted(roles_list, key=lambda d: d["label"])}
+			rights = ["read" if ptype in ("email", "print") else ptype]
 
+			if doc:
+				doc_name = get_doc_name(doc)
+				shared = frappe.share.get_shared(
+					doctype,
+					user,
+					rights=rights,
+					filters=[["share_name", "=", doc_name]],
+					limit=1,
+				)
 
-@frappe.whitelist()
-def get_permissions(doctype=None, role=None):
-    frappe.only_for(("System Manager", "Local Admin"))
-    if role:
-        out = get_all_perms(role)
-        if doctype:
-            out = [p for p in out if p.parent == doctype]
-    else:
-        out = frappe.get_all("Custom DocPerm", fields="*", filters=dict(parent=doctype), order_by="permlevel")
-        if not out:
-            out = frappe.get_all("DocPerm", fields="*", filters=dict(parent=doctype), order_by="permlevel")
+				if shared:
+					if ptype in ("read", "write", "share", "submit") or meta.permissions[0].get(ptype):
+						return True
 
-    linked_doctypes = {}
-    for d in out:
-        if not d.parent in linked_doctypes:
-            linked_doctypes[d.parent] = get_linked_doctypes(d.parent)
-        d.linked_doctypes = linked_doctypes[d.parent]
-        meta = frappe.get_meta(d.parent)
-        if meta:
-            d.is_submittable = meta.is_submittable
+			elif frappe.share.get_shared(doctype, user, rights=rights, limit=1):
+				# if atleast one shared doc of that type, then return True
+				# this is used in db_query to check if permission on DocType
+				return True
 
-    return out
+		return False
 
+	if not perm:
+		perm = false_if_not_shared()
 
-@frappe.whitelist()
-def add(parent, role, permlevel):
-    frappe.only_for(("System Manager", "Local Admin"))
-    add_permission(parent, role, permlevel)
-
-
-@frappe.whitelist()
-def update(doctype, role, permlevel, ptype, value=None):
-    frappe.only_for(("System Manager", "Local Admin"))
-    out = update_permission_property(doctype, role, permlevel, ptype, value)
-    return "refresh" if out else None
-
-
-@frappe.whitelist()
-def remove(doctype, role, permlevel):
-    frappe.only_for(("System Manager", "Local Admin"))
-    setup_custom_perms(doctype)
-
-    name = frappe.get_value("Custom DocPerm", dict(parent=doctype, role=role, permlevel=permlevel))
-
-    frappe.db.sql("delete from `tabCustom DocPerm` where name=%s", name)
-    if not frappe.get_all("Custom DocPerm", dict(parent=doctype)):
-        frappe.throw(_("There must be atleast one permission rule."), title=_("Cannot Remove"))
-
-    validate_permissions_for_doctype(doctype, for_remove=True)
-
-
-@frappe.whitelist()
-def reset(doctype):
-    frappe.only_for(("System Manager", "Local Admin"))
-    reset_perms(doctype)
-    clear_permissions_cache(doctype)
-
-
-@frappe.whitelist()
-def get_users_with_role(role):
-    frappe.only_for(("System Manager", "Local Admin"))
-    return [
-        p[0]
-        for p in frappe.db.sql(
-            """select distinct tabUser.name
-		from `tabHas Role`, tabUser where
-			`tabHas Role`.role=%s
-			and tabUser.name != "Administrator"
-			and `tabHas Role`.parent = tabUser.name
-			and tabUser.enabled=1""",
-            role,
-        )
-    ]
-
-
-@frappe.whitelist()
-def get_standard_permissions(doctype):
-    frappe.only_for(("System Manager", "Local Admin"))
-    doc = frappe.get_doc("DocType", doctype)
-    return [p.as_dict() for p in doc.permissions]
+	return bool(perm)

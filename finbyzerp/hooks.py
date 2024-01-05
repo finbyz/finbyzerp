@@ -18,7 +18,7 @@ from finbyzerp.finbyzerp.override.doctype.email_campaign import send_email_to_le
 from finbyzerp.finbyzerp.override.functionality.buying_controller import set_qty_as_per_stock_uom
 from finbyzerp.finbyzerp.override.functionality.db_query import get_date_range
 from finbyzerp.finbyzerp.override.functionality.general_ledger import get_result_as_list
-from finbyzerp.finbyzerp.override.functionality.permissions import add_permission, download_backup
+from finbyzerp.finbyzerp.override.functionality.permissions import has_permission as custom_has_permmission
 from finbyzerp.finbyzerp.override.functionality.print_format import get_pdf
 from finbyzerp.finbyzerp.override.functionality.sales_and_purchase_return import validate_returned_items
 from finbyzerp.finbyzerp.override.functionality.stock_ledger_entry import check_stock_frozen_date
@@ -190,14 +190,6 @@ override_doctype_dashboards = {
 }
 
 override_whitelisted_methods = {
-    "frappe.core.page.permission_manager.permission_manager.get_roles_and_doctypes": "finbyzerp.finbyzerp.override.functionality.permissions.get_roles_and_doctypes",
-    "frappe.core.page.permission_manager.permission_manager.get_permissions": "finbyzerp.finbyzerp.override.functionality.permissions.get_permissions",
-    "frappe.core.page.permission_manager.permission_manager.add": "finbyzerp.finbyzerp.override.functionality.permissions.add",
-    "frappe.core.page.permission_manager.permission_manager.update": "finbyzerp.finbyzerp.override.functionality.permissions.update",
-    "frappe.core.page.permission_manager.permission_manager.remove": "finbyzerp.finbyzerp.override.functionality.permissions.remove",
-    "frappe.core.page.permission_manager.permission_manager.reset": "finbyzerp.finbyzerp.override.functionality.permissions.reset",
-    "frappe.core.page.permission_manager.permission_manager.get_users_with_role": "finbyzerp.finbyzerp.override.functionality.permissions.get_users_with_role",
-    "frappe.core.page.permission_manager.permission_manager.get_standard_permissions": "finbyzerp.finbyzerp.override.functionality.permissions.get_standard_permissions",
     "erpnext.setup.doctype.company.delete_company_transactions.delete_company_transactions": "finbyzerp.finbyzerp.override.delete_company_transactions.delete_company_transactions",
     "india_compliance.gst_india.utils.e_invoice.generate_e_invoice": "finbyzerp.e_invoice_override_14.custom_generate_e_invoice",
 }
@@ -211,8 +203,7 @@ scheduler_events = {
 
 
 # Functionality Overrides
-permissions.add_permission = add_permission
-response.download_backup = download_backup
+permissions.has_permission = custom_has_permmission
 pdf.get_pdf = get_pdf
 utils.get_timespan_date_range = get_timespan_date_range
 db_query.get_date_range = get_date_range
