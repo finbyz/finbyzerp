@@ -34,14 +34,12 @@ from finbyzerp.finbyzerp.override.india_compliance.transaction_data import updat
 from finbyzerp.finbyzerp.override.item_wise_sales_register import execute as item_wise_sales_register_execute
 from finbyzerp.finbyzerp.override.pending_so_items_for_purchase_request import execute as pending_so_items_for_purchase_request_execute
 from finbyzerp.finbyzerp.override.report.general_ledger import execute as general_ledger_execute
-from finbyzerp.finbyzerp.override.report.permitted_documents_for_user import execute as permitted_documents_for_user_execute
 from finbyzerp.finbyzerp.override.report.purchase_invoice_trends import execute as purchase_invoice_trends_execute
 from finbyzerp.finbyzerp.override.report.sales_invoice_trends import execute as sales_invoice_trends_execute
 from finbyzerp.finbyzerp.override.report.stock_balance import execute as stock_balance_execute
 from finbyzerp.finbyzerp.override.sales_order_analysis import execute as sales_order_analysis_execute
 from finbyzerp.finbyzerp.override.trial_balance_for_party import execute as trial_balance_for_party_execute
 from frappe import permissions, utils
-from frappe.core.report.permitted_documents_for_user import permitted_documents_for_user
 from frappe.model import db_query
 from frappe.utils import pdf, response
 from frappe.workflow.doctype.workflow_action import workflow_action
@@ -82,7 +80,6 @@ doctype_list_js = {
 }
 
 doctype_js = {
-    "Role Profile": "public/js/doctype_js/role_profile.js",
     "Sales Order": "public/js/doctype_js/sales_order.js",
     "Delivery Note": "public/js/doctype_js/delivery_note.js",
     "Sales Invoice": "public/js/doctype_js/sales_invoice.js",
@@ -160,7 +157,6 @@ doc_events = {
     "Stock Settings": {
         "validate": "finbyzerp.finbyzerp.doc_events.stock_settings.validate",
     },
-    "User": {"validate": "finbyzerp.finbyzerp.doc_events.user.validate"},
     "Purchase Receipt": {"on_submit": "finbyzerp.finbyzerp.doc_events.purchase_receipt.on_submit"},
     "Delivery Note": {"validate": "finbyzerp.finbyzerp.doc_events.delivery_note.validate"},
     "Stock Entry": {
@@ -178,7 +174,6 @@ doc_events = {
 override_doctype_class = {
     "Customize Form": "finbyzerp.finbyzerp.override.doctype.customize_form.CustomCustomizeForm",
     "Custom Field": "finbyzerp.finbyzerp.override.doctype.custom_field.CustomFieldOverride",
-    "Report": "finbyzerp.finbyzerp.override.doctype.report.CustomReport",
     "Document Naming Settings": "finbyzerp.finbyzerp.override.doctype.document_naming_settings.CustomDocumentNamingSettings",
     "Opening Invoice Creation Tool": "finbyzerp.finbyzerp.override.doctype.opening_invoice_creation_tool.CustomOpeningInvoiceCreationTool",
 }
@@ -190,7 +185,6 @@ override_doctype_dashboards = {
 }
 
 override_whitelisted_methods = {
-    "erpnext.setup.doctype.company.delete_company_transactions.delete_company_transactions": "finbyzerp.finbyzerp.override.delete_company_transactions.delete_company_transactions",
     "india_compliance.gst_india.utils.e_invoice.generate_e_invoice": "finbyzerp.e_invoice_override_14.custom_generate_e_invoice",
 }
 
@@ -224,11 +218,9 @@ sales_order_analysis.execute = sales_order_analysis_execute
 pending_so_items_for_purchase_request.execute = pending_so_items_for_purchase_request_execute
 
 # Report
-permitted_documents_for_user.execute = permitted_documents_for_user_execute
 stock_balance.execute = stock_balance_execute
 sales_invoice_trends.execute = sales_invoice_trends_execute
 purchase_invoice_trends.execute = purchase_invoice_trends_execute
-permitted_documents_for_user.execute = permitted_documents_for_user_execute
 item_wise_sales_register.execute = item_wise_sales_register_execute
 trial_balance_for_party.execute = trial_balance_for_party_execute
 general_ledger.execute = general_ledger_execute
