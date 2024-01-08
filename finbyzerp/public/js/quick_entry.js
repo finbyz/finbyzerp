@@ -36,7 +36,7 @@ class GSTQuickEntryForm extends frappe.ui.form.QuickEntryForm {
                 // set as _pincode so that frappe.ui.form.Layout doesn't override it
                 label: __("Postal Code"),
                 fieldname: "_idx",
-                fieldtype: "Autocomplete",
+                fieldtype: "Select",
                 ignore_validation: true,
             },
             {
@@ -338,7 +338,7 @@ async function autofill_fields(dialog) {
 
     if (!gstin || gstin.length !== 15) {
         const pincode_field = dialog.fields_dict._pincode;
-        pincode_field.set_data([]);
+        pincode_field.options = [];
         pincode_field.df.onchange = null;
 
         gstin_field.set_description(get_gstin_description());
@@ -371,19 +371,30 @@ function setup_pincode_field(dialog, gstin_info) {
     if (!gstin_info.all_addresses) return;
 
     const pincode_field = dialog.fields_dict._idx;
-    pincode_field.set_data(
-        gstin_info.all_addresses.map(address => {
-            return {
-                label: address.pincode,
-                value: address.idx,
-                description: `${address.address_line1}, ${address.address_line2}, ${address.city}, ${address.state}`,
-            };
-        })
-    );
+    pincode_field.df.options = gstin_info.all_addresses.map(address => {
+        return address.idx;
+    });
+
+    gstin_info.all_addresses.forEach((row) => {
+        $("select[data-fieldname=_idx][data-fieldtype=Select][type=text]").append($("<option></option>").attr("value", row['idx']).text(`${row['pincode']} - ${row['address_line1']} - ${row['address_line2']}`));
+    });
 
     pincode_field.df.onchange = () => {
-        dialog.set_value("_pincode", gstin_info.all_addresses.find(address => address.idx == dialog.doc._idx)["pincode"]);
+        // console.log(gstin_info.all_addresses.find(address => address.idx == dialog.doc._idx))
+        var idx = dialog.doc._idx;
+        var data = gstin_info.all_addresses.find(address => address.idx == idx);
+        dialog.set_value("_pincode", data["pincode"]);
         autofill_address(dialog.doc, gstin_info);
+        for (const key in data) {
+            if (key !== 'idx'){
+                dialog.set_value("key", data[key]);
+            }
+        }
+        $("select[data-fieldname=_idx][data-fieldtype=Select][type=text]").html("");
+        gstin_info.all_addresses.forEach((row) => {
+            $("select[data-fieldname=_idx][data-fieldtype=Select][type=text]").append($("<option></option>").attr("value", row['idx']).text(`${row['pincode']} - ${row['address_line1']} - ${row['address_line2']}`));
+        });
+
         dialog.refresh();
     };
 }
@@ -423,7 +434,7 @@ function update_address_info(doc, address) {
     Object.assign(doc, address);
     // set field renamed due conflict with frappe.ui.form.Layout
     doc._pincode = address.pincode;
-    doc._idx = address.pincode;
+    doc._idx = address.idx;
 }
 
 function autofill_address(doc, { all_addresses }) {

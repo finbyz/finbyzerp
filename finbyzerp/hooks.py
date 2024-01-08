@@ -29,8 +29,9 @@ after_install = "finbyzerp.install.after_install"
 # NamingSeries.get_transactions = get_transactions
 
 from frappe.core.doctype.document_naming_settings.document_naming_settings import DocumentNamingSettings
-from finbyzerp.finbyzerp.override.naming_series import _get_prefixes as get_prefixes
+from finbyzerp.finbyzerp.override.naming_series import _get_prefixes as get_prefixes, update_series_start as _update_series_start
 DocumentNamingSettings._get_prefixes = get_prefixes
+DocumentNamingSettings.update_series_start = _update_series_start
 
 from erpnext.accounts.doctype.opening_invoice_creation_tool.opening_invoice_creation_tool import OpeningInvoiceCreationTool
 from finbyzerp.finbyzerp.doc_events.opening_invoice_creation_tool import get_invoice_dict, make_invoices
