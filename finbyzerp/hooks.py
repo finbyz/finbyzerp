@@ -279,10 +279,10 @@ item_wise_sales_register.execute = item_wise_sales_register_execute
 # from erpnext.accounts.report.item_wise_purchase_register import item_wise_purchase_register
 # item_wise_purchase_register.execute = item_wise_purchase_register_execute
 
-from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
-from india_compliance.gst_india.report.gst_itemised_sales_register import gst_itemised_sales_register
-# from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
-gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
+# from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
+# from india_compliance.gst_india.report.gst_itemised_sales_register import gst_itemised_sales_register
+# # from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
+# gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
 
 
 from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
