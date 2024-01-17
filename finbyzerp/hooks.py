@@ -151,9 +151,11 @@ override_whitelisted_methods = {
 	"erpnext.setup.doctype.company.delete_company_transactions.delete_company_transactions": "finbyzerp.finbyzerp.override.delete_company_transactions.delete_company_transactions",
 	"frappe.desk.moduleview.get_desktop_settings": "finbyzerp.api.get_desktop_settings",
 	"frappe.desk.moduleview.get_options_for_global_modules": "finbyzerp.api.get_options_for_global_modules",
-	"india_compliance.gst_india.utils.e_invoice.generate_e_invoice" : "finbyzerp.e_invoice_override_14.custom_generate_e_invoice"
+	"india_compliance.gst_india.utils.e_invoice.generate_e_invoice" : "finbyzerp.e_invoice_override_14.custom_generate_e_invoice",
 	# "erpnext.regional.india.e_invoice.utils.cancel_eway_bill": "finbyzerp.e_invoice_override.cancel_eway_bill", # cancel eway bill override for enable cancel_eway_bill api
 	#"frappe.utils.print_format.download_pdf": "finbyzerp.print_format.download_pdf",
+    "frappe.desk.form.load.getdoc": "finbyzerp.load.getdoc",
+    "frappe.desk.form.load.get_docinfo": "finbyzerp.load.get_docinfo",
 }
 
 # override for download backup
