@@ -100,39 +100,7 @@ doctype_js = {
 }
 
 doc_events = {
-    (
-        "Pick List",
-        "Expense Claim",
-        "Sales Invoice",
-        "Purchase Invoice",
-        "Payment Request",
-        "Payment Entry",
-        "Journal Entry",
-        "Material Request",
-        "Purchase Order",
-        "Work Order",
-        "Production Plan",
-        "Stock Entry",
-        "Quotation",
-        "Sales Order",
-        "Delivery Note",
-        "Purchase Receipt",
-        "Packing Slip",
-        "Jobwork Challan",
-        "Jobwork Finish",
-        "Outward Sample",
-        "Inward Sample",
-        "Manufacturing Consumption",
-        "Credit and Debit Note",
-        "Outward Tracking",
-        "Sample Requirement",
-        "Proforma Invoice",
-        "Mould Trail Request",
-        "Work Order Master",
-        "Asset",
-        "Leave Application",
-        "Contract Term",
-    ): {
+    "*": {
         "before_naming": "finbyzerp.finbyzerp.doc_events.naming_series.before_naming",
     },
     ("Quotation", "Sales Order", "Delivery Note", "Sales Invoice"): {
