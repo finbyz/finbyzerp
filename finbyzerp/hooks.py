@@ -409,3 +409,7 @@ BuyingController.set_qty_as_per_stock_uom = set_qty_as_per_stock_uom
 from erpnext.buying.report.purchase_order_analysis import purchase_order_analysis
 from finbyzerp.purchase_order_analysis import get_data
 purchase_order_analysis.get_data = get_data
+
+from india_compliance.gst_india.overrides import transaction
+from finbyzerp.finbyzerp.transaction import validate_gst_accounts
+transaction.validate_gst_accounts = validate_gst_accounts
