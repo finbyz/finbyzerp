@@ -225,7 +225,7 @@ scheduler_events = {
 
 
 # Functionality Overrides
-permissions.has_permission = custom_has_permmission
+# permissions.has_permission = custom_has_permmission
 # pdf.get_pdf = get_/dpdf
 utils.get_timespan_date_range = get_timespan_date_range
 db_query.get_date_range = get_date_range
