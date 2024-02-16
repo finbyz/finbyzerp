@@ -29,9 +29,8 @@ after_install = "finbyzerp.install.after_install"
 # NamingSeries.get_transactions = get_transactions
 
 from frappe.core.doctype.document_naming_settings.document_naming_settings import DocumentNamingSettings
-from finbyzerp.finbyzerp.override.naming_series import _get_prefixes as get_prefixes, update_series_start as _update_series_start
+from finbyzerp.finbyzerp.override.naming_series import _get_prefixes as get_prefixes
 DocumentNamingSettings._get_prefixes = get_prefixes
-DocumentNamingSettings.update_series_start = _update_series_start
 
 from erpnext.accounts.doctype.opening_invoice_creation_tool.opening_invoice_creation_tool import OpeningInvoiceCreationTool
 from finbyzerp.finbyzerp.doc_events.opening_invoice_creation_tool import get_invoice_dict, make_invoices
@@ -136,7 +135,8 @@ website_context = {
 
 override_doctype_class = {
 	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity",
-    "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride"
+    "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride",
+    "Customize Form": "finbyzerp.finbyzerp.override.customize_form.CustomizeForm",
 }
 
 override_whitelisted_methods = {
@@ -151,11 +151,9 @@ override_whitelisted_methods = {
 	"erpnext.setup.doctype.company.delete_company_transactions.delete_company_transactions": "finbyzerp.finbyzerp.override.delete_company_transactions.delete_company_transactions",
 	"frappe.desk.moduleview.get_desktop_settings": "finbyzerp.api.get_desktop_settings",
 	"frappe.desk.moduleview.get_options_for_global_modules": "finbyzerp.api.get_options_for_global_modules",
-	"india_compliance.gst_india.utils.e_invoice.generate_e_invoice" : "finbyzerp.e_invoice_override_14.custom_generate_e_invoice",
+	"india_compliance.gst_india.utils.e_invoice.generate_e_invoice" : "finbyzerp.e_invoice_override_14.custom_generate_e_invoice"
 	# "erpnext.regional.india.e_invoice.utils.cancel_eway_bill": "finbyzerp.e_invoice_override.cancel_eway_bill", # cancel eway bill override for enable cancel_eway_bill api
 	#"frappe.utils.print_format.download_pdf": "finbyzerp.print_format.download_pdf",
-    "frappe.desk.form.load.getdoc": "finbyzerp.load.getdoc",
-    "frappe.desk.form.load.get_docinfo": "finbyzerp.load.get_docinfo",
 }
 
 # override for download backup
@@ -281,16 +279,16 @@ item_wise_sales_register.execute = item_wise_sales_register_execute
 # from erpnext.accounts.report.item_wise_purchase_register import item_wise_purchase_register
 # item_wise_purchase_register.execute = item_wise_purchase_register_execute
 
-# from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
-# from india_compliance.gst_india.report.gst_itemised_sales_register import gst_itemised_sales_register
-# # from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
-# gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
+from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
+from india_compliance.gst_india.report.gst_itemised_sales_register import gst_itemised_sales_register
+# from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
+gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
 
 
-# from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
-# # from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
-# from india_compliance.gst_india.report.gst_itemised_purchase_register import gst_itemised_purchase_register
-# gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
+from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
+# from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
+from india_compliance.gst_india.report.gst_itemised_purchase_register import gst_itemised_purchase_register
+gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
 
 
 from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
@@ -408,3 +406,11 @@ purchase_invoice_trends.execute = purchase_invoice_trends_execute
 from erpnext.controllers.buying_controller import BuyingController
 from finbyzerp.api import set_qty_as_per_stock_uom
 BuyingController.set_qty_as_per_stock_uom = set_qty_as_per_stock_uom
+
+from erpnext.buying.report.purchase_order_analysis import purchase_order_analysis
+from finbyzerp.purchase_order_analysis import get_data
+purchase_order_analysis.get_data = get_data
+
+from india_compliance.gst_india.overrides import transaction
+from finbyzerp.finbyzerp.transaction import validate_gst_accounts
+transaction.validate_gst_accounts = validate_gst_accounts
