@@ -27,7 +27,8 @@ from finbyzerp.finbyzerp.override.functionality.general_ledger import get_result
 from finbyzerp.finbyzerp.override.functionality.permissions import (
     has_permission as custom_has_permmission,
 )
-from finbyzerp.finbyzerp.override.functionality.print_format import get_pdf
+
+# from finbyzerp.finbyzerp.override.functionality.print_format import get_pdf
 from finbyzerp.finbyzerp.override.functionality.sales_and_purchase_return import (
     validate_returned_items,
 )
@@ -224,8 +225,8 @@ scheduler_events = {
 
 
 # Functionality Overrides
-# permissions.has_permission = custom_has_permmission
-pdf.get_pdf = get_pdf
+permissions.has_permission = custom_has_permmission
+# pdf.get_pdf = get_/dpdf
 utils.get_timespan_date_range = get_timespan_date_range
 db_query.get_date_range = get_date_range
 workflow_action.process_workflow_actions = process_workflow_actions
