@@ -59,11 +59,6 @@ def make_meetings(source_name, doctype, ref_doctype, target_doc=None):
             if doctype == "Lead":
                 target.organization = source.company_name
 
-    def update_contact(source, target, source_parent):
-        if doctype == "Lead":
-            if not source.organization_lead:
-                target.contact = source.lead_name
-
     doclist = get_mapped_doc(
         doctype,
         source_name,
@@ -77,7 +72,6 @@ def make_meetings(source_name, doctype, ref_doctype, target_doc=None):
                     "contact_mobile": "mobile_no",
                 },
                 "field_no_map": ["naming_series", "lead", "customer", "opportunity"],
-                "postprocess": update_contact,
             }
         },
         target_doc,
