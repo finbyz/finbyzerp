@@ -200,7 +200,7 @@ doc_events = {
 }
 
 override_doctype_class = {
-    "Customize Form": "finbyzerp.finbyzerp.override.doctype.customize_form.CustomCustomizeForm",
+    "Customize Form": "finbyzerp.finbyzerp.override.doctype.customize_form.CustomizeForm",
     "Custom Field": "finbyzerp.finbyzerp.override.doctype.custom_field.CustomFieldOverride",
     "Document Naming Settings": "finbyzerp.finbyzerp.override.doctype.document_naming_settings.CustomDocumentNamingSettings",
     "Opening Invoice Creation Tool": "finbyzerp.finbyzerp.override.doctype.opening_invoice_creation_tool.CustomOpeningInvoiceCreationTool",
