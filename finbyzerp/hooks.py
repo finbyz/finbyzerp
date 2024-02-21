@@ -189,7 +189,7 @@ doc_events = {
     },
     "Stock Entry": {
         "validate": "finbyzerp.finbyzerp.doc_events.stock_entry.validate",
-        "after_insert": "finbyzerp.finbyzerp.doc_events.stock_entry.agter_insert",
+        "after_insert": "finbyzerp.finbyzerp.doc_events.stock_entry.after_insert",
         "on_submit": "finbyzerp.finbyzerp.doc_events.stock_entry.on_submit",
     },
     "Item": {

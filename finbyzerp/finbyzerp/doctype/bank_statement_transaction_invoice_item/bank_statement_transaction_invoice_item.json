@@ -96,7 +96,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-07-29 11:06:06.882127",
+ "modified": "2024-02-21 14:19:32.783175",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Bank Statement Transaction Invoice Item",
@@ -105,5 +105,6 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

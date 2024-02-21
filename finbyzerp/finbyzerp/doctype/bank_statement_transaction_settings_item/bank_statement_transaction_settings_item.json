@@ -47,7 +47,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2021-08-25 18:02:36.931339",
+ "modified": "2024-02-21 14:19:34.320115",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Bank Statement Transaction Settings Item",
@@ -56,5 +56,6 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

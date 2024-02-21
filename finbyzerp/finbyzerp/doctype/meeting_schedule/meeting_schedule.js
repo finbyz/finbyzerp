@@ -1,4 +1,4 @@
-this.frm.add_fetch('contact', 'email_id', 'email_id');
+cur_frm.add_fetch('contact', 'email_id', 'email_id');
 
 cur_frm.set_query("contact", function() {
 	return {

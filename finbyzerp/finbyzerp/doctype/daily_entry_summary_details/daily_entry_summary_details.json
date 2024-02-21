@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "creation": "2020-11-26 11:59:18.428166",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -17,7 +18,8 @@
   }
  ],
  "istable": 1,
- "modified": "2020-11-26 11:59:48.502970",
+ "links": [],
+ "modified": "2024-02-21 14:19:35.263242",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Daily Entry Summary Details",
@@ -26,5 +28,6 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

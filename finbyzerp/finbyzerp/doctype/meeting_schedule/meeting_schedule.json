@@ -171,11 +171,11 @@
    "options": "Opportunity"
   },
   {
-    "fieldname": "email_template",
-    "fieldtype": "Link",
-    "label": "email template",
-    "options": "Email Template"
-   },
+   "fieldname": "email_template",
+   "fieldtype": "Link",
+   "label": "email template",
+   "options": "Email Template"
+  },
   {
    "fieldname": "company",
    "fieldtype": "Link",
@@ -184,7 +184,7 @@
   }
  ],
  "links": [],
- "modified": "2022-01-17 15:41:57.599504",
+ "modified": "2024-02-21 14:19:33.874482",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting Schedule",
@@ -214,11 +214,11 @@
    "share": 1,
    "write": 1
   }
-  
  ],
  "search_fields": "organisation,contact_person_name",
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "title_field": "organisation",
  "track_changes": 1
 }

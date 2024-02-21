@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "autoname": "naming_series:",
  "creation": "2020-11-26 11:56:39.070850",
  "doctype": "DocType",
@@ -56,7 +57,8 @@
    "options": "DES-.###"
   }
  ],
- "modified": "2020-12-01 18:16:25.525767",
+ "links": [],
+ "modified": "2024-02-21 14:19:30.355722",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Daily Entry Summary",
@@ -78,5 +80,6 @@
  "quick_entry": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "track_changes": 1
 }

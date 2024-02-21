@@ -344,7 +344,7 @@
  "icon": "fa fa-handshake-o",
  "is_submittable": 1,
  "links": [],
- "modified": "2022-02-09 11:06:45.931022",
+ "modified": "2024-02-21 14:19:33.470399",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting",
@@ -393,6 +393,7 @@
  "search_fields": "organization,contact_person",
  "sort_field": "modified",
  "sort_order": "DESC",
+ "states": [],
  "title_field": "organization",
  "track_changes": 1
 }

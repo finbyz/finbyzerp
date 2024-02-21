@@ -23,10 +23,10 @@ class CustomizeForm(_CustomizeForm):
 	def set_property_setter_for_field_order(self, meta):
 		new_order = [df.fieldname for df in self.fields]
 
-		doc_list = frappe.get_list("Field Sequence", pluck='doc_type')
+		doc_list = frappe.get_all("Field Sequence", pluck='doc_type')
 
 		if self.doc_type in doc_list:
-			field_names = frappe.db.get_list("Field Sequence Table", filters={'doc_type': self.doc_type}, fields=['field_name', 'idx'])
+			field_names = frappe.db.get_all("Field Sequence Table", filters={'doc_type': self.doc_type}, fields=['field_name', 'idx'])
 			sorted_fields = sorted(field_names, key=lambda x: x['idx'])
 
 			# Remove multiple fields
