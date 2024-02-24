@@ -564,7 +564,7 @@ def update_transaction_tax_details(self):
 	if reverse_charge_amount < 0 and other_charges < 0:
 		other_charges = round(other_charges, 1) - round(reverse_charge_amount, 1)
 		self.transaction_details.grand_total += total_tax_amount
-
+		self.transaction_details.grand_total = round(self.transaction_details.grand_total,2)
 	if 0 > other_charges > -0.1:
 		# other charges cannot be negative
 		# handle cases where user has higher precision than 2
@@ -572,4 +572,4 @@ def update_transaction_tax_details(self):
 			self.transaction_details.rounding_adjustment + other_charges
 		)
 	else:
-		self.transaction_details.other_charges = self.rounded(other_charges)
+		self.transaction_details.other_charges = round(other_charges,2)

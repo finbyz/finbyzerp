@@ -29,9 +29,8 @@ after_install = "finbyzerp.install.after_install"
 # NamingSeries.get_transactions = get_transactions
 
 from frappe.core.doctype.document_naming_settings.document_naming_settings import DocumentNamingSettings
-from finbyzerp.finbyzerp.override.naming_series import _get_prefixes as get_prefixes, update_series_start as _update_series_start
+from finbyzerp.finbyzerp.override.naming_series import _get_prefixes as get_prefixes
 DocumentNamingSettings._get_prefixes = get_prefixes
-DocumentNamingSettings.update_series_start = _update_series_start
 
 from erpnext.accounts.doctype.opening_invoice_creation_tool.opening_invoice_creation_tool import OpeningInvoiceCreationTool
 from finbyzerp.finbyzerp.doc_events.opening_invoice_creation_tool import get_invoice_dict, make_invoices
@@ -136,7 +135,8 @@ website_context = {
 
 override_doctype_class = {
 	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity",
-    "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride"
+    "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride",
+    "Customize Form": "finbyzerp.finbyzerp.override.customize_form.CustomizeForm",
 }
 
 override_whitelisted_methods = {
@@ -279,16 +279,16 @@ item_wise_sales_register.execute = item_wise_sales_register_execute
 # from erpnext.accounts.report.item_wise_purchase_register import item_wise_purchase_register
 # item_wise_purchase_register.execute = item_wise_purchase_register_execute
 
-# from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
-# from india_compliance.gst_india.report.gst_itemised_sales_register import gst_itemised_sales_register
-# # from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
-# gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
+from finbyzerp.finbyzerp.report.gst_itemised_sales_register import execute as gst_itemised_sales_register_execute
+from india_compliance.gst_india.report.gst_itemised_sales_register import gst_itemised_sales_register
+# from erpnext.regional.report.gst_itemised_sales_register import gst_itemised_sales_register
+gst_itemised_sales_register.execute = gst_itemised_sales_register_execute
 
 
-# from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
-# # from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
-# from india_compliance.gst_india.report.gst_itemised_purchase_register import gst_itemised_purchase_register
-# gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
+from finbyzerp.finbyzerp.report.gst_itemised_purchase_register import execute as gst_itemised_purchase_register_execute
+# from erpnext.regional.report.gst_itemised_purchase_register import gst_itemised_purchase_register
+from india_compliance.gst_india.report.gst_itemised_purchase_register import gst_itemised_purchase_register
+gst_itemised_purchase_register.execute = gst_itemised_purchase_register_execute
 
 
 from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
@@ -317,9 +317,9 @@ from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
 
-from frappe.workflow.doctype.workflow_action import workflow_action
-from finbyzerp.api import process_workflow_actions
-workflow_action.process_workflow_actions = process_workflow_actions
+# from frappe.workflow.doctype.workflow_action import workflow_action
+# from finbyzerp.api import process_workflow_actions
+# workflow_action.process_workflow_actions = process_workflow_actions
 
 from erpnext.accounts import general_ledger
 from finbyzerp.finbyzerp.override.general_ledger import check_freezing_date , get_result_as_list
@@ -406,3 +406,11 @@ purchase_invoice_trends.execute = purchase_invoice_trends_execute
 from erpnext.controllers.buying_controller import BuyingController
 from finbyzerp.api import set_qty_as_per_stock_uom
 BuyingController.set_qty_as_per_stock_uom = set_qty_as_per_stock_uom
+
+from erpnext.buying.report.purchase_order_analysis import purchase_order_analysis
+from finbyzerp.purchase_order_analysis import get_data
+purchase_order_analysis.get_data = get_data
+
+from india_compliance.gst_india.overrides import transaction
+from finbyzerp.finbyzerp.transaction import validate_gst_accounts
+transaction.validate_gst_accounts = validate_gst_accounts
