@@ -135,7 +135,8 @@ website_context = {
 
 override_doctype_class = {
 	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity",
-    "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride"
+    "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride",
+    "Customize Form": "finbyzerp.finbyzerp.override.customize_form.CustomizeForm",
 }
 
 override_whitelisted_methods = {
@@ -316,9 +317,9 @@ from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
 
-from frappe.workflow.doctype.workflow_action import workflow_action
-from finbyzerp.api import process_workflow_actions
-workflow_action.process_workflow_actions = process_workflow_actions
+# from frappe.workflow.doctype.workflow_action import workflow_action
+# from finbyzerp.api import process_workflow_actions
+# workflow_action.process_workflow_actions = process_workflow_actions
 
 from erpnext.accounts import general_ledger
 from finbyzerp.finbyzerp.override.general_ledger import check_freezing_date , get_result_as_list
