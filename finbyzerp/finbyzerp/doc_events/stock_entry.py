@@ -84,8 +84,11 @@ def create_quality_inspection_entry(self, method):
 						frappe.msgprint("Quality Inspection {} is Created".format(get_link_to_form('Quality Inspection', quality_inspection.name)))
 
 def on_submit(self, method):
-	doc = frappe.db.exists("Quality Inspection",{'reference_name':self.name,'docstatus': 0})
-	if doc:
-		qi_doc = frappe.get_doc("Quality Inspection",doc)
-		if qi_doc.docstatus == 0:
-			frappe.throw("Quality Inspection Is Not Submited <br> Please Submit Quality Inspection {}".format(get_link_to_form("Quality Inspection",doc)))
+	for inspection_item in self.items:
+		item = frappe.get_doc("Item", inspection_item.item_code)
+		if item.inspection_required_after_stock_entry:
+			doc = frappe.db.exists("Quality Inspection",{'reference_name':self.name,'docstatus': 0})
+			if doc:
+				qi_doc = frappe.get_doc("Quality Inspection",doc)
+				if qi_doc.docstatus == 0:
+					frappe.throw("Quality Inspection Is Not Submited <br> Please Submit Quality Inspection {}".format(get_link_to_form("Quality Inspection",doc)))
