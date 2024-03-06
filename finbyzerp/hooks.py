@@ -213,7 +213,7 @@ override_doctype_dashboards = {
 }
 
 override_whitelisted_methods = {
-    "india_compliance.gst_india.utils.e_invoice.generate_e_invoice": "finbyzerp.finbyzerp.overrides.e_invoice.generate_e_invoice",
+    "india_compliance.gst_india.utils.e_invoice.generate_e_invoice": "finbyzerp.finbyzerp.override.e_invoice.generate_e_invoice",
 }
 
 scheduler_events = {
