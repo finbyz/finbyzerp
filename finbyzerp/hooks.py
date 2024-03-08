@@ -91,6 +91,10 @@ from india_compliance.gst_india.report.gst_itemised_sales_register import (
     gst_itemised_sales_register,
 )
 from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
+from india_compliance.gst_india.api_classes.returns import PublicCertificate
+from india_compliance.gst_india.api_classes.returns import FilesAPI
+from india_compliance.gst_india.api_classes.returns import ReturnsAPI
+from apps.finbyzerp.finbyzerp.finbyzerp.override.india_compliance.returns import get_gstn_public_certificate, returns_api_setup
 
 from . import __version__ as app_version
 
@@ -246,6 +250,11 @@ sales_order_analysis.execute = sales_order_analysis_execute
 pending_so_items_for_purchase_request.execute = (
     pending_so_items_for_purchase_request_execute
 )
+PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
+FilesAPI.BASE_PATH = "gstn/files"
+ReturnsAPI.BASE_PATH = "gstn"
+ReturnsAPI.setup = returns_api_setup
+
 
 # Report
 stock_balance.execute = stock_balance_execute
