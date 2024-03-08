@@ -2,6 +2,7 @@ import frappe
 import requests
 from india_compliance.gst_india.api_classes.base import get_public_ip
 from finbyzerp.finbyzerp.override.india_compliance.e_invoice import get_auth_token
+from frappe import _
 
 
 def get_gstn_public_certificate(self) -> str:
