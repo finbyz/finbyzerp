@@ -94,7 +94,7 @@ from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
 from india_compliance.gst_india.api_classes.returns import PublicCertificate
 from india_compliance.gst_india.api_classes.returns import FilesAPI
 from india_compliance.gst_india.api_classes.returns import ReturnsAPI
-from apps.finbyzerp.finbyzerp.finbyzerp.override.india_compliance.returns import get_gstn_public_certificate, returns_api_setup
+from finbyzerp.finbyzerp.override.india_compliance.returns import get_gstn_public_certificate, returns_api_setup
 
 from . import __version__ as app_version
 
@@ -243,6 +243,7 @@ email_campaign.send_email_to_leads_or_contacts = send_email_to_leads_or_contacts
 # India Compliance Overrides
 EInvoiceAPI.setup = einvoice_setup
 EWaybillAPI.setup = ewaybill_setup
+BaseAPI.SENSITIVE_INFO = BaseAPI.SENSITIVE_INFO + ('authorization',)
 BaseAPI.get_url = get_gsp_url
 PublicAPI.get_gstin_info = get_gstin_info
 GSTTransactionData.update_transaction_tax_details = update_transaction_tax_details
@@ -252,6 +253,7 @@ pending_so_items_for_purchase_request.execute = (
 )
 PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
 FilesAPI.BASE_PATH = "gstn/files"
+ReturnsAPI.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
 ReturnsAPI.BASE_PATH = "gstn"
 ReturnsAPI.setup = returns_api_setup
 
