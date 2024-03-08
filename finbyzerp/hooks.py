@@ -358,8 +358,18 @@ fixtures = [
       },
 ]
 
+from india_compliance.gst_india.api_classes.returns import PublicCertificate
+from india_compliance.gst_india.api_classes.returns import FilesAPI
+from india_compliance.gst_india.api_classes.returns import ReturnsAPI
 from india_compliance.gst_india.api_classes.e_invoice import EInvoiceAPI
 from finbyzerp.e_invoice_override_14 import einvoice_setup
+from finbyzerp.returns import get_gstn_public_certificate, returns_api_setup
+
+PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
+FilesAPI.BASE_PATH = "gstn/files"
+ReturnsAPI.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
+ReturnsAPI.BASE_PATH = "gstn"
+ReturnsAPI.setup = returns_api_setup
 EInvoiceAPI.setup = einvoice_setup
 
 from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
