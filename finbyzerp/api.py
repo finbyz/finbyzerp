@@ -805,6 +805,8 @@ def validate_returned_items(doc):
 				#finbyz chnages start
 			else:
 				ref = valid_items.get(d.item_code, frappe._dict())
+				if d.stock_qty>0:
+					d.stock_qty=(-1)*(d.stock_qty)
 				validate_quantity(doc, d, ref, valid_items, already_returned_items)
 
 				if ref.rate and doc.doctype in ("Delivery Note", "Sales Invoice") and flt(d.rate) > ref.rate:
