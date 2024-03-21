@@ -208,11 +208,11 @@ doc_events = {
 		"validate": [
 			"finbyzerp.api.stock_entry_validate",
 			"finbyzerp.finbyzerp.doc_events.stock_entry.validate",
-            "finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
+            # "finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
 		],
-        # "after_insert": [
-		# 		"finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
-		# ],
+        "after_insert": [
+				"finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
+		],
 		"on_submit": [
 			"finbyzerp.api.stock_entry_on_submit",
             "finbyzerp.finbyzerp.doc_events.stock_entry.on_submit"
