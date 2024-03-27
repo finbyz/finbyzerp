@@ -69,6 +69,7 @@ def create_quality_inspection_entry(self, method):
 					quality_inspection.reference_type = "Stock Entry"
 					quality_inspection.reference_name = self.name
 					quality_inspection.sample_size = inspection_item.qty
+					quality_inspection.qty=inspection_item.qty
 					quality_inspection.description = inspection_item.description
 					quality_inspection.remarks = self.remarks
 					quality_inspection.inspected_by = self.modified_by
