@@ -21,7 +21,7 @@ def returns_api_setup(self, company_gstin):
             "gstin": self.company_gstin,
             "state-cd": self.company_gstin[:2],
             "username": self.username,
-            "ip-usr": frappe.cache.hget("public_ip", "public_ip", get_public_ip),
+            "ip-usr": frappe.cache().hget("public_ip", "public_ip", get_public_ip),
             "txn": self.generate_request_id(length=32),
             "authorization":  get_auth_token(self)
         }

@@ -73,6 +73,7 @@ def create_quality_inspection_entry(self, method):
 					quality_inspection.description = inspection_item.description
 					quality_inspection.remarks = self.remarks
 					quality_inspection.inspected_by = self.modified_by
+					quality_inspection.lot_no = inspection_item.lot_no
 					quality_inspection.sample_size_uom = inspection_item.uom
 					quality_inspection.batch_no = inspection_item.batch_no
 					quality_inspection.quality_inspection_template = frappe.db.get_value("Item", inspection_item.item_code, 'quality_inspection_template')

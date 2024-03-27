@@ -351,6 +351,8 @@ def ewaybill_setup(self, doc=None, *, company_gstin=None):
 	)
 
 def get_auth_token(self):
+	if not hasattr(self, "gst_settings"):
+		self.gst_settings = frappe.get_cached_doc("GST Settings")
 	if time_diff_in_seconds(self.gst_settings.token_expiry, now_datetime()) < 150.0 or not self.gst_settings.auth_token:
 		fetch_auth_token(self)
 
