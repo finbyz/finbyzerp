@@ -24,11 +24,11 @@ def check_is_return(self):
 		self.is_return = 1
 
 class CreditandDebitNote(Document):
-	def before_naming(self):
-		if self.type=="Credit Note":
-			self.naming_series="CR-.fiscal.-"
-		else:
-			self.naming_series="DR-.fiscal.-"
+	# def before_naming(self):
+	# 	if self.type=="Credit Note":
+	# 		self.naming_series="CR-.fiscal.-"
+	# 	else:
+	# 		self.naming_series="DR-.fiscal.-"
 		
 
 	@frappe.whitelist()

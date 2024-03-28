@@ -1,26 +1,25 @@
 {
- "category": "Modules",
  "charts": [],
+ "content": "[{\"id\":\"GI2L1Kd5rl\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Your Shortcuts</span>\",\"col\":12}},{\"id\":\"nF_t0-4bN7\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Open Email Inbox\",\"col\":4}}]",
  "creation": "2021-09-08 13:57:57.024929",
- "developer_mode_only": 0,
- "disable_user_customization": 1,
+ "custom_blocks": [],
  "docstatus": 0,
  "doctype": "Workspace",
- "extends": "Home",
- "extends_another_page": 1,
  "hide_custom": 0,
  "idx": 0,
- "is_default": 0,
- "is_standard": 1,
+ "is_hidden": 0,
  "label": "Email Inbox",
  "links": [],
- "modified": "2021-09-08 13:59:15.759369",
+ "modified": "2023-12-01 09:46:52.973706",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Email Inbox",
+ "number_cards": [],
  "owner": "Administrator",
- "pin_to_bottom": 0,
- "pin_to_top": 0,
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 134.0,
  "shortcuts": [
   {
    "doc_view": "List",
@@ -28,5 +27,6 @@
    "link_to": "Communication",
    "type": "DocType"
   }
- ]
+ ],
+ "title": "Email Inbox"
 }
