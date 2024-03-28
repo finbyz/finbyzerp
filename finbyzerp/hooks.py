@@ -134,7 +134,9 @@ website_context = {
 }
 
 override_doctype_class = {
-	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity"
+	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity",
+    "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride",
+    "Customize Form": "finbyzerp.finbyzerp.override.customize_form.CustomizeForm",
 }
 
 override_whitelisted_methods = {
@@ -192,19 +194,29 @@ doc_events = {
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		"on_submit": "finbyzerp.api.sales_invoice_on_submit",
 	},
+     ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
+		"validate":"finbyzerp.finbyzerp.override.override_conversion_factor.validate_conversion",
+	},
 	"Purchase Invoice": {
 		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate"
+		"validate": "finbyzerp.api.pi_validate",
 	},
-		"Purchase Receipt": {
-		"validate": "finbyzerp.api.pr_validate"
+	"Purchase Receipt": {
+		"on_submit": "finbyzerp.finbyzerp.doc_events.purchase_receipt.set_batch_in_qc"
 	},
 	"Stock Entry": {
 		"validate": [
 			"finbyzerp.api.stock_entry_validate",
 			"finbyzerp.finbyzerp.doc_events.stock_entry.validate",
+            # "finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
 		],
-		"on_submit": "finbyzerp.api.stock_entry_on_submit",
+        "after_insert": [
+				"finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
+		],
+		"on_submit": [
+			"finbyzerp.api.stock_entry_on_submit",
+            "finbyzerp.finbyzerp.doc_events.stock_entry.on_submit"
+		],
 		"before_insert": "finbyzerp.api.before_insert",
 	},
 	"Journal Entry":{
@@ -219,7 +231,7 @@ doc_events = {
 	("Purchase Order","Sales Order"):{
 		"before_cancel":"finbyzerp.api.po_so_before_cancel",
 	},
-	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice","Mould Trail Request", "Work Order Master" , "Asset"): {
+	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice","Mould Trail Request", "Work Order Master", "Asset", "Leave Application" , "Contract Term"): {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
 	"Form Tour": {
@@ -232,6 +244,9 @@ doc_events = {
 			"before_cancel":"finbyzerp.finbyzerp.doc_events.quotation.on_cancel",
 			"on_trash":"finbyzerp.finbyzerp.doc_events.quotation.on_trash"
 		},
+    "Stock Settings":{
+        "validate":"finbyzerp.api.create_property_setter"
+	}
 }
 
 scheduler_events = {
@@ -302,9 +317,9 @@ from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
 
-from frappe.workflow.doctype.workflow_action import workflow_action
-from finbyzerp.api import process_workflow_actions
-workflow_action.process_workflow_actions = process_workflow_actions
+# from frappe.workflow.doctype.workflow_action import workflow_action
+# from finbyzerp.api import process_workflow_actions
+# workflow_action.process_workflow_actions = process_workflow_actions
 
 from erpnext.accounts import general_ledger
 from finbyzerp.finbyzerp.override.general_ledger import check_freezing_date , get_result_as_list
@@ -339,12 +354,22 @@ sales_and_purchase_return.validate_returned_items = validate_returned_items
 fixtures = [
        {
          "dt": "Custom Field", 
-         "filters":[["name", "in", ['Workspace-module_icon']]]
+         "filters":[["module", "in", ['Finbyzerp']]]
       },
 ]
 
+from india_compliance.gst_india.api_classes.returns import PublicCertificate
+from india_compliance.gst_india.api_classes.returns import FilesAPI
+from india_compliance.gst_india.api_classes.returns import ReturnsAPI
 from india_compliance.gst_india.api_classes.e_invoice import EInvoiceAPI
 from finbyzerp.e_invoice_override_14 import einvoice_setup
+from finbyzerp.returns import get_gstn_public_certificate, returns_api_setup
+
+PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
+FilesAPI.BASE_PATH = "gstn/files"
+ReturnsAPI.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
+ReturnsAPI.BASE_PATH = "gstn"
+ReturnsAPI.setup = returns_api_setup
 EInvoiceAPI.setup = einvoice_setup
 
 from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
@@ -387,3 +412,15 @@ purchase_receipt_trends.execute = purchase_receipt_trends_execute
 from erpnext.accounts.report.purchase_invoice_trends import purchase_invoice_trends
 from finbyzerp.purchase_invoice_trends import purchase_invoice_trends_execute
 purchase_invoice_trends.execute = purchase_invoice_trends_execute
+
+from erpnext.controllers.buying_controller import BuyingController
+from finbyzerp.api import set_qty_as_per_stock_uom
+BuyingController.set_qty_as_per_stock_uom = set_qty_as_per_stock_uom
+
+from erpnext.buying.report.purchase_order_analysis import purchase_order_analysis
+from finbyzerp.purchase_order_analysis import get_data
+purchase_order_analysis.get_data = get_data
+
+from india_compliance.gst_india.overrides import transaction
+from finbyzerp.finbyzerp.transaction import validate_gst_accounts
+transaction.validate_gst_accounts = validate_gst_accounts

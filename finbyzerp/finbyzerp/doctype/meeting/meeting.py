@@ -7,7 +7,7 @@ import frappe
 from frappe.model.document import Document
 from frappe import msgprint, db, _
 import json
-from frappe.utils import cint, getdate, get_fullname, get_url_to_form,now_datetime
+from frappe.utils import cint, getdate, get_fullname, get_url_to_form,now_datetime, get_datetime
 # from erpnext.accounts.party import get_party_details
 from finbyzerp.finbyzerp.doctype.meeting_schedule.meeting_schedule import get_party_details
 
@@ -57,6 +57,26 @@ class Meeting(Document):
 			if not target_lead.mobile_no:
 				target_lead.mobile_no = self.mobile_no
 			target_lead.save(ignore_permissions=True)
+		
+		# When submit the Meeting then will create the Event
+		for d in self.get('actionables'):
+			if d.expected_completion_date:
+				date_obj = get_datetime(d.expected_completion_date)
+				starts_on = date_obj.replace(hour=0, minute=0, second=0, microsecond=0)
+				ends_on = date_obj.replace(hour=23, minute=59, second=59, microsecond=999999)
+				new_event = frappe.get_doc(dict(
+					doctype = 'Event',
+					subject = d.actionable +' - '+ d.responsible,
+					event_category = "Meeting",
+					event_type = d.event_type,
+					starts_on = starts_on,
+					ends_on = ends_on,
+					description = self.discussion
+				))
+				new_event.append('event_participants', {
+					'reference_doctype': "Meeting", 'reference_docname': self.name
+					})
+				new_event.save(ignore_permissions=True)
 
 @frappe.whitelist()
 def get_events(start, end, filters=None):

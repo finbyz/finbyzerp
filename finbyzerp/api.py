@@ -805,6 +805,8 @@ def validate_returned_items(doc):
 				#finbyz chnages start
 			else:
 				ref = valid_items.get(d.item_code, frappe._dict())
+				if d.stock_qty>0:
+					d.stock_qty=(-1)*(d.stock_qty)
 				validate_quantity(doc, d, ref, valid_items, already_returned_items)
 
 				if ref.rate and doc.doctype in ("Delivery Note", "Sales Invoice") and flt(d.rate) > ref.rate:
@@ -1109,3 +1111,78 @@ def get_rounded_tax_amount(itemised_tax, precision):
 	for taxes in itemised_tax.values():
 		for tax_account in taxes:
 			taxes[tax_account]["tax_amount"] = flt(taxes[tax_account]["tax_amount"], precision)
+
+def create_property_setter(self,method):
+	property_setter=[
+	{'doctype_or_field': 'DocField',
+	'doc_type': 'Purchase Order Item',
+	'field_name': 'stock_qty',
+	'property': 'read_only',
+	'property_type': 'Check',
+	'value': '0',
+	},
+	{'doctype_or_field': 'DocField',
+	'doc_type': 'Purchase Order Item',
+	'field_name': 'conversion_factor',
+	'property': 'read_only',
+	'property_type': 'Check',
+	'value': '1',
+	},
+	{'doctype_or_field': 'DocField',
+	'doc_type': 'Purchase Receipt Item',
+	'field_name': 'stock_qty',
+	'property': 'read_only',
+	'property_type': 'Check',
+	'value': '0',
+	},
+	{'doctype_or_field': 'DocField',
+	'doc_type': 'Purchase Receipt Item',
+	'field_name': 'conversion_factor',
+	'property': 'read_only',
+	'property_type': 'Check',
+	'value': '1',
+	},
+	{'doctype_or_field': 'DocField',
+	'doc_type': 'Purchase Invoice Item',
+	'field_name': 'stock_qty',
+	'property': 'read_only',
+	'property_type': 'Check',
+	'value': '0',
+	},
+	{'doctype_or_field': 'DocField',
+	'doc_type': 'Purchase Invoice Item',
+	'field_name': 'conversion_factor',
+	'property': 'read_only',
+	'property_type': 'Check',
+	'value': '1',
+	}]
+	if self.calculate_conversion_factor_based_on_stock_quantity_and_quantity:
+		for each in property_setter:
+			name = str(each.get('doc_type')) + '-' + str(each.get('field_name')) + '-' + str(each.get('property'))
+			if not frappe.db.exists("Property Setter", name):
+				doc = frappe.new_doc("Property Setter")
+				doc.update(each)
+				doc.save(ignore_permissions=True)
+	else:
+		for each in property_setter:
+			name = str(each.get('doc_type')) + '-' + str(each.get('field_name')) + '-' + str(each.get('property'))
+			if frappe.db.exists("Property Setter", name):
+				doc = frappe.get_doc("Property Setter", name)
+				doc.delete()
+
+def set_qty_as_per_stock_uom(self):
+	conversion_factor = frappe.db.get_single_value("Stock Settings", "calculate_conversion_factor_based_on_stock_quantity_and_quantity")
+	for d in self.get("items"):
+		if d.meta.get_field("stock_qty"):
+			# Check if item code is present
+			# Conversion factor should not be mandatory for non itemized items
+			if not d.conversion_factor and d.item_code:
+				frappe.throw(_("Row {0}: Conversion Factor is mandatory").format(d.idx))
+			if conversion_factor == 0:
+				d.stock_qty = flt(d.qty) * flt(d.conversion_factor)
+
+				if self.doctype == "Purchase Receipt" and d.meta.get_field("received_stock_qty"):
+					# Set Received Qty in Stock UOM
+					d.received_stock_qty = flt(d.received_qty) * flt(
+						d.conversion_factor, d.precision("conversion_factor")
+					)

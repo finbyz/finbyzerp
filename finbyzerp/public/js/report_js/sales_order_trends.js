@@ -82,7 +82,6 @@ frappe.query_reports["Sales Order Trends"] = {
 			"label": __("Fiscal Year"),
 			"fieldtype": "Link",
 			"options":'Fiscal Year',
-			"default": erpnext.utils.get_fiscal_year(frappe.datetime.get_today())
 		},
 		{
 			"fieldname":"company",

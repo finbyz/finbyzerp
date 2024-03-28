@@ -5,7 +5,10 @@ from frappe.utils import add_days, cint, formatdate, get_datetime, getdate
 def validate(self,method):
 	before_validate(self,method)
 	if self.is_new() and not self.is_stock_item:
-		frappe.msgprint("Please define correct expense account in Item Defaults.<br>In absence of same expense will be parked in 'Cost of Goods Sold' account")
+		for row in self.item_defaults:
+			if not row.expense_account:
+				frappe.msgprint("Please define correct expense account in Item Defaults.<br>In absence of same expense will be parked in 'Cost of Goods Sold' account")
+		# frappe.msgprint("Please define correct expense account in Item Defaults.<br>In absence of same expense will be parked in 'Cost of Goods Sold' account")
 
 def before_validate(self,method):
 	if  self.item_code:
