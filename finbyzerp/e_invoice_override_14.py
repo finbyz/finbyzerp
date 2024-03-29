@@ -351,15 +351,10 @@ def ewaybill_setup(self, doc=None, *, company_gstin=None):
     )
 
 def get_auth_token(self):
-<<<<<<< HEAD
+    if not hasattr(self, "gst_settings"):
+        self.gst_settings = frappe.get_cached_doc("GST Settings")
     if time_diff_in_seconds(self.gst_settings.token_expiry, now_datetime()) < 150.0 or not self.gst_settings.auth_token:
         fetch_auth_token(self)
-=======
-	if not hasattr(self, "gst_settings"):
-		self.gst_settings = frappe.get_cached_doc("GST Settings")
-	if time_diff_in_seconds(self.gst_settings.token_expiry, now_datetime()) < 150.0 or not self.gst_settings.auth_token:
-		fetch_auth_token(self)
->>>>>>> 51d6d004f848e3568534c2c6c74cbe62a5d91521
 
     return self.gst_settings.auth_token
     
@@ -389,18 +384,8 @@ from india_compliance.gst_india.api_classes.base import BaseAPI
 # class CustomBaseAPI(BaseAPI):
 # 	base_url = "https://gsp.adaequare.com"
 def get_url(self, *parts):
-<<<<<<< HEAD
     self.base_url = "https://gsp.adaequare.com"
-    if parts and not list(parts)[-1]:
-        parts = list(parts)[:-1]
-    elif not parts:
-        parts = []
-    else:
-        parts = list(parts)
-=======
-	self.base_url = "https://gsp.adaequare.com"
-	parts = [i for i in parts if i != '']
->>>>>>> 51d6d004f848e3568534c2c6c74cbe62a5d91521
+    parts = [i for i in parts if i != '']
 
     if self.BASE_PATH:
         parts.insert(0, self.BASE_PATH)
@@ -579,11 +564,10 @@ def update_transaction_tax_details(self):
     current_total -= self.transaction_details.discount_amount
     other_charges = self.transaction_details.grand_total - current_total
 
-<<<<<<< HEAD
     if reverse_charge_amount < 0 and other_charges < 0:
         other_charges = round(other_charges, 1) - round(reverse_charge_amount, 1)
         self.transaction_details.grand_total += total_tax_amount
-
+        self.transaction_details.grand_total = round(self.transaction_details.grand_total,2)
     if 0 > other_charges > -0.1:
         # other charges cannot be negative
         # handle cases where user has higher precision than 2
@@ -591,18 +575,4 @@ def update_transaction_tax_details(self):
             self.transaction_details.rounding_adjustment + other_charges
         )
     else:
-        self.transaction_details.other_charges = self.rounded(other_charges)
-=======
-	if reverse_charge_amount < 0 and other_charges < 0:
-		other_charges = round(other_charges, 1) - round(reverse_charge_amount, 1)
-		self.transaction_details.grand_total += total_tax_amount
-		self.transaction_details.grand_total = round(self.transaction_details.grand_total,2)
-	if 0 > other_charges > -0.1:
-		# other charges cannot be negative
-		# handle cases where user has higher precision than 2
-		self.transaction_details.rounding_adjustment = self.rounded(
-			self.transaction_details.rounding_adjustment + other_charges
-		)
-	else:
-		self.transaction_details.other_charges = round(other_charges,2)
->>>>>>> 51d6d004f848e3568534c2c6c74cbe62a5d91521
+        self.transaction_details.other_charges = round(other_charges,2)
