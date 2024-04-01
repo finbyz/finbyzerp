@@ -5,7 +5,6 @@ import "./finbyzerp/finbyz-theme.js";
 import "./finbyzerp/ui/page.js";
 import "./finbyzerp/views/workspace/workspace.js";
 import "./finbyzerp/views/container.js";
-import "./frappe/request.js";
 import "./report_js/stock_balance.js";
 import "./report_js/trial_balance_for_party.js";
 import "./report_js/sales_order_trends.js";
@@ -14,5 +13,3 @@ import "./report_js/sales_invoice_trends.js";
 import "./report_js/purchase_order_trends.js"
 import "./report_js/purchase_receipt_trends.js"
 import "./report_js/purchase_invoice_trends.js";
-import "./finbyzerp/transaction.js";
-// import "./quick_entry.js";
