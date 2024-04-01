@@ -1417,17 +1417,17 @@ erpnext.TransactionController = class TransactionController extends erpnext.taxe
 			return;
 		}
 
-		return this.frm.call({
-			method: "erpnext.accounts.doctype.pricing_rule.pricing_rule.apply_pricing_rule",
-			args: {	args: args, doc: me.frm.doc },
-			callback: function(r) {
-				if (!r.exc && r.message) {
-					me._set_values_for_item_list(r.message);
-					if(item) me.set_gross_profit(item);
-					if (me.frm.doc.apply_discount_on) me.frm.trigger("apply_discount_on")
-				}
-			}
-		});
+		// return this.frm.call({
+		// 	method: "erpnext.accounts.doctype.pricing_rule.pricing_rule.apply_pricing_rule",
+		// 	args: {	args: args, doc: me.frm.doc },
+		// 	callback: function(r) {
+		// 		if (!r.exc && r.message) {
+		// 			me._set_values_for_item_list(r.message);
+		// 			if(item) me.set_gross_profit(item);
+		// 			if (me.frm.doc.apply_discount_on) me.frm.trigger("apply_discount_on")
+		// 		}
+		// 	}
+		// });
 	}
 
 	_get_args(item) {
