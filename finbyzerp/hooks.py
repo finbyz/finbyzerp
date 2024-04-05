@@ -218,6 +218,12 @@ override_doctype_dashboards = {
 
 override_whitelisted_methods = {
     "india_compliance.gst_india.utils.e_invoice.generate_e_invoice": "finbyzerp.finbyzerp.override.e_invoice.generate_e_invoice",
+    "erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_receipt" : "finbyzerp.finbyzerp.override.whitelisted_methods.purchase_order.make_purchase_receipt",
+    "erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_invoice" : "finbyzerp.finbyzerp.override.whitelisted_methods.purchase_order.make_purchase_invoice",
+    "erpnext.stock.doctype.purchase_receipt.purchase_receipt.make_purchase_invoice" : "finbyzerp.finbyzerp.override.whitelisted_methods.purchase_receipt.make_purchase_invoice",
+    "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice": "finbyzerp.finbyzerp.override.whitelisted_methods.sales_order.make_sales_invoice",
+    "erpnext.selling.doctype.sales_order.sales_order.make_delivery_note":"finbyzerp.finbyzerp.override.whitelisted_methods.sales_order.make_delivery_note",
+    "erpnext.stock.doctype.delivery_note.delivery_note.make_sales_invoice":"finbyzerp.finbyzerp.override.whitelisted_methods.delivery_note.make_sales_invoice",
 }
 
 scheduler_events = {
