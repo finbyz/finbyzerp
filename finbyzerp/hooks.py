@@ -163,6 +163,7 @@ doc_events = {
     },
     ("Purchase Order", "Sales Order"): {
         "before_cancel": "finbyzerp.finbyzerp.doc_events.sales_purchase_order.before_cancel",
+        "validate" : "finbyzerp.finbyzerp.doc_events.sales_purchase_order.validate"
     },
     ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
         "validate": "finbyzerp.finbyzerp.doc_events.conversion_factor.validate",
