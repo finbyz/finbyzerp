@@ -7,6 +7,7 @@ from erpnext.accounts.utils import get_fiscal_year
 def validate(self, method):
     tcs_deduction(self)
     calculate_gst_taxable_value(self)
+    other_contact_list(self)
 
 
 def before_save(self, method):
@@ -149,3 +150,13 @@ def tcs_deduction(self):
 def get_fiscal(date):
     fiscal_year = get_fiscal_year(date)
     return str(fiscal_year[0]), str(fiscal_year[1]), str(fiscal_year[2])
+
+
+def other_contact_list(self):
+    email_lst = []
+    for row in self.other_contacts_:
+        if row.email_id:
+            email_lst.append(row.email_id)
+    combined_emails = ", ".join(email_lst)
+    # frappe.throw(emails)
+    self.emails = combined_emails
