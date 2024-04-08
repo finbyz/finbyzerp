@@ -15,7 +15,7 @@ class FieldSequence(Document):
 			row.doc_type = self.doc_type
 			if row.field_name == self.add_fields_before_section:
 				frappe.throw("You can't select the <b>" +row.field_name+"</b> in the Field Sequence Table.")
-	
+
 	def on_update(self):
 		if self.apply_changes:
 			doc = frappe.get_doc("Customize Form")
