@@ -180,6 +180,9 @@ doc_events = {
         "on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
         "on_submit": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_submit",
     },
+    # "Address":{
+    #     "before_validate":"finbyzerp.finbyzerp.doc_events.address.MyCustomDocument.before_validate"
+    # },
     "Purchase Invoice": {
         "validate": "finbyzerp.finbyzerp.doc_events.sales_purchase_invoice.validate",
     },
@@ -209,6 +212,7 @@ override_doctype_class = {
     "Custom Field": "finbyzerp.finbyzerp.override.doctype.custom_field.CustomFieldOverride",
     "Document Naming Settings": "finbyzerp.finbyzerp.override.doctype.document_naming_settings.CustomDocumentNamingSettings",
     "Opening Invoice Creation Tool": "finbyzerp.finbyzerp.override.doctype.opening_invoice_creation_tool.CustomOpeningInvoiceCreationTool",
+    "Address": "finbyzerp.finbyzerp.override.doctype.address.Address",
 }
 
 override_doctype_dashboards = {
@@ -252,6 +256,7 @@ EInvoiceAPI.setup = einvoice_setup
 EWaybillAPI.setup = ewaybill_setup
 BaseAPI.SENSITIVE_INFO = BaseAPI.SENSITIVE_INFO + ('authorization',)
 BaseAPI.get_url = get_gsp_url
+BaseAPI.BASE_URL="https://asp.resilient.tech"
 PublicAPI.get_gstin_info = get_gstin_info
 GSTTransactionData.update_transaction_tax_details = update_transaction_tax_details
 sales_order_analysis.execute = sales_order_analysis_execute
