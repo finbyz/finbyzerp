@@ -20,5 +20,5 @@ def other_contact_list(self, frm):
     for row in self.other_contacts:
         if row.email_id:
             email_lst.append(row.email_id)
-    emails = ", ".join(email_lst)
-    self.email = emails
+    combined_emails = ", ".join(email_lst)
+    self.email = combined_emails
