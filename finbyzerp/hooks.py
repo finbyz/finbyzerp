@@ -160,6 +160,11 @@ override_whitelisted_methods = {
     "erpnext.selling.doctype.sales_order.sales_order.make_delivery_note":"finbyzerp.api.make_delivery_note"    
 }
 
+# override for supplier query
+from erpnext.controllers import queries
+from finbyzerp.queries import supplier_query as custom_supplier_query
+queries.supplier_query = custom_supplier_query
+
 # override for download backup
 from frappe.utils import response
 from finbyzerp.permission import download_backup
