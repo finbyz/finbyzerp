@@ -15,7 +15,8 @@ class Address(_Address):
                     self.city=data.get("city","")
                     self.state=data.get("state","")
                     self.country=data.get("country","")
-                    self.address_title= gst_data["business_name"]        
+                    self.address_title= gst_data["business_name"]  
+                    self.fetch_from_gst_no=0     
         except Exception as e:
             frappe.throw(str(e))
         if hasattr(_Address, 'before_validate'):
