@@ -3,4 +3,4 @@
 #finbyzerp.patches.create_form_tour_fields_with_steps
 #finbyzerp.patches.create_custom_field_for_einvoice
 #finbyzerp.patches.create_comment_fields
-#finbyzerp.patches.gst_settings
+finbyzerp.patches.gst_settings
