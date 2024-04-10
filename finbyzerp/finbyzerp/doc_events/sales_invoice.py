@@ -154,9 +154,9 @@ def get_fiscal(date):
 
 def other_contact_list(self):
     email_lst = []
-    for row in self.other_contacts_:
+    email_lst.append(self.contact_email)
+    for row in self.other_contacts:
         if row.email_id:
             email_lst.append(row.email_id)
     combined_emails = ", ".join(email_lst)
-    # frappe.throw(emails)
-    self.emails = combined_emails
+    self.email = combined_emails

@@ -17,6 +17,7 @@ def validate(self, frm):
 
 def other_contact_list(self, frm):
     email_lst = []
+    email_lst.append(self.contact_email)
     for row in self.other_contacts:
         if row.email_id:
             email_lst.append(row.email_id)
