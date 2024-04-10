@@ -1,3 +1,4 @@
+#finbyzerp change for payment terms to fetch form Delivery Note to Sales Invoice
 import frappe
 from frappe import _
 from frappe.contacts.doctype.address.address import get_company_address
@@ -71,13 +72,13 @@ def make_sales_invoice(source_name, target_doc=None):
 				"doctype": "Sales Invoice",
 				"field_map": {
 					"is_return": "is_return",
-					"payment_terms_template": "payment_terms_template",
+					"payment_terms_template": "payment_terms_template",#finbyz Changes
 				},
 				"validation": {"docstatus": ["=", 1]},
-			},
+			},#finbyz Changes
 			"Payment Schedule": {
 				"doctype": "Payment Schedule",
-			},
+			},# finbyz Changes end
 			"Delivery Note Item": {
 				"doctype": "Sales Invoice Item",
 				"field_map": {

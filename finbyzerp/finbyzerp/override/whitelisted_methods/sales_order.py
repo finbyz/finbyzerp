@@ -206,13 +206,13 @@ def make_sales_invoice(source_name, target_doc=None, ignore_permissions=False):
 				"doctype": "Sales Invoice",
 				"field_map": {
 					"party_account_currency": "party_account_currency",
-					"payment_terms_template": "payment_terms_template",
+					"payment_terms_template": "payment_terms_template", #finbyz Changes
 				},
 				"validation": {"docstatus": ["=", 1]},
-			},
+			},#finbyz Changes
 			"Payment Schedule": {
 				"doctype": "Payment Schedule",
-			},
+			},# finbyz Changes end
 			"Sales Order Item": {
 				"doctype": "Sales Invoice Item",
 				"field_map": {

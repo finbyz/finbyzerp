@@ -68,15 +68,15 @@ def make_purchase_invoice(source_name, target_doc=None, args=None):
 					"supplier_warehouse": "supplier_warehouse",
 					"is_return": "is_return",
 					"bill_date": "bill_date",
-					"payment_terms_template": "payment_terms_template",
+					"payment_terms_template": "payment_terms_template", #finbyz Changes
 				},
 				"validation": {
 					"docstatus": ["=", 1],
 				},
-			},
+			},#finbyz Changes
 			"Payment Schedule": {
 				"doctype": "Payment Schedule",
-			},
+			},# finbyz Changes end
 			"Purchase Receipt Item": {
 				"doctype": "Purchase Invoice Item",
 				"field_map": {
@@ -106,5 +106,3 @@ def make_purchase_invoice(source_name, target_doc=None, args=None):
 	)
 
 	return doclist
-
-
