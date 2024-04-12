@@ -4,7 +4,7 @@ import frappe
 from erpnext.accounts.utils import get_fiscal_year, flt
 import datetime
 from frappe.utils.background_jobs import enqueue
-from frappe.utils import cint, getdate, get_fullname, get_url_to_form,now_datetime,validate_email_address,now
+from frappe.utils import cint,cstr, getdate, get_fullname, get_url_to_form,now_datetime,validate_email_address,now
 
 from frappe.utils.pdf import get_pdf
 from frappe.utils.file_manager import save_file
@@ -32,6 +32,14 @@ import time
 from erpnext.stock.doctype.repost_item_valuation.repost_item_valuation import execute_repost_item_valuation
 from erpnext.controllers.sales_and_purchase_return import *
 from frappe.desk.desktop import Workspace
+from erpnext.stock.doctype.purchase_receipt.purchase_receipt import make_purchase_invoice
+from erpnext.buying.doctype.purchase_order.purchase_order import set_missing_values
+from frappe.model.mapper import get_mapped_doc
+from erpnext.stock.doctype.item.item import get_item_defaults
+from erpnext.setup.doctype.item_group.item_group import get_item_group_defaults
+from erpnext.accounts.party import get_party_account
+from frappe.contacts.doctype.address.address import get_company_address
+from frappe.model.utils import get_fetch_values
 
 def before_insert(self, method):
 	opening_naming_series(self)
@@ -1186,3 +1194,313 @@ def set_qty_as_per_stock_uom(self):
 					d.received_stock_qty = flt(d.received_qty) * flt(
 						d.conversion_factor, d.precision("conversion_factor")
 					)
+
+
+@frappe.whitelist()
+def make_purchase_invoice(source_name, target_doc=None):
+	return get_mapped_purchase_invoice(source_name, target_doc)
+
+def get_mapped_purchase_invoice(source_name, target_doc=None, ignore_permissions=False):
+	def postprocess(source, target):
+		target.flags.ignore_permissions = ignore_permissions
+		set_missing_values(source, target)
+		# Get the advance paid Journal Entries in Purchase Invoice Advance
+		if target.get("allocate_advances_automatically"):
+			target.set_advances()
+
+		target.set_payment_schedule()
+		target.credit_to = get_party_account("Supplier", source.supplier, source.company)
+
+	def update_item(obj, target, source_parent):
+		target.amount = flt(obj.amount) - flt(obj.billed_amt)
+		target.base_amount = target.amount * flt(source_parent.conversion_rate)
+		target.qty = (
+			target.amount / flt(obj.rate) if (flt(obj.rate) and flt(obj.billed_amt)) else flt(obj.qty)
+		)
+
+		item = get_item_defaults(target.item_code, source_parent.company)
+		item_group = get_item_group_defaults(target.item_code, source_parent.company)
+		target.cost_center = (
+			obj.cost_center
+			or frappe.db.get_value("Project", obj.project, "cost_center")
+			or item.get("buying_cost_center")
+			or item_group.get("buying_cost_center")
+		)
+
+	fields = {
+		"Purchase Order": {
+			"doctype": "Purchase Invoice",
+			"field_map": {
+				"party_account_currency": "party_account_currency",
+				"supplier_warehouse": "supplier_warehouse",
+				"payment_terms_template": "payment_terms_template",
+			},
+			"validation": {
+				"docstatus": ["=", 1],
+			},
+		},
+		"Purchase Order Item": {
+			"doctype": "Purchase Invoice Item",
+			"field_map": {
+				"name": "po_detail",
+				"parent": "purchase_order",
+				"wip_composite_asset": "wip_composite_asset",
+			},
+			"postprocess": update_item,
+			"condition": lambda doc: (doc.base_amount == 0 or abs(doc.billed_amt) < abs(doc.amount)),
+		},
+		"Purchase Receipt":{
+			"doctype":"Payment Schedule",
+			"field_map":{
+				"name":"payment_schedule",
+				"payment_term":"payment_term",
+				"due_date":"due_date",
+				"invoice_portion":"invoice_portion",
+				"discount_type":"discount_type",
+				"discount":"discount",
+				"payment_amount":"payment_amount",
+				"base_payment_amount":"base_payment_amount",
+				"outstanding":"outstanding"
+			}
+		},
+		"Purchase Taxes and Charges": {"doctype": "Purchase Taxes and Charges", "add_if_empty": True},
+	}
+
+	doc = get_mapped_doc(
+		"Purchase Order",
+		source_name,
+		fields,
+		target_doc,
+		postprocess,
+		ignore_permissions=ignore_permissions,
+	)
+
+	return doc
+
+
+@frappe.whitelist()
+def make_purchase_receipt(source_name, target_doc=None):
+	def update_item(obj, target, source_parent):
+		target.qty = flt(obj.qty) - flt(obj.received_qty)
+		target.stock_qty = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.conversion_factor)
+		target.amount = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate)
+		target.base_amount = (
+			(flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate) * flt(source_parent.conversion_rate)
+		)
+
+	doc = get_mapped_doc(
+		"Purchase Order",
+		source_name,
+		{
+			"Purchase Order": {
+				"doctype": "Purchase Receipt",
+				"field_map": {"supplier_warehouse": "supplier_warehouse"},
+				"validation": {
+					"docstatus": ["=", 1],
+				},
+			},
+			"Purchase Order Item": {
+				"doctype": "Purchase Receipt Item",
+				"field_map": {
+					"name": "purchase_order_item",
+					"parent": "purchase_order",
+					"bom": "bom",
+					"material_request": "material_request",
+					"material_request_item": "material_request_item",
+					"sales_order": "sales_order",
+					"sales_order_item": "sales_order_item",
+					"wip_composite_asset": "wip_composite_asset",
+				},
+				"postprocess": update_item,
+				"condition": lambda doc: abs(doc.received_qty) < abs(doc.qty)
+				and doc.delivered_by_supplier != 1,
+			},
+			"Payment Schedule":{
+			"doctype":"Payment Schedule",
+			"field_map":{
+				"name":"payment_schedule",
+				"payment_term":"payment_term",
+				"due_date":"due_date",
+				"invoice_portion":"invoice_portion",
+				"discount_type":"discount_type",
+				"discount":"discount",
+				"payment_amount":"payment_amount",
+				"base_payment_amount":"base_payment_amount",
+				"outstanding":"outstanding"
+			}
+		},
+			"Purchase Taxes and Charges": {"doctype": "Purchase Taxes and Charges", "add_if_empty": True},
+		},
+		target_doc,
+		set_missing_values,
+	)
+
+	return doc
+
+
+@frappe.whitelist()
+def make_delivery_note(source_name, target_doc=None, skip_item_mapping=False):
+	from erpnext.stock.doctype.packed_item.packed_item import make_packing_list
+
+	def set_missing_values(source, target):
+		target.run_method("set_missing_values")
+		target.run_method("set_po_nos")
+		target.run_method("calculate_taxes_and_totals")
+
+		if source.company_address:
+			target.update({"company_address": source.company_address})
+		else:
+			# set company address
+			target.update(get_company_address(target.company))
+
+		if target.company_address:
+			target.update(get_fetch_values("Delivery Note", "company_address", target.company_address))
+
+		make_packing_list(target)
+
+	def update_item(source, target, source_parent):
+		target.base_amount = (flt(source.qty) - flt(source.delivered_qty)) * flt(source.base_rate)
+		target.amount = (flt(source.qty) - flt(source.delivered_qty)) * flt(source.rate)
+		target.qty = flt(source.qty) - flt(source.delivered_qty)
+
+		item = get_item_defaults(target.item_code, source_parent.company)
+		item_group = get_item_group_defaults(target.item_code, source_parent.company)
+
+		if item:
+			target.cost_center = (
+				frappe.db.get_value("Project", source_parent.project, "cost_center")
+				or item.get("buying_cost_center")
+				or item_group.get("buying_cost_center")
+			)
+
+	mapper = {
+		"Sales Order": {"doctype": "Delivery Note", "validation": {"docstatus": ["=", 1]}},
+		"Sales Taxes and Charges": {"doctype": "Sales Taxes and Charges", "add_if_empty": True},
+		"Sales Team": {"doctype": "Sales Team", "add_if_empty": True},
+	}
+
+	if not skip_item_mapping:
+
+		def condition(doc):
+			# make_mapped_doc sets js `args` into `frappe.flags.args`
+			if frappe.flags.args and frappe.flags.args.delivery_dates:
+				if cstr(doc.delivery_date) not in frappe.flags.args.delivery_dates:
+					return False
+			return abs(doc.delivered_qty) < abs(doc.qty) and doc.delivered_by_supplier != 1
+
+		mapper["Sales Order Item"] = {
+			"doctype": "Delivery Note Item",
+			"field_map": {
+				"rate": "rate",
+				"name": "so_detail",
+				"parent": "against_sales_order",
+			},
+			"postprocess": update_item,
+			"condition": condition,
+			
+		}
+
+	target_doc = get_mapped_doc("Sales Order", source_name, mapper, target_doc, set_missing_values)
+
+	return target_doc
+
+@frappe.whitelist()
+def make_sales_invoice(source_name, target_doc=None, ignore_permissions=False):
+	def postprocess(source, target):
+		set_missing_values(source, target)
+		# Get the advance paid Journal Entries in Sales Invoice Advance
+		if target.get("allocate_advances_automatically"):
+			target.set_advances()
+
+	def set_missing_values(source, target):
+		target.flags.ignore_permissions = True
+		target.run_method("set_missing_values")
+		target.run_method("set_po_nos")
+		target.run_method("calculate_taxes_and_totals")
+
+		if source.company_address:
+			target.update({"company_address": source.company_address})
+		else:
+			# set company address
+			target.update(get_company_address(target.company))
+
+		if target.company_address:
+			target.update(get_fetch_values("Sales Invoice", "company_address", target.company_address))
+
+		# set the redeem loyalty points if provided via shopping cart
+		if source.loyalty_points and source.order_type == "Shopping Cart":
+			target.redeem_loyalty_points = 1
+
+		target.debit_to = get_party_account("Customer", source.customer, source.company)
+
+	def update_item(source, target, source_parent):
+		target.amount = flt(source.amount) - flt(source.billed_amt)
+		target.base_amount = target.amount * flt(source_parent.conversion_rate)
+		target.qty = (
+			target.amount / flt(source.rate)
+			if (source.rate and source.billed_amt)
+			else source.qty - source.returned_qty
+		)
+
+		if source_parent.project:
+			target.cost_center = frappe.db.get_value("Project", source_parent.project, "cost_center")
+		if target.item_code:
+			item = get_item_defaults(target.item_code, source_parent.company)
+			item_group = get_item_group_defaults(target.item_code, source_parent.company)
+			cost_center = item.get("selling_cost_center") or item_group.get("selling_cost_center")
+
+			if cost_center:
+				target.cost_center = cost_center
+
+	doclist = get_mapped_doc(
+		"Sales Order",
+		source_name,
+		{
+			"Sales Order": {
+				"doctype": "Sales Invoice",
+				"field_map": {
+					"party_account_currency": "party_account_currency",
+					"payment_terms_template": "payment_terms_template",
+					"payment_terms_template":"payment_terms_template"
+				},
+				"validation": {"docstatus": ["=", 1]},
+			},
+			"Sales Order Item": {
+				"doctype": "Sales Invoice Item",
+				"field_map": {
+					"name": "so_detail",
+					"parent": "sales_order",
+				},
+				"postprocess": update_item,
+				"condition": lambda doc: doc.qty
+				and (doc.base_amount == 0 or abs(doc.billed_amt) < abs(doc.amount)),
+			},
+			"Payment Schedule":{
+			"doctype":"Payment Schedule",
+			"field_map":{
+				"name":"payment_schedule",
+				"payment_term":"payment_term",
+				"due_date":"due_date",
+				"invoice_portion":"invoice_portion",
+				"discount_type":"discount_type",
+				"discount":"discount",
+				"payment_amount":"payment_amount",
+				"base_payment_amount":"base_payment_amount",
+				"outstanding":"outstanding"
+			}
+		},
+			"Sales Taxes and Charges": {"doctype": "Sales Taxes and Charges", "add_if_empty": True},
+			"Sales Team": {"doctype": "Sales Team", "add_if_empty": True},
+		},
+		target_doc,
+		postprocess,
+		ignore_permissions=ignore_permissions,
+	)
+
+	automatically_fetch_payment_terms = cint(
+		frappe.db.get_single_value("Accounts Settings", "automatically_fetch_payment_terms")
+	)
+	if automatically_fetch_payment_terms:
+		doclist.set_payment_schedule()
+
+	return doclist
