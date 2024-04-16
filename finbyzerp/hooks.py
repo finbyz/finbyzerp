@@ -201,7 +201,7 @@ doc_events = {
 			"finbyzerp.api.si_validate"
 		],
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
-		"on_submit": "finbyzerp.api.sales_invoice_on_submit",
+		# "on_submit": "finbyzerp.api.sales_invoice_on_submit",
 	},
      ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
 		"validate":"finbyzerp.finbyzerp.override.override_conversion_factor.validate_conversion",
