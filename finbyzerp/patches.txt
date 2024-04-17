@@ -7,3 +7,4 @@ finbyzerp.patches.create_comment_fields
 finbyzerp.patches.navbar_setting
 finbyzerp.patches.delete_custom_qr
 finbyzerp.patches.delete_qr_field_from_database
+finbyzerp.patches.gst_settings
