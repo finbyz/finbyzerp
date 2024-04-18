@@ -162,7 +162,9 @@ doc_events = {
         "before_rename": "finbyzerp.finbyzerp.doc_events.customer_supplier.before_rename",
     },
     ("Purchase Order", "Sales Order"): {
-        "before_cancel": "finbyzerp.finbyzerp.doc_events.sales_purchase_order.before_cancel",
+        "before_cancel": "finbyzerp.finbyzerp.doc_events.sales_purchase_order.before_cancel"
+    },
+    "Sales Order":{
         "validate" : "finbyzerp.finbyzerp.doc_events.sales_purchase_order.validate"
     },
     ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
