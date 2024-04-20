@@ -217,7 +217,7 @@ doc_events = {
 	"Stock Entry": {
 		"validate": [
 			"finbyzerp.api.stock_entry_validate",
-			"finbyzerp.finbyzerp.doc_events.stock_entry.validate",
+			# "finbyzerp.finbyzerp.doc_events.stock_entry.validate",
             # "finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
 		],
         "after_insert": [
