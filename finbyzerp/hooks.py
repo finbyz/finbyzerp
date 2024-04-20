@@ -137,6 +137,7 @@ override_doctype_class = {
 	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity",
     "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride",
     "Customize Form": "finbyzerp.finbyzerp.override.customize_form.CustomizeForm",
+    "Quality Inspection": "finbyzerp.finbyzerp.override.quality_inspection.QualityInspection",
 }
 
 override_whitelisted_methods = {
@@ -220,7 +221,7 @@ doc_events = {
             # "finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
 		],
         "after_insert": [
-				"finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
+			"finbyzerp.finbyzerp.doc_events.stock_entry.after_insert",
 		],
 		"on_submit": [
 			"finbyzerp.api.stock_entry_on_submit",
