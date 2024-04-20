@@ -158,5 +158,8 @@ def other_contact_list(self):
     for row in self.other_contacts:
         if row.email_id:
             email_lst.append(row.email_id)
-    combined_emails = ", ".join(email_lst)
+    if None not in email_lst :
+       combined_emails = ", ".join(email_lst)
+    else:
+        combined_emails=""
     self.email = combined_emails
