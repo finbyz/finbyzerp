@@ -1,3 +1,4 @@
+#finbyzerp change for payment terms to fetch form Purchase Order to Purchase Receipt and Purchase Invoice
 import frappe
 from erpnext.buying.doctype.purchase_order.purchase_order import set_missing_values
 from erpnext.accounts.party import get_party_account
@@ -29,15 +30,16 @@ def make_purchase_receipt(source_name, target_doc=None):
 				"doctype": "Purchase Receipt",
 				"field_map": {
 					"supplier_warehouse": "supplier_warehouse",
-					"payment_terms_template": "payment_terms_template",
+					"payment_terms_template": "payment_terms_template",#finbyz Changes
                 },
 				"validation": {
 					"docstatus": ["=", 1],
 				},
 			},
+			#finbyz Changes
 			"Payment Schedule": {
 				"doctype": "Payment Schedule",
-			},
+			},# finbyz Changes end
 			"Purchase Order Item": {
 				"doctype": "Purchase Receipt Item",
 				"field_map": {
@@ -96,7 +98,7 @@ def get_mapped_purchase_invoice(source_name, target_doc=None, ignore_permissions
 			"field_map": {
 				"party_account_currency": "party_account_currency",
 				"supplier_warehouse": "supplier_warehouse",
-				"payment_terms_template": "payment_terms_template",
+				"payment_terms_template": "payment_terms_template",#finbyz Changes
 			},
 			
 			"field_no_map": ["payment_terms_template"],
@@ -104,10 +106,10 @@ def get_mapped_purchase_invoice(source_name, target_doc=None, ignore_permissions
 				"docstatus": ["=", 1],
 			},
 
-		},
+		},#finbyz Changes
 		"Payment Schedule": {
 				"doctype": "Payment Schedule",
-			},
+			},# finbyz Changes end
 		"Purchase Order Item": {
 			"doctype": "Purchase Invoice Item",
 			"field_map": {
