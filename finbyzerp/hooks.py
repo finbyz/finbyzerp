@@ -229,6 +229,7 @@ override_whitelisted_methods = {
     "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice": "finbyzerp.finbyzerp.override.whitelisted_methods.sales_order.make_sales_invoice",
     "erpnext.selling.doctype.sales_order.sales_order.make_delivery_note":"finbyzerp.finbyzerp.override.whitelisted_methods.sales_order.make_delivery_note",
     "erpnext.stock.doctype.delivery_note.delivery_note.make_sales_invoice":"finbyzerp.finbyzerp.override.whitelisted_methods.delivery_note.make_sales_invoice",
+    "frappe.modules.utils.export_customizations":"finbyzerp.finbyzerp.override.doctype.customize_form.export_customizations", 
 }
 
 scheduler_events = {
