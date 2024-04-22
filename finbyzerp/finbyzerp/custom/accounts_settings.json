@@ -38,7 +38,7 @@
    "label": "Create Item on Creation of Expense Account",
    "length": 0,
    "mandatory_depends_on": null,
-   "modified": "2023-12-01 10:46:15.435025",
+   "modified": "2024-04-22 15:08:46.284320",
    "modified_by": "Administrator",
    "module": "Finbyzerp",
    "name": "Accounts Settings-enable_expense_item_creation",
