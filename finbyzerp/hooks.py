@@ -160,7 +160,8 @@ override_whitelisted_methods = {
 	"erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_invoice" : "finbyzerp.api.make_purchase_invoice",
     "erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_receipt" : "finbyzerp.api.make_purchase_receipt",
     "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice":"finbyzerp.api.make_sales_invoice",
-    "erpnext.selling.doctype.sales_order.sales_order.make_delivery_note":"finbyzerp.api.make_delivery_note"    
+    "erpnext.selling.doctype.sales_order.sales_order.make_delivery_note":"finbyzerp.api.make_delivery_note",
+    "frappe.modules.utils.export_customizations":"finbyzerp.finbyzerp.override.customize_form.export_customizations", 
 }
 
 # override for supplier query
