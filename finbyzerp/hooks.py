@@ -138,6 +138,8 @@ override_doctype_class = {
     "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride",
     "Customize Form": "finbyzerp.finbyzerp.override.customize_form.CustomizeForm",
     "Quality Inspection": "finbyzerp.finbyzerp.override.quality_inspection.QualityInspection",
+    "Sales Invoice": "finbyzerp.finbyzerp.override.sales_invoice.SalesInvoice",
+    "Purchase Invoice": "finbyzerp.finbyzerp.override.purchase_invoice.PurchaseInvoice",
 }
 
 override_whitelisted_methods = {
@@ -414,3 +416,7 @@ purchase_order_analysis.get_data = get_data
 from india_compliance.gst_india.overrides import transaction
 from finbyzerp.finbyzerp.transaction import validate_gst_accounts
 transaction.validate_gst_accounts = validate_gst_accounts
+
+from india_compliance.gst_india.overrides.transaction import ItemGSTTreatment
+from finbyzerp.finbyzerp.transaction import set_for_no_taxes as _set_for_no_taxes
+ItemGSTTreatment.set_for_no_taxes = _set_for_no_taxes

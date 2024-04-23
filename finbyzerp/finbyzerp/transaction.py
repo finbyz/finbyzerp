@@ -281,3 +281,10 @@ def validate_gst_accounts(doc, is_sales_transaction=False):
             )
 
     return all_valid_accounts
+
+def set_for_no_taxes(self):
+        for item in self.doc.items:
+            if item.gst_treatment not in ("Exempted", "Non-GST"):
+                item.gst_treatment = "Nil-Rated"
+            if self.doc.gst_category == "Overseas":
+                item.gst_treatment = "Taxable"
