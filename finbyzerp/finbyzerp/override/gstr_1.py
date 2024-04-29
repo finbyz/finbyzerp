@@ -25,7 +25,8 @@ def get_row_data_for_invoice(self, invoice, invoice_details, tax_rate, items):
                 row[fieldname] = get_invoice_type_for_excel(invoice_details)
             # FINBYZ CHANGES START
             elif fieldname == "invoice_value":
-                row[fieldname] = flt(invoice_details.base_rounded_total - flt(self.export_reverse_charge.get(invoice_details.invoice_number)), 2) or flt(
+                total_value = invoice_details.base_rounded_total if invoice_details.base_rounded_total > 0 else invoice_details.base_grand_total
+                row[fieldname] = flt(total_value - flt(self.export_reverse_charge.get(invoice_details.invoice_number)), 2) or flt(
                     invoice_details.base_grand_total  - flt(self.export_reverse_charge.get(invoice_details.invoice_number)) , 2
                 )
             # FINBYZ CHANGES END
