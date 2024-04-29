@@ -372,7 +372,7 @@ def get_gl_entries(filters, accounting_dimensions):
 	gl_entries = [i for i in gl_entries if i]
 
 	if filters.get("presentation_currency"):
-		return convert_to_presentation_currency(gl_entries, currency_map, filters.get("company"))
+		return convert_to_presentation_currency(gl_entries, currency_map)
 	else:
 		return gl_entries
 
