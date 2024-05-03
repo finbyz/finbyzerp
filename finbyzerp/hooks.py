@@ -140,6 +140,7 @@ override_doctype_class = {
     "Quality Inspection": "finbyzerp.finbyzerp.override.quality_inspection.QualityInspection",
     "Sales Invoice": "finbyzerp.finbyzerp.override.sales_invoice.SalesInvoice",
     "Purchase Invoice": "finbyzerp.finbyzerp.override.purchase_invoice.PurchaseInvoice",
+    "Authorization Rule": "finbyzerp.finbyzerp.override.authorization_rule.AuthorizationRule",
 }
 
 override_whitelisted_methods = {
