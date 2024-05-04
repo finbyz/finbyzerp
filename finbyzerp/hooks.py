@@ -261,6 +261,9 @@ doc_events = {
 			"before_cancel":"finbyzerp.finbyzerp.doc_events.quotation.on_cancel",
 			"on_trash":"finbyzerp.finbyzerp.doc_events.quotation.on_trash"
 		},
+    "Sales Order": {
+        "validate": "finbyzerp.finbyzerp.doc_events.sales_order.validate",
+	},
     "Stock Settings":{
         "validate":"finbyzerp.api.create_property_setter"
 	}
