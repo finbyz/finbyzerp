@@ -24,6 +24,10 @@ class Meeting(Document):
 				self.address_display = data.address_display
 				self.organization = data.organisation
 
+		if self.meeting_from and self.meeting_to:
+			if self.meeting_from > self.meeting_to:
+				frappe.throw(_("Meeting To Date must be after Meeting From Date"))
+
 	def on_submit(self):
 		user_name = frappe.db.get_value("Employee",{"user_id":frappe.session.user},"employee_name")
 		url = get_url_to_form("Meeting", self.name)
