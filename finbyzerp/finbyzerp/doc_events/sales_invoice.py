@@ -13,6 +13,9 @@ def validate(self, method):
 def validate(self, frm):
     other_contact_list(self, frm)
 
+def on_update_after_submit(self,frm):
+    other_contact_list(self,frm)
+
 def before_save(self, method):
     set_shipping_address(self)
 
@@ -92,4 +95,11 @@ def other_contact_list(self, frm):
     email_lst += [row.email_id for row in self.other_contacts if row.email_id]
     
     if email_lst:
+        
         self.email = ", ".join(email_lst)
+        self.db_set("email", self.email)
+        
+    else:
+        frappe.msgprint("hello abubhav")
+        self.email = " "
+        self.db_set("email", self.email)
