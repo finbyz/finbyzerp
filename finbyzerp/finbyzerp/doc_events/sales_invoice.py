@@ -13,8 +13,8 @@ def validate(self, method):
 def before_save(self, method):
     set_shipping_address(self)
 
-def on_update_before_submit(self,frm):
-    other_contact_list(self, frm)
+def on_update_after_submit(self,method):
+    other_contact_list(self)
 
 def set_shipping_address(self):
     if self.customer_address and not self.shipping_address_name:
@@ -153,11 +153,15 @@ def get_fiscal(date):
     fiscal_year = get_fiscal_year(date)
     return str(fiscal_year[0]), str(fiscal_year[1]), str(fiscal_year[2])
 
-
-def other_contact_list(self,frm):
+def other_contact_list(self):
     
     email_lst = [self.contact_email] if self.contact_email else []
     email_lst += [row.email_id for row in self.other_contacts if row.email_id]
     
     if email_lst:
         self.email = ", ".join(email_lst)
+        frappe.db.set_value("Purchase Order", self.name, "email", self.email)
+        
+    else:
+        self.email = " "
+        frappe.db.set_value("Purchase Order", self.name, "email", " ")

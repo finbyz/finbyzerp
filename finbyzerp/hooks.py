@@ -166,14 +166,14 @@ doc_events = {
     },
     "Sales Order":{
         "validate" : "finbyzerp.finbyzerp.doc_events.sales_order.validate",
-        "on_update_before_submit": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_before_submit",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_after_submit",
     },
     ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
         "validate": "finbyzerp.finbyzerp.doc_events.conversion_factor.validate",
     },
     "Purchase Order": {
         "validate":  "finbyzerp.finbyzerp.doc_events.purchase_order.validate",
-        "on_update_before_submit": "finbyzerp.finbyzerp.doc_events.purchase_order.on_update_before_submit",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.purchase_order.on_update_after_submit",
     },
     "Fiscal Year": {
         "before_save": "finbyzerp.finbyzerp.doc_events.fiscal_year.before_save"
@@ -186,7 +186,7 @@ doc_events = {
         ],
         "on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
         "on_submit": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_submit",
-        "on_update_before_submit": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_update_before_submit",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_update_after_submit",
     },
     # "Address":{
     #     "before_validate":"finbyzerp.finbyzerp.doc_events.address.MyCustomDocument.before_validate"
