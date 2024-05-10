@@ -13,6 +13,8 @@ def validate(self, method):
 def before_save(self, method):
     set_shipping_address(self)
 
+def on_update_before_submit(self,frm):
+    other_contact_list(self, frm)
 
 def set_shipping_address(self):
     if self.customer_address and not self.shipping_address_name:
@@ -152,14 +154,10 @@ def get_fiscal(date):
     return str(fiscal_year[0]), str(fiscal_year[1]), str(fiscal_year[2])
 
 
-def other_contact_list(self):
-    email_lst = []
-    email_lst.append(self.contact_email)
-    for row in self.other_contacts:
-        if row.email_id:
-            email_lst.append(row.email_id)
-    if None not in email_lst :
-       combined_emails = ", ".join(email_lst)
-    else:
-        combined_emails=""
-    self.email = combined_emails
+def other_contact_list(self,frm):
+    
+    email_lst = [self.contact_email] if self.contact_email else []
+    email_lst += [row.email_id for row in self.other_contacts if row.email_id]
+    
+    if email_lst:
+        self.email = ", ".join(email_lst)
