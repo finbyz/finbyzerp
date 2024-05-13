@@ -100,6 +100,5 @@ def other_contact_list(self, frm):
         self.db_set("email", self.email)
         
     else:
-        frappe.msgprint("hello abubhav")
         self.email = " "
         self.db_set("email", self.email)
