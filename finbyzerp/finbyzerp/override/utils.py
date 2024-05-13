@@ -60,16 +60,16 @@ class calculate_taxes_and_totals(_calculate_taxes_and_totals):
 		if self.doc.currency == "INR":
 			tax.tax_amount = round(tax.tax_amount, 2)
 			tax.tax_amount_after_discount_amount = round(tax.tax_amount_after_discount_amount, 2)
-		
+		else:
+			tax.tax_amount = flt(tax.tax_amount, tax.precision("tax_amount"))
+			tax.tax_amount_after_discount_amount = flt(
+				tax.tax_amount_after_discount_amount, tax.precision("tax_amount")
+			)
 
 		if tax.account_head in frappe.flags.round_off_applicable_accounts:
 			tax.tax_amount = round(tax.tax_amount, 0)
 			tax.tax_amount_after_discount_amount = round(tax.tax_amount_after_discount_amount, 0)
-
-		tax.tax_amount = flt(tax.tax_amount, tax.precision("tax_amount"))
-		tax.tax_amount_after_discount_amount = flt(
-			tax.tax_amount_after_discount_amount, tax.precision("tax_amount")
-		)
+		
 
 	def round_off_base_values(self, tax):
 		tax.base_tax_amount = round(tax.base_tax_amount, 2)

@@ -140,6 +140,7 @@ override_doctype_class = {
     "Quality Inspection": "finbyzerp.finbyzerp.override.quality_inspection.QualityInspection",
     "Sales Invoice": "finbyzerp.finbyzerp.override.sales_invoice.SalesInvoice",
     "Purchase Invoice": "finbyzerp.finbyzerp.override.purchase_invoice.PurchaseInvoice",
+    "Authorization Rule": "finbyzerp.finbyzerp.override.authorization_rule.AuthorizationRule",
 }
 
 override_whitelisted_methods = {
@@ -206,6 +207,7 @@ doc_events = {
 		],
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		# "on_submit": "finbyzerp.api.sales_invoice_on_submit",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_update_after_submit",
 	},
      ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
 		"validate":"finbyzerp.finbyzerp.override.override_conversion_factor.validate_conversion",
@@ -247,6 +249,10 @@ doc_events = {
 	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice","Mould Trail Request", "Work Order Master", "Asset", "Leave Application" , "Contract Term"): {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
+	"Purchase Order": {
+        "validate": "finbyzerp.finbyzerp.doc_events.purchase_order.validate",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.purchase_order.on_update_after_submit",
+	},
 	"Form Tour": {
 		"before_save":"finbyzerp.finbyzerp.doc_events.form_tour.before_save",
 		"on_update":"finbyzerp.finbyzerp.doc_events.form_tour.on_update"
@@ -257,6 +263,10 @@ doc_events = {
 			"before_cancel":"finbyzerp.finbyzerp.doc_events.quotation.on_cancel",
 			"on_trash":"finbyzerp.finbyzerp.doc_events.quotation.on_trash"
 		},
+    "Sales Order": {
+        "validate": "finbyzerp.finbyzerp.doc_events.sales_order.validate",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_after_submit",
+	},
     "Stock Settings":{
         "validate":"finbyzerp.api.create_property_setter"
 	}
@@ -309,6 +319,12 @@ utils.get_timespan_date_range = get_timespan_date_range
 from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
+
+from india_compliance.gst_india.report.gstr_1.gstr_1 import Gstr1Report
+from finbyzerp.finbyzerp.override.gstr_1 import get_items_based_on_tax_rate as get_items_based_on_tax_rate_custom
+from finbyzerp.finbyzerp.override.gstr_1 import get_row_data_for_invoice as get_row_data_for_invoice_custom
+Gstr1Report.get_row_data_for_invoice = get_row_data_for_invoice_custom
+Gstr1Report.get_items_based_on_tax_rate = get_items_based_on_tax_rate_custom
 
 # from frappe.workflow.doctype.workflow_action import workflow_action
 # from finbyzerp.api import process_workflow_actions

@@ -9,6 +9,12 @@ from erpnext.accounts.utils import unlink_ref_doc_from_payment_entries
 def validate(self, method):
     tcs_deduction(self)
     calculate_gst_taxable_value(self)
+    
+def validate(self, frm):
+    other_contact_list(self, frm)
+
+def on_update_after_submit(self,frm):
+    other_contact_list(self,frm)
 
 def before_save(self, method):
     set_shipping_address(self)
@@ -83,3 +89,17 @@ def get_fiscal(date):
     from erpnext.accounts.utils import get_fiscal_year
     fiscal_year = get_fiscal_year(date)
     return str(fiscal_year[0]),str(fiscal_year[1]),str(fiscal_year[2])
+
+def other_contact_list(self, frm):
+    email_lst = [self.contact_email] if self.contact_email else []
+    email_lst += [row.email_id for row in self.other_contacts if row.email_id]
+    
+    if email_lst:
+        
+        self.email = ", ".join(email_lst)
+        self.db_set("email", self.email)
+        
+    else:
+        frappe.msgprint("hello abubhav")
+        self.email = " "
+        self.db_set("email", self.email)
