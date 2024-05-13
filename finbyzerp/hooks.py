@@ -250,6 +250,10 @@ doc_events = {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
 	"Purchase Order": {
+        "validate": "finbyzerp.finbyzerp.doc_events.payment_entry.validate",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.payment_entry.on_update_after_submit",
+	},
+    "Payment Entry": {
         "validate": "finbyzerp.finbyzerp.doc_events.purchase_order.validate",
         "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.purchase_order.on_update_after_submit",
 	},
