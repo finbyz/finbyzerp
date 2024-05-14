@@ -17,7 +17,7 @@ from email.utils import COMMASPACE, formatdate
 
 import frappe
 from frappe import _, db, msgprint
-from frappe.contacts.doctype.address.address import get_address_display, get_default_address
+from frappe.contacts.doctype.address.address import get_default_address, render_address
 from frappe.contacts.doctype.contact.contact import get_contact_details, get_default_contact
 from frappe.core.doctype.communication.email import make
 from frappe.email.smtp import SMTPServer
@@ -267,3 +267,10 @@ def set_other_values(out, party, party_type):
 		to_copy = ["supplier_name", "supplier_type", "language"]
 	for f in to_copy:
 		out[f] = party.get(f)
+	
+
+@frappe.whitelist()
+def get_address_display(address_dict: dict | str | None) -> str | None:
+	return render_address(address_dict, False)
+
+
