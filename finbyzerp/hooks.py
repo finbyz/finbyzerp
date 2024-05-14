@@ -166,7 +166,7 @@ doc_events = {
     },
     "Sales Order":{
         "validate" : "finbyzerp.finbyzerp.doc_events.sales_order.validate",
-        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_after_submit",
+        "   ": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_after_submit",
     },
     ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
         "validate": "finbyzerp.finbyzerp.doc_events.conversion_factor.validate",
@@ -194,6 +194,10 @@ doc_events = {
     "Purchase Invoice": {
         "validate": "finbyzerp.finbyzerp.doc_events.sales_purchase_invoice.validate",
             
+    },
+    "Payment Entry": {
+        "validate": "finbyzerp.finbyzerp.doc_events.payment_entry.validate",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.payment_entry.on_update_after_submit",
     },
     "Stock Settings": {
         "validate": "finbyzerp.finbyzerp.doc_events.stock_settings.validate",
