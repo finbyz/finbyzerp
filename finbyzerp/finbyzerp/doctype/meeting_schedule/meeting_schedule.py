@@ -3,24 +3,29 @@
 # For license information, please see license.txt
 
 from __future__ import unicode_literals
-import frappe
-import json, os, datetime
-from frappe.model.document import Document
-from frappe.model.mapper import get_mapped_doc
-from frappe import msgprint, db, _
-from frappe.core.doctype.communication.email import make
-from frappe.utils import get_datetime
-from frappe.contacts.doctype.address.address import get_address_display, get_default_address
-from frappe.contacts.doctype.contact.contact import get_contact_details, get_default_contact
-from email.mime.multipart import MIMEMultipart
+
+import datetime
+import json
+import os
+import re
+import smtplib
+from email import encoders
 from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import COMMASPACE, formatdate
-from email import encoders
+
+import frappe
+from frappe import _, db, msgprint
+from frappe.contacts.doctype.address.address import get_address_display, get_default_address
+from frappe.contacts.doctype.contact.contact import get_contact_details, get_default_contact
+from frappe.core.doctype.communication.email import make
 from frappe.email.smtp import SMTPServer
-import smtplib
+from frappe.model.document import Document
+from frappe.model.mapper import get_mapped_doc
+from frappe.utils import get_datetime
 from frappe.utils.user import get_user_fullname
-import re
+
 
 class MeetingSchedule(Document):
 	@frappe.whitelist()
@@ -174,7 +179,7 @@ def get_events(start, end, filters=None):
 	)			
 
 @frappe.whitelist()
-def get_party_details(party=None, party_type="Customer", ignore_permissions=False):
+def get_party_details(party=None, party_type="Customer", ignore_permissions=True):
 
 	if not party:
 		return {}
@@ -184,7 +189,7 @@ def get_party_details(party=None, party_type="Customer", ignore_permissions=Fals
 
 	return _get_party_details(party, party_type, ignore_permissions)
 
-def _get_party_details(party=None, party_type="Customer", ignore_permissions=False):
+def _get_party_details(party=None, party_type="Customer", ignore_permissions=True):
 
 	out = frappe._dict({
 		party_type.lower(): party
