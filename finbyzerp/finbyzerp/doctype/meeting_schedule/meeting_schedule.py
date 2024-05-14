@@ -189,7 +189,7 @@ def get_party_details(party=None, party_type="Customer", ignore_permissions=True
 
 	return _get_party_details(party, party_type, ignore_permissions)
 
-def _get_party_details(party=None, party_type="Customer", ignore_permissions=True):
+def _get_party_details(party=None, party_type="Customer", ignore_permissions=False):
 
 	out = frappe._dict({
 		party_type.lower(): party
