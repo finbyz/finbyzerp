@@ -117,13 +117,13 @@ frappe.ui.form.on('Payment Entry Reference', {
 	}
 });
 cur_frm.fields_dict.other_contacts.grid.get_field("contact").get_query = function(doc) {
-	if(cur_frm.doc.customer) {
+	if(cur_frm.doc.party_name) {
 		return {
 			query: "frappe.contacts.doctype.contact.contact.contact_query",
-			filters: { link_doctype: "Customer", link_name: cur_frm.doc.customer} 
+			filters: { link_doctype: cur_frm.doc.party_type, link_name: cur_frm.doc.party_name} 
 		};
 	}
-	else frappe.throw(__("Please set Customer"));
+	else frappe.throw(__("Please set Party"));
 };
 
 frappe.ui.form.on('Other Contact', {
