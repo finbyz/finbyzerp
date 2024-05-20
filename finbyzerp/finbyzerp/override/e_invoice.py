@@ -102,7 +102,7 @@ def generate_e_invoice(docname, throw=True, force=False):
         {
             "irn": result.Irn,
             "einvoice_status": "Generated",
-            "signed_qr_code": result.SignedQRCode #finbyz changes
+            # "signed_qr_code": result.SignedQRCode #finbyz changes
         }
     )
 
@@ -129,22 +129,22 @@ def generate_e_invoice(docname, throw=True, force=False):
         },
     )
 
-    #finbyz changes
-    is_qrcode_file_attached = doc.qrcode_image and frappe.db.exists(
-        "File",
-        {
-            "attached_to_doctype": doc.doctype,
-            "attached_to_name": doc.name,
-            "file_url": doc.qrcode_image,
-            "attached_to_field": "qrcode_image",
-        },
-    )
+    # #finbyz changes
+    # is_qrcode_file_attached = doc.qrcode_image and frappe.db.exists(
+    #     "File",
+    #     {
+    #         "attached_to_doctype": doc.doctype,
+    #         "attached_to_name": doc.name,
+    #         "file_url": doc.qrcode_image,
+    #         "attached_to_field": "qrcode_image",
+    #     },
+    # )
 
-    if not is_qrcode_file_attached:
-        if doc.signed_qr_code:
-            attach_qrcode_image(doc)
+    # if not is_qrcode_file_attached:
+    #     if doc.signed_qr_code:
+    #         attach_qrcode_image(doc)
     
-    #finbyz changes end
+    # #finbyz changes end
 
     if result.EwbNo:
         log_and_process_e_waybill_generation(doc, result, with_irn=True)
