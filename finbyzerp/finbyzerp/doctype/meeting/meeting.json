@@ -77,6 +77,7 @@
    "options": "Lead"
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fieldname": "party_type",
    "fieldtype": "Select",
    "in_standard_filter": 1,
@@ -84,6 +85,7 @@
    "options": "\nLead\nCustomer\nSupplier"
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fieldname": "party",
    "fieldtype": "Dynamic Link",
    "ignore_user_permissions": 1,
@@ -247,7 +249,6 @@
    "reqd": 1
   },
   {
-   "depends_on": "eval:doc.internal_meeting != 1",
    "fieldname": "actionable",
    "fieldtype": "Section Break",
    "label": "Actionable"
@@ -362,7 +363,7 @@
  "icon": "fa fa-handshake-o",
  "is_submittable": 1,
  "links": [],
- "modified": "2024-05-20 17:37:50.253820",
+ "modified": "2024-05-20 18:34:41.071261",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting",
