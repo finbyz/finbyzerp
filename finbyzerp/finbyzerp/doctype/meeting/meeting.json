@@ -9,6 +9,7 @@
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
+  "internal_meeting",
   "lead",
   "party_type",
   "party",
@@ -85,6 +86,7 @@
   {
    "fieldname": "party",
    "fieldtype": "Dynamic Link",
+   "ignore_user_permissions": 1,
    "label": "Party",
    "options": "party_type"
   },
@@ -107,6 +109,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Meeting From",
+   "mandatory_depends_on": "eval:doc.internal_meeting != 1",
    "reqd": 1
   },
   {
@@ -154,19 +157,23 @@
    "options": "Contact"
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fetch_from": "contact_person.mobile_no",
    "fieldname": "mobile_no",
    "fieldtype": "Data",
    "label": "Mobile No"
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fetch_from": "contact_person.email_id",
    "fieldname": "email_id",
    "fieldtype": "Data",
    "label": "Email Id",
+   "mandatory_depends_on": "eval:doc.internal_meeting != 1",
    "reqd": 1
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fieldname": "address",
    "fieldtype": "Link",
    "label": "Address",
@@ -179,6 +186,7 @@
    "read_only": 1
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fieldname": "company_details",
    "fieldtype": "Section Break",
    "label": "Company Details"
@@ -201,8 +209,8 @@
    "fieldname": "industry",
    "fieldtype": "Link",
    "label": "Industry",
-   "options": "Industry Type",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.internal_meeting == 0",
+   "options": "Industry Type"
   },
   {
    "fieldname": "business_specifics",
@@ -221,6 +229,7 @@
    "options": "Meeting Company Representative"
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fieldname": "meeting_party_representative",
    "fieldtype": "Table",
    "label": "Meeting Party Representative",
@@ -238,6 +247,7 @@
    "reqd": 1
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fieldname": "actionable",
    "fieldtype": "Section Break",
    "label": "Actionable"
@@ -249,6 +259,7 @@
    "options": "Meeting Actionable"
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fieldname": "sec_brk1",
    "fieldtype": "Section Break"
   },
@@ -273,6 +284,7 @@
    "label": "Next Contact Date"
   },
   {
+   "depends_on": "eval:doc.internal_meeting != 1",
    "fieldname": "expenses",
    "fieldtype": "Section Break",
    "label": "Expenses"
@@ -339,15 +351,22 @@
    "hidden": 1,
    "label": "Opportunity",
    "options": "Opportunity"
+  },
+  {
+   "default": "0",
+   "fieldname": "internal_meeting",
+   "fieldtype": "Check",
+   "label": "Internal Meeting"
   }
  ],
  "icon": "fa fa-handshake-o",
  "is_submittable": 1,
  "links": [],
- "modified": "2024-02-21 14:19:33.470399",
+ "modified": "2024-05-20 17:37:50.253820",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
