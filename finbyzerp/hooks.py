@@ -238,7 +238,12 @@ scheduler_events = {
     "daily": [
         "finbyzerp.scheduler.daily_entry_summary_mail",
         "finbyzerp.scheduler.daily_transaction_summary_mail",
-    ]
+    ],
+    "cron":{
+		"0 4 * * SUN": [
+			"finbyzerp.api.sales_invoice_payment_remainder",
+		]
+	},
 }
 
 
