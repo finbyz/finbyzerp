@@ -126,7 +126,8 @@ doctype_js = {
 	"Payment Reconciliation":"public/js/doctype_js/payment_reconciliation.js",
 	"BOM":"public/js/doctype_js/bom.js",
 	"Form Tour": "public/js/doctype_js/form_tour.js",
-    "Quotation": "public/js/doctype_js/quotation.js"
+    "Quotation": "public/js/doctype_js/quotation.js",
+	"Quick Stock Balance": "public/js/doctype_js/quick_stock_balance.js"
 }
 website_context = {
 	"favicon": 	"/assets/finbyzerp/images/favicon.ico",
