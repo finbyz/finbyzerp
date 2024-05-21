@@ -126,7 +126,8 @@ doctype_js = {
 	"Payment Reconciliation":"public/js/doctype_js/payment_reconciliation.js",
 	"BOM":"public/js/doctype_js/bom.js",
 	"Form Tour": "public/js/doctype_js/form_tour.js",
-    "Quotation": "public/js/doctype_js/quotation.js"
+    "Quotation": "public/js/doctype_js/quotation.js",
+	"Quick Stock Balance": "public/js/doctype_js/quick_stock_balance.js"
 }
 website_context = {
 	"favicon": 	"/assets/finbyzerp/images/favicon.ico",
@@ -250,6 +251,10 @@ doc_events = {
 		"before_naming": "finbyzerp.api.before_naming",
 	},
 	"Purchase Order": {
+        "validate": "finbyzerp.finbyzerp.doc_events.payment_entry.validate",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.payment_entry.on_update_after_submit",
+	},
+    "Payment Entry": {
         "validate": "finbyzerp.finbyzerp.doc_events.purchase_order.validate",
         "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.purchase_order.on_update_after_submit",
 	},

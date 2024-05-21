@@ -6,6 +6,11 @@ import frappe
 from frappe import _
 from frappe.utils.data import comma_and
 
+def list_to_sql(lst):
+	if not lst:
+		return "()"
+	return "(" + ", ".join([f'"{l}"' for l in lst]) + ")"
+
 def execute(filters=None):
 #	if not filters: filters = {}
 	columns = get_columns()
@@ -62,6 +67,9 @@ def get_bom_stock(filters):
 	conditions = ""
 	bom = filters.get("bom")
 
+	if not bom:
+		frappe.throw("Please Select BOM")
+
 	table = "`tabBOM Item`"
 	qty_field = "qty"
 
@@ -95,9 +103,9 @@ def get_bom_stock(filters):
 				{conditions}
 
 			WHERE
-				bom_item.parent = '{bom}' and bom_item.parenttype='BOM'
+				bom_item.parent in {bom} and bom_item.parenttype='BOM'
 
-			GROUP BY bom_item.item_code""".format(qty_field=qty_field, table=table, conditions=conditions, bom=bom), as_dict=1)
+			GROUP BY bom_item.item_code""".format(qty_field=qty_field, table=table, conditions=conditions, bom=list_to_sql(bom)), as_dict=1)
 
 def get_manufacturer_records():
 	details = frappe.get_list('Item Manufacturer', fields = ["manufacturer", "manufacturer_part_no", "parent"])

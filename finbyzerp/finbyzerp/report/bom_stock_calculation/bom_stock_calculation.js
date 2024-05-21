@@ -7,9 +7,12 @@ frappe.query_reports["BOM Stock Calculation"] = {
 		{
 			"fieldname": "bom",
 			"label": __("BOM"),
-			"fieldtype": "Link",
+			"fieldtype": "MultiSelectList",
 			"options": "BOM",
-			"reqd": 1
+			"reqd": 1,			
+			get_data: function (txt) {
+				return frappe.db.get_link_options("BOM", txt, {});
+			},
 		},
 		{
 			"fieldname": "warehouse",
