@@ -165,10 +165,15 @@ doc_events = {
         "before_cancel": "finbyzerp.finbyzerp.doc_events.sales_purchase_order.before_cancel"
     },
     "Sales Order":{
-        "validate" : "finbyzerp.finbyzerp.doc_events.sales_purchase_order.validate"
+        "validate" : "finbyzerp.finbyzerp.doc_events.sales_order.validate",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_after_submit",
     },
     ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
         "validate": "finbyzerp.finbyzerp.doc_events.conversion_factor.validate",
+    },
+    "Purchase Order": {
+        "validate":  "finbyzerp.finbyzerp.doc_events.purchase_order.validate",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.purchase_order.on_update_after_submit",
     },
     "Fiscal Year": {
         "before_save": "finbyzerp.finbyzerp.doc_events.fiscal_year.before_save"
@@ -177,16 +182,22 @@ doc_events = {
         "before_save": "finbyzerp.finbyzerp.doc_events.sales_invoice.before_save",
         "validate": [
             "finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
-            "finbyzerp.finbyzerp.doc_events.sales_purchase_invoice.validate",
+            "finbyzerp.finbyzerp.doc_events.purchase_invoice.validate",
         ],
         "on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
         "on_submit": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_submit",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_update_after_submit",
     },
     # "Address":{
     #     "before_validate":"finbyzerp.finbyzerp.doc_events.address.MyCustomDocument.before_validate"
     # },
     "Purchase Invoice": {
         "validate": "finbyzerp.finbyzerp.doc_events.sales_purchase_invoice.validate",
+            
+    },
+    "Payment Entry": {
+        "validate": "finbyzerp.finbyzerp.doc_events.payment_entry.validate",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.payment_entry.on_update_after_submit",
     },
     "Stock Settings": {
         "validate": "finbyzerp.finbyzerp.doc_events.stock_settings.validate",
