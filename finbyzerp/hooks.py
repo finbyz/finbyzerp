@@ -166,7 +166,7 @@ doc_events = {
     },
     "Sales Order":{
         "validate" : "finbyzerp.finbyzerp.doc_events.sales_order.validate",
-        "   ": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_after_submit",
+        "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_after_submit",
     },
     ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
         "validate": "finbyzerp.finbyzerp.doc_events.conversion_factor.validate",
