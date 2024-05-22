@@ -1527,6 +1527,8 @@ def send_sales_invoice_mails():
 			'is_opening': 'No',
 		},
 		order_by='posting_date',
+		group_by= "customer,company",
+		fields=["group_concat(name) as name", "customer", "company"]
 	)
 	email_template = frappe.get_doc("Email Template", "Payment Reminder")
 
@@ -1534,17 +1536,23 @@ def send_sales_invoice_mails():
 		recipients = ",".join([row.email_id for row in account_settings.test_recipients_emails])
 		
 	for d in data:
-		doc = frappe.get_doc("Sales Invoice", d.name)
-		context = {"doc": doc}
-		sender = frappe.db.get_value("Company",doc.company,"send_from_overdue_email")
+		sender = frappe.db.get_value("Company",d.company,"send_from_overdue_email")
 		
 		if not sender:
 			continue
-		if not account_settings.send_testing_overdue_mail:
-			recipients = doc.email
+		
+		context = {"customer": d.customer, "company": d.company}
+		context['sales_invoices'] = [frappe.get_doc("Sales Invoice", name) for name in d.name.split(",")]
 
-			if not doc.email:
+		recipients_emails = ",".join([doc.email for doc in context['sales_invoices'] if doc.email and doc.email.replace(" ", "")])
+		emails = ",".join(sorted(list(set(recipients_emails.split(",")))))
+		
+		if not account_settings.send_testing_overdue_mail:
+			if not recipients_emails:
 				continue
+			recipients = emails
+		else:
+			context["emails"] = emails
 
 		try:
 			frappe.sendmail(
@@ -1552,8 +1560,6 @@ def send_sales_invoice_mails():
 				sender=sender,
 				subject=frappe.render_template(email_template.subject, context),
 				message=frappe.render_template(email_template.response_html, context),
-				# attachments=g
-				# et_attachments(stop),
 			)
 		except Exception as e:
 			frappe.log_error("Mail Sending Issue", frappe.get_traceback())
