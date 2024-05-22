@@ -1545,7 +1545,7 @@ def send_sales_invoice_mails():
 		context['sales_invoices'] = [frappe.get_doc("Sales Invoice", name) for name in d.name.split(",")]
 
 		recipients_emails = ",".join([doc.email for doc in context['sales_invoices'] if doc.email and doc.email.replace(" ", "")])
-		emails = ".".join(sorted(list(set(recipients_emails.split(",")))))
+		emails = ",".join(sorted(list(set(recipients_emails.split(",")))))
 		
 		if not account_settings.send_testing_overdue_mail:
 			if not recipients_emails:
