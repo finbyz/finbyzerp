@@ -91,8 +91,8 @@ def get_data(filters, conditions):
 		if filters.get("group_by") == 'Item':
 			sel_col = 't2.item_code'
 			item_name = ', t2.item_name'
-		elif filters.get("group_by") == 'Supplier':
-			sel_col = 't1.party_name' if conditions.get('trans') == 'Quotation' else 't1.supplier'
+		elif filters.get("group_by") == 'Customer':
+			sel_col = 't1.party_name' if conditions.get('trans') == 'Quotation' else 't1.customer'
 		elif filters.get("group_by") == 'Supplier':
 			sel_col = 't1.supplier'
 		elif filters.get("group_by") == 'Item Group':
