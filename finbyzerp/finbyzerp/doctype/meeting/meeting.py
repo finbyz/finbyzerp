@@ -28,6 +28,8 @@ class Meeting(Document):
 			if self.meeting_from > self.meeting_to:
 				frappe.throw(_("Meeting To Date must be after Meeting From Date"))
 
+		self.check_min_participants()
+
 	def on_submit(self):
 		user_name = frappe.db.get_value("Employee",{"user_id":frappe.session.user},"employee_name")
 		url = get_url_to_form("Meeting", self.name)
@@ -81,6 +83,14 @@ class Meeting(Document):
 					'reference_doctype': "Meeting", 'reference_docname': self.name
 					})
 				new_event.save(ignore_permissions=True)
+
+		self.check_min_participants()
+
+
+	def check_min_participants(self):
+		if self.internal_meeting == 1:
+			if len(self.get('meeting_company_representative')) < 2:
+				frappe.throw(_("Please add atleast two Participants"))
 
 @frappe.whitelist()
 def get_events(start, end, filters=None):
