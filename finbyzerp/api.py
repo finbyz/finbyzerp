@@ -1504,3 +1504,63 @@ def make_sales_invoice(source_name, target_doc=None, ignore_permissions=False):
 		doclist.set_payment_schedule()
 
 	return doclist
+
+# email templates
+
+@frappe.whitelist()
+def sales_invoice_payment_remainder():
+	frappe.enqueue(send_sales_invoice_mails, queue='long', timeout=5000, job_name='Payment Reminder Mails')
+	return "Payment Reminder Mails Send"
+
+
+@frappe.whitelist()
+def send_sales_invoice_mails():
+	account_settings = frappe.get_doc("Accounts Settings")
+
+	if not account_settings.send_overdue_reminder:
+		return
+
+	data = frappe.get_all("Sales Invoice", filters={
+			'status': ['in', ('Overdue')],
+			'outstanding_amount':(">", 5000),
+			'docstatus': 1,
+			'is_opening': 'No',
+		},
+		order_by='posting_date',
+		group_by= "customer,company",
+		fields=["group_concat(name) as name", "customer", "company"]
+	)
+	email_template = frappe.get_doc("Email Template", "Payment Reminder")
+
+	if account_settings.send_testing_overdue_mail:
+		recipients = ",".join([row.email_id for row in account_settings.test_recipients_emails])
+		
+	for d in data:
+		sender = frappe.db.get_value("Company",d.company,"send_from_overdue_email")
+		
+		if not sender:
+			continue
+		
+		context = {"customer": d.customer, "company": d.company}
+		context['sales_invoices'] = [frappe.get_doc("Sales Invoice", name) for name in d.name.split(",")]
+
+		recipients_emails = ",".join([doc.email for doc in context['sales_invoices'] if doc.email and doc.email.replace(" ", "")])
+		emails = ",".join(sorted(list(set(recipients_emails.split(",")))))
+		
+		if not account_settings.send_testing_overdue_mail:
+			if not recipients_emails:
+				continue
+			recipients = emails
+		else:
+			context["emails"] = emails
+
+		try:
+			frappe.sendmail(
+				recipients=recipients,
+				sender=sender,
+				subject=frappe.render_template(email_template.subject, context),
+				message=frappe.render_template(email_template.response_html, context),
+			)
+		except Exception as e:
+			frappe.log_error("Mail Sending Issue", frappe.get_traceback())
+			print(frappe.get_traceback())

@@ -278,11 +278,14 @@ doc_events = {
 }
 
 scheduler_events = {
-# 	"cron":{
+	"cron":{
 # 		"*/5 * * * *":[
 # 			"finbyzerp.api.repost_transaction_entries"
 # 		],
-# 	},
+		"0 4 * * SUN": [
+			"finbyzerp.api.sales_invoice_payment_remainder",
+		]
+	},
 	"daily":[
 		"finbyzerp.api.daily_entry_summary_mail",
 		"finbyzerp.api.daily_transaction_summary_mail"
@@ -325,11 +328,11 @@ from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
 
-from india_compliance.gst_india.report.gstr_1.gstr_1 import Gstr1Report
-from finbyzerp.finbyzerp.override.gstr_1 import get_items_based_on_tax_rate as get_items_based_on_tax_rate_custom
-from finbyzerp.finbyzerp.override.gstr_1 import get_row_data_for_invoice as get_row_data_for_invoice_custom
-Gstr1Report.get_row_data_for_invoice = get_row_data_for_invoice_custom
-Gstr1Report.get_items_based_on_tax_rate = get_items_based_on_tax_rate_custom
+# from india_compliance.gst_india.report.gstr_1.gstr_1 import Gstr1Report
+# from finbyzerp.finbyzerp.override.gstr_1 import get_items_based_on_tax_rate as get_items_based_on_tax_rate_custom
+# from finbyzerp.finbyzerp.override.gstr_1 import get_row_data_for_invoice as get_row_data_for_invoice_custom
+# Gstr1Report.get_row_data_for_invoice = get_row_data_for_invoice_custom
+# Gstr1Report.get_items_based_on_tax_rate = get_items_based_on_tax_rate_custom
 
 # from frappe.workflow.doctype.workflow_action import workflow_action
 # from finbyzerp.api import process_workflow_actions
