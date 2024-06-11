@@ -13,6 +13,7 @@ from finbyzerp.finbyzerp.doctype.meeting_schedule.meeting_schedule import get_pa
 
 class Meeting(Document):
 	def validate(self):
+		
 		if self.party_type and self.party:
 			data = get_party_details(party_type=self.party_type,party=self.party)
 			if data:
