@@ -11,7 +11,7 @@ frappe.query_reports["BOM Stock Calculation"] = {
 			"options": "BOM",
 			"reqd": 1,			
 			get_data: function (txt) {
-				return frappe.db.get_link_options("BOM", txt, {});
+				return frappe.db.get_link_options("BOM", txt, {"docstatus": 1});
 			},
 		},
 		{
