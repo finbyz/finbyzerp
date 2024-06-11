@@ -110,7 +110,6 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Meeting From",
-   "mandatory_depends_on": "eval:doc.internal_meeting != 1",
    "reqd": 1
   },
   {
@@ -363,7 +362,7 @@
  "icon": "fa fa-handshake-o",
  "is_submittable": 1,
  "links": [],
- "modified": "2024-05-31 17:19:07.289500",
+ "modified": "2024-06-11 15:09:50.179095",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting",
