@@ -210,7 +210,7 @@
    "fieldname": "industry",
    "fieldtype": "Link",
    "label": "Industry",
-   "mandatory_depends_on": "eval:doc.internal_meeting != 0",
+   "mandatory_depends_on": "eval:doc.internal_meeting == 0",
    "options": "Industry Type"
   },
   {
