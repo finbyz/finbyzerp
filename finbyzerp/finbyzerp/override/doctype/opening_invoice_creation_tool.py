@@ -1,6 +1,6 @@
 import frappe
 from frappe import _, scrub
-from frappe.utils import nowdate, scr
+from frappe.utils import nowdate, flt
 from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
     get_accounting_dimensions,
 )
