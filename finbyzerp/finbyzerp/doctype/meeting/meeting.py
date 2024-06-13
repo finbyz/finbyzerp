@@ -29,6 +29,36 @@ class Meeting(Document):
 				frappe.throw(_("Meeting To Date must be after Meeting From Date"))
 
 		self.check_min_participants()
+		# Convert meeting_from and meeting_to to datetime objects
+		meeting_from = get_datetime(self.meeting_from)
+		meeting_to = get_datetime(self.meeting_to)
+		# Check overlapping meetings for each representative in the 'meeting_company_representative' child table
+		for representative in self.meeting_company_representative:
+			overlapping_employee_meetings = frappe.db.sql("""
+				SELECT
+					m.name, m.meeting_from, m.meeting_to
+				FROM
+					`tabMeeting` m
+				JOIN
+					`tabMeeting Company Representative` cr ON cr.parent = m.name
+				WHERE
+					cr.employee = %(employee)s
+					AND (m.meeting_from <= %(meeting_to)s AND m.meeting_to >= %(meeting_from)s)
+					AND m.name != %(name)s
+					AND m.docstatus = 1
+			""", {
+				'meeting_from': meeting_from,
+				'meeting_to': meeting_to,
+				'employee': representative.employee,
+				'name': self.name
+			})
+
+			# If there are overlapping meetings for the representative, throw a validation error
+			if overlapping_employee_meetings:
+				employee_meeting_links = "\n".join(
+					[f'<a href="/app/meeting/{meeting[0]}">{meeting[0]}</a>' for meeting in overlapping_employee_meetings]
+				)
+				frappe.throw(f"Employee {representative.employee} already has a meeting during this time period:\n{employee_meeting_links}")
 
 	def on_submit(self):
 		user_name = frappe.db.get_value("Employee",{"user_id":frappe.session.user},"employee_name")
