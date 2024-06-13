@@ -10,6 +10,7 @@ from erpnext.accounts.doctype.opening_invoice_creation_tool.opening_invoice_crea
 
 
 class CustomOpeningInvoiceCreationTool(OpeningInvoiceCreationTool):
+    @frappe.whitelist()
     def make_invoices(self):
         names = []
         mandatory_error_msg = _(
@@ -243,7 +244,7 @@ class CustomOpeningInvoiceCreationTool(OpeningInvoiceCreationTool):
             args["bill_no"] = row.get("bill_no") or row.invoice_no
 
         return args
-
+@frappe.whitelist()
 def get_temporary_opening_account(company=None):
 	if not company:
 		return
