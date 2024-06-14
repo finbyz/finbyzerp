@@ -437,6 +437,7 @@ def update_transaction_tax_details(self):
 
 	current_total -= self.transaction_details.discount_amount
 	other_charges = self.transaction_details.grand_total - current_total
+	self.transaction_details.grand_total = round(self.transaction_details.grand_total,2)
 
 	if reverse_charge_amount < 0 and other_charges < 0:
 		other_charges = round(other_charges, 1) - round(reverse_charge_amount, 1)
