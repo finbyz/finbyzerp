@@ -87,6 +87,9 @@ def before_naming(self, method):
 		date = self.get("transaction_date") or self.get("posting_date") or  self.get("manufacturing_date") or self.get('date') or getdate()
 		fiscal = get_fiscal(date)
 		self.fiscal = fiscal
+		# get fiscal year from fiscal year
+		fiscal_year = get_fiscal_year(date)[0]
+		self.fiscal_year = fiscal_year
 		if not self.get('company_series'):
 			self.company_series = None
 		
