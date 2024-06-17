@@ -1,5 +1,6 @@
 import frappe
 from finbyzerp.api import get_naming_series_name, get_fiscal
+from erpnext.accounts.utils import get_fiscal_year
 from frappe.utils import cint, getdate
 
 
@@ -15,6 +16,9 @@ def before_naming(self, method):
         
         fiscal = get_fiscal(date)
         self.fiscal = fiscal
+        # get fiscal year from fiscal year
+        fiscal_year = get_fiscal_year(date)[0]
+        self.fiscal_year = fiscal_year
         
         if not self.get("company_series"):
             self.company_series = None
