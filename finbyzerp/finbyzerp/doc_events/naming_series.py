@@ -19,7 +19,7 @@ def before_naming(self, method):
         # get fiscal year from fiscal year
         fiscal_year = get_fiscal_year(date)[0]
         self.fiscal_year = fiscal_year
-        
+
         if not self.get("company_series"):
             self.company_series = None
 
