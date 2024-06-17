@@ -38,7 +38,7 @@
    "label": "TCS Account",
    "length": 0,
    "mandatory_depends_on": null,
-   "modified": "2024-05-29 18:33:16.665163",
+   "modified": "2024-06-17 09:56:11.725204",
    "modified_by": "Administrator",
    "module": "Finbyzerp",
    "name": "GST Account-tcs_account",

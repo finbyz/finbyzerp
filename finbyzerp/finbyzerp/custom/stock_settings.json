@@ -38,7 +38,7 @@
    "label": "Calculate Conversion Factor based on Stock Quantity and Quantity",
    "length": 0,
    "mandatory_depends_on": null,
-   "modified": "2024-05-29 18:33:37.337221",
+   "modified": "2024-06-17 09:56:24.891752",
    "modified_by": "Administrator",
    "module": "Finbyzerp",
    "name": "Stock Settings-calculate_conversion_factor_based_on_stock_quantity_and_quantity",
