@@ -75,13 +75,13 @@ def get_data(filters, conditions):
 	)
 	parent_condition = ''
 	
-	if filters.get('item') and filters.get('item'):
+	if filters.get("based_on") == "Item" and filters.get('item'):
 		parent_condition += f" and t2.item_code = {frappe.db.escape(filters.get('item'))}"
 	
-	elif filters.get('customer') and filters.get('customer'):
+	elif filters.get("based_on") == "Customer" and filters.get('customer'):
 		parent_condition += f" and t1.customer = {frappe.db.escape(filters.get('customer'))}"
 
-	elif filters.get('customer_group') and filters.get('customer_group'):
+	elif filters.get("based_on") == "Customer Group" and filters.get('customer_group'):
 		parent_condition += f" and t1.customer_group = {frappe.db.escape(filters.get('customer_group'))}"
 
 	elif filters.get("based_on") == "Item Group" and filters.get('item_group'):
@@ -96,10 +96,13 @@ def get_data(filters, conditions):
 
 		if filters.get("group_by") == "Item":
 			sel_col = "t2.item_code"
+		if filters.get("group_by") == "Item Group":
+			sel_col = "t2.item_group"
 		elif filters.get("group_by") == "Customer":
 			sel_col = "t1.party_name" if conditions.get("trans") == "Quotation" else "t1.customer"
 		elif filters.get("group_by") == "Supplier":
 			sel_col = "t1.supplier"
+		
 
 		if filters.get("based_on") in ["Item", "Customer", "Supplier"]:
 			inc = 2
@@ -108,7 +111,7 @@ def get_data(filters, conditions):
 		data1 = frappe.db.sql(
 			""" select %s from `tab%s` t1, `tab%s Item` t2 %s
 					where t2.parent = t1.name and t1.company = %s and %s between %s and %s and
-					t1.docstatus = 1 %s %s
+					t1.docstatus = 1 %s %s %s
 					group by %s
 				"""
 			% (
@@ -122,6 +125,7 @@ def get_data(filters, conditions):
 				"%s",
 				conditions.get("addl_tables_relational_cond"),
 				cond,
+				parent_condition,
 				conditions["group_by"],
 			),
 			(filters.get("company"), year_start_date, year_end_date),
@@ -138,7 +142,7 @@ def get_data(filters, conditions):
 			row = frappe.db.sql(
 				"""select DISTINCT(%s) from `tab%s` t1, `tab%s Item` t2 %s
 						where t2.parent = t1.name and t1.company = %s and %s between %s and %s
-						and t1.docstatus = 1 and %s = %s %s %s
+						and t1.docstatus = 1 and %s = %s %s %s %s
 					"""
 				% (
 					sel_col,
@@ -153,6 +157,7 @@ def get_data(filters, conditions):
 					"%s",
 					conditions.get("addl_tables_relational_cond"),
 					cond,
+					parent_condition
 				),
 				(filters.get("company"), year_start_date, year_end_date, data1[d][0]),
 				as_list=1,
@@ -165,7 +170,7 @@ def get_data(filters, conditions):
 				row1 = frappe.db.sql(
 					""" select %s , %s from `tab%s` t1, `tab%s Item` t2 %s
 							where t2.parent = t1.name and t1.company = %s and %s between %s and %s
-							and t1.docstatus = 1 and %s = %s and %s = %s %s %s
+							and t1.docstatus = 1 and %s = %s and %s = %s %s %s %s
 						"""
 					% (
 						sel_col,
@@ -183,6 +188,7 @@ def get_data(filters, conditions):
 						"%s",
 						conditions.get("addl_tables_relational_cond"),
 						cond,
+						parent_condition
 					),
 					(filters.get("company"), year_start_date, year_end_date, row[i][0], data1[d][0]),
 					as_list=1,
@@ -198,7 +204,7 @@ def get_data(filters, conditions):
 		data = frappe.db.sql(
 			""" select %s from `tab%s` t1, `tab%s Item` t2 %s
 					where t2.parent = t1.name and t1.company = %s and %s between %s and %s and
-					t1.docstatus = 1 %s %s
+					t1.docstatus = 1 %s %s %s
 					group by %s
 				"""
 			% (
@@ -211,6 +217,7 @@ def get_data(filters, conditions):
 				"%s",
 				"%s",
 				cond,
+				parent_condition,
 				conditions.get("addl_tables_relational_cond", ""),
 				conditions["group_by"],
 			),

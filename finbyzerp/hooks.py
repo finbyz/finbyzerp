@@ -4,8 +4,12 @@ from __future__ import unicode_literals
 from erpnext.accounts import general_ledger
 from erpnext.accounts.report.general_ledger import general_ledger
 from erpnext.accounts.report.item_wise_sales_register import item_wise_sales_register
+from erpnext.buying.report.purchase_order_trends import purchase_order_trends
+from erpnext.stock.report.purchase_receipt_trends import purchase_receipt_trends
 from erpnext.accounts.report.purchase_invoice_trends import purchase_invoice_trends
+from erpnext.selling.report.sales_order_trends import sales_order_trends
 from erpnext.accounts.report.sales_invoice_trends import sales_invoice_trends
+from erpnext.stock.report.delivery_note_trends import delivery_note_trends
 from erpnext.accounts.report.trial_balance_for_party import trial_balance_for_party
 from erpnext.controllers import sales_and_purchase_return
 from erpnext.controllers.buying_controller import BuyingController
@@ -61,8 +65,20 @@ from finbyzerp.finbyzerp.override.pending_so_items_for_purchase_request import (
 from finbyzerp.finbyzerp.override.report.general_ledger import (
     execute as general_ledger_execute,
 )
+from finbyzerp.finbyzerp.override.report.purchase_order_trends import (
+    execute as purchase_order_trends_execute,
+)
+from finbyzerp.finbyzerp.override.report.purchase_receipt_trends import (
+    execute as purchase_receipt_trends_execute,
+)
 from finbyzerp.finbyzerp.override.report.purchase_invoice_trends import (
     execute as purchase_invoice_trends_execute,
+)
+from finbyzerp.finbyzerp.override.report.sales_order_trends import (
+    execute as sales_order_trends_execute,
+)
+from finbyzerp.finbyzerp.override.report.delivery_note_trends import (
+    execute as delivery_note_trends_execute,
 )
 from finbyzerp.finbyzerp.override.report.sales_invoice_trends import (
     execute as sales_invoice_trends_execute,
@@ -291,7 +307,11 @@ ReturnsAPI.setup = returns_api_setup
 
 # Report
 stock_balance.execute = stock_balance_execute
+sales_order_trends.execute = sales_order_trends_execute
+delivery_note_trends.execute = delivery_note_trends_execute
 sales_invoice_trends.execute = sales_invoice_trends_execute
+purchase_order_trends.execute = purchase_order_trends_execute
+purchase_receipt_trends.execute = purchase_receipt_trends
 purchase_invoice_trends.execute = purchase_invoice_trends_execute
 item_wise_sales_register.execute = item_wise_sales_register_execute
 trial_balance_for_party.execute = trial_balance_for_party_execute
