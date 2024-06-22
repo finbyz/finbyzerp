@@ -1,6 +1,12 @@
-import frappe
+# Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
+# License: GNU General Public License v3. See license.txt
+
+
 from frappe import _
-from erpnext.controllers.trends import get_columns, get_data
+
+from finbyzerp.finbyzerp.override.report.trends import get_columns, get_data
+
+
 
 def execute(filters=None):
 	if not filters:

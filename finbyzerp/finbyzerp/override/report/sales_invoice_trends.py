@@ -1,5 +1,10 @@
-from erpnext.controllers.trends import get_columns, get_data
+# Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
+# License: GNU General Public License v3. See license.txt
+
+
 from frappe import _
+
+from finbyzerp.finbyzerp.override.report.trends import get_columns, get_data
 
 
 def execute(filters=None):
@@ -9,6 +14,7 @@ def execute(filters=None):
 	conditions = get_columns(filters, "Sales Invoice")
 	data = get_data(filters, conditions)
 	chart_data = get_chart_data(data, filters)
+	
 	return conditions["columns"], data, None, chart_data
 
 def get_chart_data(data, filters):
