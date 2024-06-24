@@ -442,6 +442,6 @@ from india_compliance.gst_india.overrides import transaction
 from finbyzerp.finbyzerp.transaction import validate_gst_accounts
 transaction.validate_gst_accounts = validate_gst_accounts
 
-from india_compliance.gst_india.overrides.transaction import ItemGSTTreatment
-from finbyzerp.finbyzerp.transaction import set_for_no_taxes as _set_for_no_taxes
-ItemGSTTreatment.set_for_no_taxes = _set_for_no_taxes
+# from india_compliance.gst_india.overrides.transaction import ItemGSTTreatment
+# from finbyzerp.finbyzerp.transaction import set_for_no_taxes as _set_for_no_taxes
+# ItemGSTTreatment.set_for_no_taxes = _set_for_no_taxes #not in india_compliance

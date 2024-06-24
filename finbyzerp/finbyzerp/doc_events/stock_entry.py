@@ -11,7 +11,7 @@ def create_quality_inspection_entry(self):
  
 	for row in self.items:
 		item = frappe.get_doc("Item", row.item_code)
-		if self.purpose in ["Manufacture", "Repack"]:
+		if self.purpose  == "Manufacture":
 			if item.inspection_required_after_stock_entry and row.is_finished_item and row.t_warehouse:
 				quality_inspection = frappe.new_doc("Quality Inspection")
 				quality_inspection.naming_series = 'MAT-IS-.YYYY.-'
