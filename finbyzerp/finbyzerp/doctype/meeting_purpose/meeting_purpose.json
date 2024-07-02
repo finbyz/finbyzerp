@@ -1,0 +1,51 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:purpose",
+ "creation": "2024-07-01 10:26:56.717335",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "purpose",
+  "internal_meeting"
+ ],
+ "fields": [
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Data",
+   "label": "Purpose",
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "internal_meeting",
+   "fieldtype": "Check",
+   "label": " Internal Meeting"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-07-02 08:06:43.848819",
+ "modified_by": "Administrator",
+ "module": "Finbyzerp",
+ "name": "Meeting Purpose",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -60,6 +60,15 @@ class Meeting(Document):
 				)
 				frappe.throw(f"Employee {representative.employee} already has a meeting during this time period:\n{employee_meeting_links}")
 
+		if self.party_type == "Lead":
+			customer = frappe.db.sql("""select lead_name, name from `tabCustomer` where lead_name = %s""", self.party, as_dict=1)
+			if customer:
+				self.party = customer[0].name
+				self.party_type = "Customer"
+				frappe.msgprint("This Lead was already converted to Customer. Now the Party Type is changed to Customer")
+			else:
+				pass
+
 	def on_submit(self):
 		user_name = frappe.db.get_value("Employee",{"user_id":frappe.session.user},"employee_name")
 		url = get_url_to_form("Meeting", self.name)

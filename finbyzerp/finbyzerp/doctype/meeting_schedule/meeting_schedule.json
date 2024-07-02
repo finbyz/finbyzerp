@@ -7,6 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
+  "purpose",
+  "internal_meeting",
   "scheduled_from",
   "scheduled_to",
   "party_type",
@@ -181,13 +183,30 @@
    "fieldtype": "Link",
    "label": "Company",
    "options": "Company"
+  },
+  {
+   "fieldname": "purpose",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Purpose",
+   "options": "Meeting Purpose",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "default": "0",
+   "fetch_from": "purpose.internal_meeting",
+   "fieldname": "internal_meeting",
+   "fieldtype": "Check",
+   "label": "Internal Meeting"
   }
  ],
  "links": [],
- "modified": "2024-02-21 14:19:33.874482",
+ "modified": "2024-07-02 08:10:57.305688",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting Schedule",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
