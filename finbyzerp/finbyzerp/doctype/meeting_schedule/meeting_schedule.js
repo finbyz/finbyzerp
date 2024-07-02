@@ -14,9 +14,21 @@ frappe.ui.form.on('Meeting Schedule', {
 				method : "finbyzerp.finbyzerp.doctype.meeting_schedule.meeting_schedule.make_meeting",
 				frm : frm
 			})
-		})
+		});
+		frm.trigger('filter_purpose');
 	},
-
+	internal_meeting: function(frm) {
+		frm.trigger('filter_purpose');
+	},
+    filter_purpose: function(frm) {
+		frm.set_query('purpose', function() {
+			return {
+				filters: {
+					internal_meeting: cur_frm.doc.internal_meeting
+				}
+			};
+		});
+    },
 	onload: function(frm) {
 		if (frm.doc.party) {
 			frm.trigger("get_party_details");

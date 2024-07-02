@@ -9,8 +9,8 @@
  "engine": "InnoDB",
  "field_order": [
   "naming_series",
-  "purpose",
   "internal_meeting",
+  "purpose",
   "lead",
   "party_type",
   "party",
@@ -355,7 +355,6 @@
   },
   {
    "default": "0",
-   "fetch_from": "purpose.internal_meeting",
    "fieldname": "internal_meeting",
    "fieldtype": "Check",
    "in_filter": 1,
@@ -373,7 +372,7 @@
  "icon": "fa fa-handshake-o",
  "is_submittable": 1,
  "links": [],
- "modified": "2024-07-02 08:08:20.214762",
+ "modified": "2024-07-02 08:19:18.966474",
  "modified_by": "Administrator",
  "module": "Finbyzerp",
  "name": "Meeting",

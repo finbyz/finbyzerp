@@ -50,7 +50,20 @@ frappe.ui.form.on('Meeting', {
 				}
 			}
 		};
+		frm.trigger('filter_purpose');
 	},
+	internal_meeting: function(frm) {
+		frm.trigger('filter_purpose');
+	},
+    filter_purpose: function(frm) {
+		frm.set_query('purpose', function() {
+			return {
+				filters: {
+					internal_meeting: cur_frm.doc.internal_meeting
+				}
+			};
+		});
+    },
 	meeting_from(frm) {
 		if (frm.doc.meeting_from && !frm.doc.meeting_to){
 		    // frm.set_value('scheduled_to',frm.doc.scheduled_from)
