@@ -7,23 +7,28 @@ def update_transaction_tax_details(self):
 
 	for key in tax_total_keys:
 		self.transaction_details[key] = 0
-	# Finbyz Changes Start
+	
 	reverse_charge_account = frappe.db.get_value("GST Account", {'company': self.doc.company, "account_type" : "Output"}, "export_reverse_charge_account")
 
 	reverse_charge_amount = 0
 	total_tax_amount = 0
 
 	for row in self.doc.taxes:
+		if (
+			not row.base_tax_amount_after_discount_amount
+			or self.is_purchase_rcm
+			or row.gst_tax_type not in GST_TAX_TYPES
+		):
+			continue
+			
 		if reverse_charge_account == row.account_head:
 			reverse_charge_amount = row.base_tax_amount_after_discount_amount
-		# Finbyz Changes End
-		if not row.tax_amount or row.account_head not in self.gst_accounts:
-			continue
 
-		tax = self.gst_accounts[row.account_head][:-8]
+		tax = row.gst_tax_type
 		self.transaction_details[f"total_{tax}_amount"] = abs(
 			self.rounded(row.base_tax_amount_after_discount_amount)
 		)
+
 		total_tax_amount += self.transaction_details[f"total_{tax}_amount"]
 
 	# Other Charges
