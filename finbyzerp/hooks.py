@@ -328,11 +328,6 @@ from frappe.model import db_query
 from finbyzerp.api import get_date_range
 db_query.get_date_range = get_date_range
 
-# from india_compliance.gst_india.report.gstr_1.gstr_1 import Gstr1Report
-# from finbyzerp.finbyzerp.override.gstr_1 import get_items_based_on_tax_rate as get_items_based_on_tax_rate_custom
-# from finbyzerp.finbyzerp.override.gstr_1 import get_row_data_for_invoice as get_row_data_for_invoice_custom
-# Gstr1Report.get_row_data_for_invoice = get_row_data_for_invoice_custom
-# Gstr1Report.get_items_based_on_tax_rate = get_items_based_on_tax_rate_custom
 
 # from frappe.workflow.doctype.workflow_action import workflow_action
 # from finbyzerp.api import process_workflow_actions
@@ -342,6 +337,9 @@ from erpnext.accounts import general_ledger
 from finbyzerp.finbyzerp.override.general_ledger import check_freezing_date , get_result_as_list
 general_ledger.check_freezing_date = check_freezing_date
 
+from india_compliance.gst_india.report.gstr_1 import gstr_1
+from finbyzerp.finbyzerp.override.gstr_1 import execute 
+gstr_1.execute = execute
 
 from erpnext.accounts.report.general_ledger  import  general_ledger
 from finbyzerp.finbyzerp.override.general_ledger import execute
@@ -442,6 +440,6 @@ from india_compliance.gst_india.overrides import transaction
 from finbyzerp.finbyzerp.transaction import validate_gst_accounts
 transaction.validate_gst_accounts = validate_gst_accounts
 
-from india_compliance.gst_india.overrides.transaction import ItemGSTTreatment
-from finbyzerp.finbyzerp.transaction import set_for_no_taxes as _set_for_no_taxes
-ItemGSTTreatment.set_for_no_taxes = _set_for_no_taxes
+# from india_compliance.gst_india.overrides.transaction import ItemGSTTreatment
+# from finbyzerp.finbyzerp.transaction import set_for_no_taxes as _set_for_no_taxes
+# ItemGSTTreatment.set_for_no_taxes = _set_for_no_taxes #not in india_compliance

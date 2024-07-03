@@ -1,13 +1,35 @@
 import frappe
 import json
 from frappe import _
-from frappe.utils import cint, flt, formatdate, getdate
+from frappe.utils import flt
+
+import frappe.utils
+from india_compliance.gst_india.constants.__init__ import GST_TAX_TYPES
+from frappe.utils import formatdate
 from india_compliance.gst_india.report.gstr_1.gstr_1 import get_invoice_type_for_excel
 from india_compliance.gst_india.utils import (
-    is_overseas_transaction,
+is_overseas_transaction,
 )
-def get_row_data_for_invoice(self, invoice, invoice_details, tax_rate, items):
+from india_compliance.gst_india.report.gstr_1.gstr_1 import Gstr1Report as _Gstr1Report
+def execute(filters=None):
+    return CustomGstr1Report(filters).run()
+
+class CustomGstr1Report(_Gstr1Report):
+    def get_row_data_for_invoice(self, invoice_details, tax_rate, item_detail):
+        """
+        Build row for GSTR-1
+
+        Value mapping from books to GSTR-1 Excel.
+        """
         row = {}
+        # For CDNR values should be positive
+        item_detail.update(
+            {
+                "taxable_value": abs(flt(item_detail.get("taxable_value", 0), 2)),
+                "cess_amount": abs(flt(item_detail.get("cess_amount", 0), 2)),
+            }
+        )
+
         for fieldname in self.invoice_fields:
             if (
                 self.filters.get("type_of_business") in ("CDNR-REG", "CDNR-UNREG")
@@ -38,41 +60,44 @@ def get_row_data_for_invoice(self, invoice, invoice_details, tax_rate, items):
                 row[fieldname] = export_type
             else:
                 row[fieldname] = invoice_details.get(fieldname)
-        taxable_value = 0
-        cess_amount = 0
 
-        for item_code, net_amount in self.invoice_items.get(invoice).items():
-            if item_code in items:
-                taxable_value += flt(abs(net_amount), 2)
-                cess_amount += flt(
-                    self.invoice_cess.get(invoice, {}).get(item_code, 0.0), 2
-                )
+        row.update({"rate": tax_rate, "applicable_tax_rate": 0, **item_detail})
 
-        row["rate"] = tax_rate or 0
-        row["taxable_value"] = taxable_value
-        row["applicable_tax_rate"] = 0
+        return row
 
-        for column in self.other_columns:
-            if column.get("fieldname") == "cess_amount":
-                row["cess_amount"] = cess_amount
+    def get_invoice_wise_tax_details(self):
+        """
+        Returns item wise tax details for each invoice.
 
-        return row, taxable_value
+        Important: Only Updates Tax amounts and Tax Rates.
+        Taxable value is updated in get_invoice_tax_rate_info
 
-
-def get_items_based_on_tax_rate(self):
-        tax_details = frappe.db.sql(
+        Example:
+            {
+                "INV-001": {
+                    "item_code": {
+                        "tax_rate": 5,
+                        "cess_amount": 0,
+                        "taxable_value": 0
+                    }
+                }
+            }
+        """
+        unidentified_gst_accounts = set()
+        invoice_tax_details = frappe.db.sql(
             """
-			select
-				parent, account_head, item_wise_tax_detail
-			from `tab%s`
-			where
-				parenttype = %s and docstatus = 1
-				and parent in (%s)
-			order by account_head
-		"""
+            select
+                parent, account_head, item_wise_tax_detail,gst_tax_type
+            from `tab%s`
+            where
+                parenttype = %s and docstatus = 1
+                and parent in (%s)
+            order by account_head
+        """
             % (self.tax_doctype, "%s", ", ".join(["%s"] * len(self.invoices.keys()))),
             tuple([self.doctype] + list(self.invoices.keys())),
         )
+
         # FINBYZ CHANGES START
         self.export_reverse_charge = {} 
         self.export_reverse_charge_account = frappe.db.sql("""
@@ -82,56 +107,44 @@ def get_items_based_on_tax_rate(self):
         """, (self.filters.get("company"),), as_dict=1)
         # frappe.throw(str(self.export_reverse_charge_account[0]["export_reverse_charge_account"]))
         # FINBYZ CHANGES END
-        self.items_based_on_tax_rate = {}
-        self.invoice_cess = frappe._dict()
 
-        unidentified_gst_accounts = set()
-        unidentified_gst_accounts_invoice = set()
-        for parent, account, item_wise_tax_detail in tax_details:
+        invoice_item_wise_tax_details = frappe._dict()
+
+        for parent, account, item_wise_tax_detail, gst_tax_type in invoice_tax_details:
             # FINBYZ CHANGES START
             if account ==  self.export_reverse_charge_account[0]["export_reverse_charge_account"]:
                 self.export_reverse_charge[parent] = list(json.loads(item_wise_tax_detail).values())[-1][-1]
             # FINBYZ CHANGES END
             if not item_wise_tax_detail:
                 continue
-            if account not in self.gst_accounts.values():
+
+            if gst_tax_type not in GST_TAX_TYPES:
                 if "gst" in account.lower():
                     unidentified_gst_accounts.add(account)
-                    unidentified_gst_accounts_invoice.add(parent)
-
                 continue
-
             try:
                 item_wise_tax_detail = json.loads(item_wise_tax_detail)
             except ValueError:
                 continue
 
-            is_cess = account == self.gst_accounts.cess_account
-            is_cgst_or_sgst = (
-                account == self.gst_accounts.cgst_account
-                or account == self.gst_accounts.sgst_account
-            )
+            is_cess = "cess" in gst_tax_type
+            is_cgst_or_sgst = gst_tax_type in ("cgst", "sgst")
 
-            for item_code, tax_amounts in item_wise_tax_detail.items():
-                tax_rate = tax_amounts[0]
+            parent_dict = invoice_item_wise_tax_details.setdefault(parent, {})
+            for item_code, invoice_tax_details in item_wise_tax_detail.items():
+                tax_rate = flt(invoice_tax_details[0])
+                tax_rate = flt(tax_rate * 2 if is_cgst_or_sgst else tax_rate)
+                tax_amount = flt(invoice_tax_details[1])
 
-                if not tax_rate and parent not in self.nil_exempt_non_gst:
-                    continue
+                item_dict = parent_dict.setdefault(
+                    item_code, {"tax_rate": 0, "cess_amount": 0, "taxable_value": 0}
+                )
 
                 if is_cess:
-                    self.invoice_cess.setdefault(parent, {})
-                    self.invoice_cess[parent].setdefault(item_code, 0.0)
-                    self.invoice_cess[parent][item_code] += tax_amounts[1]
+                    item_dict["cess_amount"] += tax_amount
                     continue
 
-                if is_cgst_or_sgst:
-                    tax_rate *= 2
-
-                (
-                    self.items_based_on_tax_rate.setdefault(parent, {})
-                    .setdefault(tax_rate, set())
-                    .add(item_code)
-                )
+                item_dict["tax_rate"] = tax_rate
 
         if unidentified_gst_accounts:
             frappe.msgprint(
@@ -141,27 +154,4 @@ def get_items_based_on_tax_rate(self):
                 alert=True,
             )
 
-        # Build itemised tax for export invoices where tax table is blank
-        for invoice_no, items in self.invoice_items.items():
-            if (
-                invoice_no in self.items_based_on_tax_rate
-                or invoice_no in unidentified_gst_accounts_invoice
-            ):
-                continue
-
-            invoice = self.invoices.get(invoice_no, {})
-            if not invoice.get("is_export_with_gst") and is_overseas_transaction(
-                "Sales Invoice", invoice.gst_category, invoice.place_of_supply
-            ):
-                self.items_based_on_tax_rate.setdefault(invoice_no, {}).setdefault(
-                    0, []
-                ).extend(items)
-
-            # Show invoice with all items are in nil exempt and exclude non-gst
-            if (
-                invoice_no in self.nil_exempt_non_gst
-                and self.nil_exempt_non_gst[invoice_no][2] == 0
-            ):
-                self.items_based_on_tax_rate.setdefault(invoice_no, {}).setdefault(
-                    0, []
-                ).extend(items)
+        return invoice_item_wise_tax_details
