@@ -6,7 +6,7 @@ from frappe.utils import flt
 import frappe.utils
 from india_compliance.gst_india.constants.__init__ import GST_TAX_TYPES
 from frappe.utils import formatdate
-from india_compliance.gst_india.report.gstr_1.gstr_1 import get_invoice_type_for_excel
+# from india_compliance.gst_india.report.gstr_1.gstr_1 import get_invoice_type_for_excel
 from india_compliance.gst_india.utils import (
 is_overseas_transaction,
 )
