@@ -41,6 +41,20 @@ frappe.ui.form.on('Sales Invoice', {
 	},
 	posting_date: function (frm) {
 		frm.trigger('naming_series');
+		frm.trigger('payment_terms_template');
+	},
+	payment_terms_template: function (frm) {
+		if (frm.doc.payment_terms_template) {
+			frappe.call({
+				method: "erpnext.controllers.accounts_controller.get_payment_terms",
+				args: {
+					'terms_template' : frm.doc.payment_terms_template
+				},
+				callback: function (e) {
+					frm.set_value('payment_schedule', e.message);
+				}
+			});
+		}
 	},
 	validate:function(frm){
 		if(frm.doc.customer_address && !frm.doc.shipping_address_name){

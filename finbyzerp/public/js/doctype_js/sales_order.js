@@ -25,7 +25,6 @@ frappe.ui.form.on('Sales Order', {
 
 					}
 				});
-				// frm.refresh_field('series_value')
 			}
 		}
 	},
@@ -34,6 +33,20 @@ frappe.ui.form.on('Sales Order', {
 	},
 	transaction_date: function (frm) {
 		frm.trigger('naming_series');
+		frm.trigger('payment_terms_template');
+	},
+	payment_terms_template: function (frm) {
+		if (frm.doc.payment_terms_template) {
+			frappe.call({
+				method: "erpnext.controllers.accounts_controller.get_payment_terms",
+				args: {
+					'terms_template' : frm.doc.payment_terms_template
+				},
+				callback: function (e) {
+					frm.set_value('payment_schedule', e.message);
+				}
+			});
+		}
 	},
 });
 
