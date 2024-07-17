@@ -14,11 +14,14 @@ def before_naming(self, method):
             or getdate()
         )
 
-        fiscal = get_fiscal(date)
-        self.fiscal = fiscal
-        # get fiscal year from fiscal year
-        fiscal_year = get_fiscal_year(date)[0]
-        self.fiscal_year = fiscal_year
+        try:
+            fiscal = get_fiscal(date)
+            # get fiscal year from fiscal year
+            fiscal_year = get_fiscal_year(date)[0]
+            self.fiscal_year = fiscal_year
+            self.fiscal = fiscal
+        except Exception:
+            pass
 
         if not self.get("company_series"):
             self.company_series = None
@@ -40,14 +43,3 @@ def before_naming(self, method):
                     f"UPDATE `tabSeries` SET current = {cint(self.series_value) - 1} WHERE name = '{name}'"
                 )
 
-def before_insert(self, method):
-	set_opening_naming_series(self)
-
-def set_opening_naming_series(self):
-	if not self.name and self.is_opening == "Yes":
-		self.naming_series = "O" + self.naming_series
-		if self.naming_series.find("Ofiscal") != -1:
-			self.naming_series = self.naming_series.replace("Ofiscal", "O.fiscal")
-		
-		if self.naming_series.find("Ocompany_series") != -1:
-			self.naming_series = self.naming_series.replace("Ocompany_series", "O.company_series")

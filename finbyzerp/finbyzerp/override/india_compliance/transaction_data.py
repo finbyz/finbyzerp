@@ -14,6 +14,9 @@ def update_transaction_tax_details(self):
 	total_tax_amount = 0
 
 	for row in self.doc.taxes:
+		if reverse_charge_account == row.account_head:
+			reverse_charge_amount = row.base_tax_amount_after_discount_amount
+
 		if (
 			not row.base_tax_amount_after_discount_amount
 			or self.is_purchase_rcm
@@ -21,8 +24,6 @@ def update_transaction_tax_details(self):
 		):
 			continue
 			
-		if reverse_charge_account == row.account_head:
-			reverse_charge_amount = row.base_tax_amount_after_discount_amount
 
 		tax = row.gst_tax_type
 		self.transaction_details[f"total_{tax}_amount"] = abs(
