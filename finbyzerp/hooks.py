@@ -13,12 +13,9 @@ from erpnext.selling.report.pending_so_items_for_purchase_request import (
 )
 from erpnext.selling.report.sales_order_analysis import sales_order_analysis
 from finbyzerp.finbyzerp.override.india_compliance.base import get_url as get_gsp_url
-from finbyzerp.finbyzerp.override.india_compliance.e_invoice import einvoice_setup
-from finbyzerp.finbyzerp.override.india_compliance.e_waybill import ewaybill_setup
+from finbyzerp.finbyzerp.override.india_compliance.e_invoice import setup as einvoice_setup
+from finbyzerp.finbyzerp.override.india_compliance.e_waybill import setup as ewaybill_setup
 from finbyzerp.finbyzerp.override.india_compliance.public import get_gstin_info
-from finbyzerp.finbyzerp.override.india_compliance.transaction_data import (
-    update_transaction_tax_details,
-)
 from finbyzerp.finbyzerp.override.pending_so_items_for_purchase_request import (
     execute as pending_so_items_for_purchase_request_execute,
 )
@@ -47,11 +44,11 @@ from india_compliance.gst_india.api_classes.base import BaseAPI
 from india_compliance.gst_india.api_classes.e_invoice import EInvoiceAPI
 from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
 from india_compliance.gst_india.api_classes.public import PublicAPI
-from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
 from india_compliance.gst_india.api_classes.taxpayer_base import PublicCertificate
 from india_compliance.gst_india.api_classes.taxpayer_base import FilesAPI
 from india_compliance.gst_india.api_classes.taxpayer_returns import ReturnsAPI
-from finbyzerp.finbyzerp.override.india_compliance.returns import get_gstn_public_certificate, returns_api_setup
+from finbyzerp.finbyzerp.override.india_compliance.taxpayer_returns import setup as returns_api_setup
+from finbyzerp.finbyzerp.override.india_compliance.taxpayer_base import get_gstn_public_certificate
 
 from . import __version__ as app_version
 
@@ -94,7 +91,6 @@ doctype_js = {
     "Customer": "public/js/doctype_js/customer.js",
     "Opportunity": "public/js/doctype_js/opportunity.js",
     "Opening Invoice Creation Tool": "public/js/doctype_js/opening_invoice_creation_tool.js",
-    "Payment Reconciliation": "public/js/doctype_js/payment_reconciliation.js",
     "BOM": "public/js/doctype_js/bom.js",
     "Quotation": "public/js/doctype_js/quotation.js",
 }
@@ -110,13 +106,6 @@ doc_events = {
         "before_cancel": "finbyzerp.finbyzerp.doc_events.sales_comment.on_cancel",
         "on_trash": "finbyzerp.finbyzerp.doc_events.sales_comment.on_trash",
     },
-    # ("Customer", "Supplier"): {
-    #     "validate": "finbyzerp.finbyzerp.doc_events.customer_supplier.validate",
-    #     "before_rename": "finbyzerp.finbyzerp.doc_events.customer_supplier.before_rename", Sir ko puchna hai
-    # },
-    # ("Purchase Order", "Sales Order"): {
-    #     "before_cancel": "finbyzerp.finbyzerp.doc_events.sales_purchase_order.before_cancel"  Sir ko puchna hai
-    # },
     "Sales Order":{
         "validate" : "finbyzerp.finbyzerp.doc_events.sales_order.validate",
         "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_after_submit",
@@ -201,17 +190,12 @@ scheduler_events = {
 
 
 # India Compliance Overrides
+BaseAPI.SENSITIVE_INFO = BaseAPI.SENSITIVE_INFO + ('authorization',)
+BaseAPI.BASE_URL="https://asp.resilient.tech"
+BaseAPI.get_url = get_gsp_url
 EInvoiceAPI.setup = einvoice_setup
 EWaybillAPI.setup = ewaybill_setup
-BaseAPI.SENSITIVE_INFO = BaseAPI.SENSITIVE_INFO + ('authorization',)
-BaseAPI.get_url = get_gsp_url
-BaseAPI.BASE_URL="https://asp.resilient.tech"
 PublicAPI.get_gstin_info = get_gstin_info
-GSTTransactionData.update_transaction_tax_details = update_transaction_tax_details
-sales_order_analysis.execute = sales_order_analysis_execute
-pending_so_items_for_purchase_request.execute = (
-    pending_so_items_for_purchase_request_execute
-)
 PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
 FilesAPI.BASE_PATH = "gstn/files"
 ReturnsAPI.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
@@ -220,10 +204,12 @@ ReturnsAPI.setup = returns_api_setup
 
 
 # Report
+sales_order_analysis.execute = sales_order_analysis_execute
+pending_so_items_for_purchase_request.execute = pending_so_items_for_purchase_request_execute
+
 sales_order_trends.execute = sales_order_trends_execute
 delivery_note_trends.execute = delivery_note_trends_execute
 sales_invoice_trends.execute = sales_invoice_trends_execute
 purchase_order_trends.execute = purchase_order_trends_execute
 purchase_receipt_trends.execute = purchase_receipt_trends_execute
 purchase_invoice_trends.execute = purchase_invoice_trends_execute
-
