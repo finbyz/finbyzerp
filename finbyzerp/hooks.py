@@ -373,9 +373,9 @@ fixtures = [
       },
 ]
 
-from india_compliance.gst_india.api_classes.returns import PublicCertificate
-from india_compliance.gst_india.api_classes.returns import FilesAPI
-from india_compliance.gst_india.api_classes.returns import ReturnsAPI
+from india_compliance.gst_india.api_classes.taxpayer_base import PublicCertificate
+from india_compliance.gst_india.api_classes.taxpayer_base import FilesAPI
+from india_compliance.gst_india.api_classes.taxpayer_returns import ReturnsAPI
 from india_compliance.gst_india.api_classes.e_invoice import EInvoiceAPI
 from finbyzerp.e_invoice_override_14 import einvoice_setup
 from finbyzerp.returns import get_gstn_public_certificate, returns_api_setup
