@@ -90,8 +90,6 @@ doctype_js = {
     "Stock Entry": "public/js/doctype_js/stock_entry.js",
     "Account": "public/js/doctype_js/account.js",
     "GST Settings": "public/js/doctype_js/gst_settings.js",
-    "Lead": "public/js/doctype_js/lead.js",
-    "Customer": "public/js/doctype_js/customer.js",
     "Opportunity": "public/js/doctype_js/opportunity.js",
     "Opening Invoice Creation Tool": "public/js/doctype_js/opening_invoice_creation_tool.js",
     "Payment Reconciliation": "public/js/doctype_js/payment_reconciliation.js",
