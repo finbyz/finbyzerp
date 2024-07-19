@@ -14,14 +14,12 @@ def before_naming(self, method):
             or getdate()
         )
 
-        try:
+        if frappe.db.get_all("Fiscal Year"):
             fiscal = get_fiscal(date)
             # get fiscal year from fiscal year
             fiscal_year = get_fiscal_year(date)[0]
             self.fiscal_year = fiscal_year
             self.fiscal = fiscal
-        except Exception:
-            pass
 
         if not self.get("company_series"):
             self.company_series = None

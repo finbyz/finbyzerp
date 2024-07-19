@@ -1,8 +1,13 @@
 from urllib.parse import urljoin
 
+BASE_URL = "https://gsp.adaequare.com"
+
 def get_url(self, *parts):
-	self.base_url = "https://gsp.adaequare.com"
-	parts = [i for i in parts if i != '']
+	parts = list(parts)
+
+	# If the first part is a URL, return it as it is
+	if parts and parts[0].startswith("https"):
+		return parts[0]
 
 	if self.BASE_PATH:
 		parts.insert(0, self.BASE_PATH)
@@ -10,4 +15,4 @@ def get_url(self, *parts):
 	if self.sandbox_mode:
 		parts.insert(0, "test")
 
-	return urljoin(self.base_url, "/".join(part.strip("/") for part in parts))
+	return urljoin(BASE_URL, "/".join(part.strip("/") for part in parts))
