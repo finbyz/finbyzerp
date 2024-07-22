@@ -74,7 +74,19 @@ website_context = {
 doctype_list_js = {
     "Batch": "public/js/doctype_js/batch_list.js",
 }
-
+fixtures = [
+    {
+        "dt": "Custom Field",
+        "filters": [
+            ["name", "in", [
+                "Accounts Settings-send_overdue_reminder",
+                "Accounts Settings-send_testing_overdue_mail",
+                "Accounts Settings-test_recipients_emails-email_id",
+                "Company-send_from_overdue_email" 
+            ]]
+        ]
+    }
+]
 # Doctype Js
 doctype_js = {
     "Sales Order": "public/js/doctype_js/sales_order.js",
