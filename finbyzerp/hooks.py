@@ -82,7 +82,6 @@ fixtures = [
                 "Accounts Settings-send_overdue_reminder",
                 "Accounts Settings-send_testing_overdue_mail",
                 "Accounts Settings-test_recipients_emails",
-                "Accounts Settings-test_recipients_emails-email_id",
                 "Company-send_from_overdue_email",
                 "Accounts Settings-recipients"
             ]]
