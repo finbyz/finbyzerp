@@ -46,7 +46,7 @@ from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
 from india_compliance.gst_india.api_classes.public import PublicAPI
 from india_compliance.gst_india.api_classes.taxpayer_base import PublicCertificate
 from india_compliance.gst_india.api_classes.taxpayer_base import FilesAPI
-from india_compliance.gst_india.api_classes.taxpayer_base import TaxpayerBaseAPI
+from india_compliance.gst_india.api_classes.taxpayer_base import TaxpayerBaseAPI, TaxpayerAuthenticate
 from india_compliance.gst_india.api_classes.taxpayer_returns import ReturnsAPI
 from finbyzerp.finbyzerp.override.india_compliance.taxpayer_base import setup as tax_payer_base_api, get_gstn_public_certificate
 
@@ -209,8 +209,8 @@ EWaybillAPI.setup = ewaybill_setup
 PublicAPI.get_gstin_info = get_gstin_info
 PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
 FilesAPI.BASE_PATH = "gstn/files"
-ReturnsAPI.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
-ReturnsAPI.BASE_PATH = "gstn"
+TaxpayerAuthenticate.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
+TaxpayerBaseAPI.BASE_PATH = "gstn"
 TaxpayerBaseAPI.setup = tax_payer_base_api
 
 
