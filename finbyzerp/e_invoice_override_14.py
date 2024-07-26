@@ -209,54 +209,6 @@ def get_item_list(self):
 		self.get_item_tax_details(item_details, row)
 		self.item_list.append(self.get_item_data(item_details))
 
-# def get_item_list(invoice):
-# 	item_list = []
-
-# 	for d in invoice.items:
-# 		einvoice_item_schema = read_json('einv_item_template')
-# 		item = frappe._dict({})
-# 		item.update(d.as_dict())
-
-# 		item.sr_no = d.idx
-# 		item.description = json.dumps(d.item_name)[1:-1]
-
-# 		# Finbyz changes Start: Wherever Quantity is calculating based on concentration with qty 
-# 		try:
-# 			item.qty = abs(item.quantity)
-# 		except:
-# 			item.qty = abs(item.qty)
-# 		# Finbyz Changes End
-		
-# 		if invoice.apply_discount_on == 'Net Total' and invoice.discount_amount:
-# 			item.discount_amount = abs(item.base_amount - item.base_net_amount)
-# 		else:
-# 			item.discount_amount = 0
-
-# 		item.unit_rate = abs((abs(item.taxable_value) - item.discount_amount)/ item.qty)
-# 		item.gross_amount = abs(item.taxable_value) + item.discount_amount
-# 		item.taxable_value = abs(item.taxable_value)
-
-# 		item.batch_expiry_date = frappe.db.get_value('Batch', d.batch_no, 'expiry_date') if d.batch_no else None
-# 		item.batch_expiry_date = format_date(item.batch_expiry_date, 'dd/mm/yyyy') if item.batch_expiry_date else None
-# 		#finbyz Changes
-# 		if frappe.db.get_value('Item', d.item_code, 'is_stock_item') or frappe.db.get_value('Item', d.item_code, 'is_not_service_item'):
-# 			item.is_service_item = 'N'  
-# 		else:
-# 			item.is_service_item = 'Y'
-# 		#finbyz changes end
-		
-# 		item.serial_no = ""
-
-# 		item = update_item_taxes(invoice, item)
-		
-# 		item.total_value = abs(
-# 			item.taxable_value + item.igst_amount + item.sgst_amount +
-# 			item.cgst_amount + item.cess_amount + item.cess_nadv_amount + item.other_charges
-# 		)
-# 		einv_item = einvoice_item_schema.format(item=item)
-# 		item_list.append(einv_item)
-
-# 	return ', '.join(item_list)
 
 def get_port_address_details(address_name, skip_gstin_validation):
 	addr = frappe.get_doc('Address', address_name)

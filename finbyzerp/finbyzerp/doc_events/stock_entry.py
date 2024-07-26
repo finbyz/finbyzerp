@@ -86,3 +86,13 @@ def on_submit(self, method):
 				qi_doc = frappe.get_doc("Quality Inspection",doc)
 				if qi_doc.docstatus == 0:
 					frappe.throw("Quality Inspection Is Not Submited <br> Please Submit Quality Inspection {}".format(get_link_to_form("Quality Inspection",doc)))
+
+
+def stock_entry_on_submit(self,method):
+    validate_additional_cost(self)
+
+def validate_additional_cost(self):
+    if self.purpose in ['Repack','Manufacture']:
+        diff = abs(round(flt(self.value_difference,1)) - (round(flt(self.total_additional_costs,1))))
+        if diff > 5:
+            frappe.throw("ValuationError: Value difference between incoming and outgoing amount is higher than additional cost")

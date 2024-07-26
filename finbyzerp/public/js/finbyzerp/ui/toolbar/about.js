@@ -8,9 +8,9 @@ frappe.ui.misc.about = function() {
 		<p><i class='fa fa-globe fa-fw'></i>\
 			Website: <a href=' https://finbyz.tech' target='_blank'> https://finbyz.tech</a></p>\
 		<p><i class='fa fa-youtube-play aria-hidden=true'></i>\
-			Youtube Tutorial  : <a href=' https://www.youtube.com/@Finbyz'> https://www.youtube.com/@Finbyz</a></p>\
+			Youtube Tutorial  : <a href=' https://www.youtube.com/@Finbyz' target='_blank'> https://www.youtube.com/@Finbyz</a></p>\
 		<p><i class='fa fa-solid fa-envelope fa-fw'></i>\
-			Support: <a href='support@finbyz.tech' target='_blank'>support@finbyz.tech</a></p>\
+			Support: <a href='mailto:support@finbyz.tech'>support@finbyz.tech</a></p>\
 		<p><i class='fa fa-phone fa-fw'></i>\
 			Phone:<a href='tel:079 48912428'> 079 48912428</a></p>\
 		<hr>\

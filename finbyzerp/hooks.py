@@ -23,20 +23,16 @@ after_install = "finbyzerp.install.after_install"
 # GSTR3BReport.get_inter_state_supplies = get_inter_state_supplies
 # GSTR3BReport.get_tax_amounts = get_tax_amounts
 
-#depreciated in v13
-# from erpnext.setup.doctype.naming_series.naming_series import NamingSeries
-# from finbyzerp.finbyzerp.override.naming_series import get_transactions
-# NamingSeries.get_transactions = get_transactions
 
-from frappe.core.doctype.document_naming_settings.document_naming_settings import DocumentNamingSettings
+from frappe.core.doctype.document_naming_settings.document_naming_settings import DocumentNamingSettings #todo v14
 from finbyzerp.finbyzerp.override.naming_series import _get_prefixes as get_prefixes
 DocumentNamingSettings._get_prefixes = get_prefixes
 
-from erpnext.accounts.doctype.opening_invoice_creation_tool.opening_invoice_creation_tool import OpeningInvoiceCreationTool
-from finbyzerp.finbyzerp.doc_events.opening_invoice_creation_tool import get_invoice_dict, make_invoices
+# from erpnext.accounts.doctype.opening_invoice_creation_tool.opening_invoice_creation_tool import OpeningInvoiceCreationTool #todo v14
+# from finbyzerp.finbyzerp.doc_events.opening_invoice_creation_tool import get_invoice_dict, make_invoices
 
-OpeningInvoiceCreationTool.get_invoice_dict = get_invoice_dict
-OpeningInvoiceCreationTool.make_invoices = make_invoices
+# OpeningInvoiceCreationTool.get_invoice_dict = get_invoice_dict
+# OpeningInvoiceCreationTool.make_invoices = make_invoices
 
 
 from frappe.core.doctype.report.report import Report
@@ -142,28 +138,25 @@ override_doctype_class = {
     "Sales Invoice": "finbyzerp.finbyzerp.override.sales_invoice.SalesInvoice",
     "Purchase Invoice": "finbyzerp.finbyzerp.override.purchase_invoice.PurchaseInvoice",
     "Authorization Rule": "finbyzerp.finbyzerp.override.authorization_rule.AuthorizationRule",
+    "Opening Invoice Creation Tool": "finbyzerp.finbyzerp.override.doctype.opening_invoice_creation_tool.OpeningInvoiceCreationTool",
 }
 
 override_whitelisted_methods = {
-	"frappe.core.page.permission_manager.permission_manager.get_roles_and_doctypes": "finbyzerp.permission.get_roles_and_doctypes",
-	"frappe.core.page.permission_manager.permission_manager.get_permissions": "finbyzerp.permission.get_permissions",
-	"frappe.core.page.permission_manager.permission_manager.add": "finbyzerp.permission.add",
-	"frappe.core.page.permission_manager.permission_manager.update": "finbyzerp.permission.update",
-	"frappe.core.page.permission_manager.permission_manager.remove": "finbyzerp.permission.remove",
-	"frappe.core.page.permission_manager.permission_manager.reset": "finbyzerp.permission.reset",
-	"frappe.core.page.permission_manager.permission_manager.get_users_with_role": "finbyzerp.permission.get_users_with_role",
-	"frappe.core.page.permission_manager.permission_manager.get_standard_permissions": "finbyzerp.permission.get_standard_permissions",
-	"erpnext.setup.doctype.company.delete_company_transactions.delete_company_transactions": "finbyzerp.finbyzerp.override.delete_company_transactions.delete_company_transactions",
-	"frappe.desk.moduleview.get_desktop_settings": "finbyzerp.api.get_desktop_settings",
-	"frappe.desk.moduleview.get_options_for_global_modules": "finbyzerp.api.get_options_for_global_modules",
-	# "india_compliance.gst_india.utils.e_invoice.generate_e_invoice" : "finbyzerp.e_invoice_override_14.custom_generate_e_invoice",
-	# "erpnext.regional.india.e_invoice.utils.cancel_eway_bill": "finbyzerp.e_invoice_override.cancel_eway_bill", # cancel eway bill override for enable cancel_eway_bill api
-	#"frappe.utils.print_format.download_pdf": "finbyzerp.print_format.download_pdf",
-	"erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_invoice" : "finbyzerp.api.make_purchase_invoice",
-    "erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_receipt" : "finbyzerp.api.make_purchase_receipt",
-    "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice":"finbyzerp.api.make_sales_invoice",
-    # "erpnext.selling.doctype.sales_order.sales_order.make_delivery_note":"finbyzerp.api.make_delivery_note",
-    "frappe.modules.utils.export_customizations":"finbyzerp.finbyzerp.override.customize_form.export_customizations", 
+	"frappe.core.page.permission_manager.permission_manager.get_roles_and_doctypes": "finbyzerp.finbyzerp.override_whitelisted.permission.get_roles_and_doctypes",
+	"frappe.core.page.permission_manager.permission_manager.get_permissions": "finbyzerp.finbyzerp.override_whitelisted.permission.get_permissions",
+	"frappe.core.page.permission_manager.permission_manager.add": "finbyzerp.finbyzerp.override_whitelisted.permission.add",
+	"frappe.core.page.permission_manager.permission_manager.update": "finbyzerp.finbyzerp.override_whitelisted.permission.update",
+	"frappe.core.page.permission_manager.permission_manager.remove": "finbyzerp.finbyzerp.override_whitelisted.permission.remove",
+	"frappe.core.page.permission_manager.permission_manager.reset": "finbyzerp.finbyzerp.override_whitelisted.permission.reset",
+	"frappe.core.page.permission_manager.permission_manager.get_users_with_role": "finbyzerp.finbyzerp.override_whitelisted.permission.get_users_with_role",
+	"frappe.core.page.permission_manager.permission_manager.get_standard_permissions": "finbyzerp.finbyzerp.override_whitelisted.permission.get_standard_permissions",
+	"erpnext.setup.doctype.company.delete_company_transactions.delete_company_transactions": "finbyzerp.finbyzerp.override_whitelisted.delete_company_transactions.delete_company_transactions",
+	"frappe.desk.moduleview.get_desktop_settings": "finbyzerp.finbyzerp.override_whitelisted.module_view.get_desktop_settings",
+	"frappe.desk.moduleview.get_options_for_global_modules": "finbyzerp.finbyzerp.override_whitelisted.module_view.get_options_for_global_modules",
+	"erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_invoice" : "finbyzerp.finbyzerp.override_whitelisted.purchase_order.make_purchase_invoice",
+    "erpnext.buying.doctype.purchase_order.purchase_order.make_purchase_receipt" : "finbyzerp.finbyzerp.override_whitelisted.purchase_order.make_purchase_receipt",
+    "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice":"finbyzerp.finbyzerp.override_whitelisted.sales_invoice.make_sales_invoice",
+    "frappe.modules.utils.export_customizations":"finbyzerp.finbyzerp.override_whitelisted.customize_form.export_customizations", 
 }
 
 # override for supplier query
@@ -173,7 +166,7 @@ queries.supplier_query = custom_supplier_query
 
 # override for download backup
 from frappe.utils import response
-from finbyzerp.permission import download_backup
+from finbyzerp.finbyzerp.override_whitelisted.permission import download_backup
 response.download_backup = download_backup
 
 override_doctype_dashboards = {
@@ -184,11 +177,11 @@ override_doctype_dashboards = {
 
 doc_events = {
 	"Customer": {
-		"validate":"finbyzerp.api.customer_validate",
+		"validate":"finbyzerp.finbyzerp.doc_events.customer.customer_validate",
 		"before_rename": "finbyzerp.finbyzerp.doc_events.customer.before_rename",
 	},
 	"Supplier": {
-		"validate":"finbyzerp.api.supplier_validate",
+		"validate":"finbyzerp.finbyzerp.doc_events.supplier.supplier_validate",
 		"before_rename": "finbyzerp.finbyzerp.doc_events.supplier.before_rename"
 	},
 	"Item": {
@@ -197,32 +190,31 @@ doc_events = {
 		"before_rename": "finbyzerp.finbyzerp.doc_events.item.before_rename"
 	},
 	"User": {
-		"validate":"finbyzerp.api.validate_user"
+		"validate":"finbyzerp.finbyzerp.doc_events.user.validate_user"
 	},
 	"Sales Invoice": {
-		"before_insert": "finbyzerp.api.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
 		"before_save":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_save",
 		"validate":[
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
-			"finbyzerp.api.si_validate"
+			"finbyzerp.doc_events.sales_invoice.si_validate"
 		],
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		# "on_submit": "finbyzerp.api.sales_invoice_on_submit",
         "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_update_after_submit",
 	},
      ("Purchase Order", "Purchase Receipt", "Purchase Invoice"): {
-		"validate":"finbyzerp.finbyzerp.override.override_conversion_factor.validate_conversion",
+		"validate":"finbyzerp.finbyzerp.doc_events.override_conversion_factor.validate_conversion",
 	},
 	"Purchase Invoice": {
-		"before_insert": "finbyzerp.api.before_insert",
-		"validate": "finbyzerp.api.pi_validate",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
+		"validate": "finbyzerp.finbyzerp.doc_events.purchase_invoice.pi_validate",
 	},
 	"Purchase Receipt": {
 		"on_submit": "finbyzerp.finbyzerp.doc_events.purchase_receipt.set_batch_in_qc"
 	},
 	"Stock Entry": {
 		"validate": [
-			"finbyzerp.api.stock_entry_validate",
 			# "finbyzerp.finbyzerp.doc_events.stock_entry.validate",
             # "finbyzerp.finbyzerp.doc_events.stock_entry.create_quality_inspection_entry"
 		],
@@ -230,13 +222,13 @@ doc_events = {
 			"finbyzerp.finbyzerp.doc_events.stock_entry.after_insert",
 		],
 		"on_submit": [
-			"finbyzerp.api.stock_entry_on_submit",
+			"finbyzerp.finbyzerp.doc_events.stock_entry_on_submit",
             "finbyzerp.finbyzerp.doc_events.stock_entry.on_submit"
 		],
-		"before_insert": "finbyzerp.api.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
 	},
 	"Journal Entry":{
-		"before_insert": "finbyzerp.api.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
 	},
 	# "Payment Entry":{
 	# 	# "validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
@@ -245,10 +237,10 @@ doc_events = {
 		"validate":"finbyzerp.finbyzerp.doc_events.delivery_note.validate"
 	},
 	("Purchase Order","Sales Order"):{
-		"before_cancel":"finbyzerp.api.po_so_before_cancel",
+		"before_cancel":"finbyzerp.finbyzerp.doc_events.before_cancel.po_so_before_cancel",
 	},
 	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice","Mould Trail Request", "Work Order Master", "Asset", "Leave Application" , "Contract Term"): {
-		"before_naming": "finbyzerp.api.before_naming",
+		"before_naming": "finbyzerp.finbyzerp.doc_events.before_naming.before_naming",
 	},
 	"Purchase Order": {
         "validate": "finbyzerp.finbyzerp.doc_events.payment_entry.validate",
@@ -273,7 +265,7 @@ doc_events = {
         "on_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_order.on_update_after_submit",
 	},
     "Stock Settings":{
-        "validate":"finbyzerp.api.create_property_setter"
+        "validate":"finbyzerp.finbyzerp.doc_events.stock_settings.create_property_setter"
 	}
 }
 
@@ -283,12 +275,12 @@ scheduler_events = {
 # 			"finbyzerp.api.repost_transaction_entries"
 # 		],
 		"0 4 * * SUN": [
-			"finbyzerp.api.sales_invoice_payment_remainder",
+			"finbyzerp.schedule.sales_invoice_payment_remainder",
 		]
 	},
 	"daily":[
-		"finbyzerp.api.daily_entry_summary_mail",
-		"finbyzerp.api.daily_transaction_summary_mail"
+		"finbyzerp.schedule.daily_entry_summary_mail",
+		"finbyzerp.schedule.daily_transaction_summary_mail"
 	]
 }
 
@@ -442,4 +434,4 @@ transaction.validate_gst_accounts = validate_gst_accounts
 
 # from india_compliance.gst_india.overrides.transaction import ItemGSTTreatment
 # from finbyzerp.finbyzerp.transaction import set_for_no_taxes as _set_for_no_taxes
-# ItemGSTTreatment.set_for_no_taxes = _set_for_no_taxes #not in india_compliance
+# ItemGSTTreatment.set_for_no_taxes = _set_for_no_taxes #not in india_compliance REMOVE
