@@ -5,13 +5,20 @@
 frappe.query_reports["BOM Stock Calculation"] = {
 	"filters": [
 		{
+			"fieldname": "company",
+			"label": __("Company"),
+			"fieldtype": "Link",
+			"options": "Company",
+			"reqd": 1,
+		},
+		{
 			"fieldname": "bom",
 			"label": __("BOM"),
 			"fieldtype": "MultiSelectList",
 			"options": "BOM",
-			"reqd": 1,			
+			"reqd": 1,
 			get_data: function (txt) {
-				return frappe.db.get_link_options("BOM", txt, {"docstatus": 1});
+				return frappe.db.get_link_options("BOM", txt, { "docstatus": 1, "company": frappe.query_report.filters[0].value,is_default:1 });
 			},
 		},
 		{
@@ -19,6 +26,13 @@ frappe.query_reports["BOM Stock Calculation"] = {
 			"label": __("Warehouse"),
 			"fieldtype": "Link",
 			"options": "Warehouse",
+			get_query: () => {
+				return {
+					filters: {
+						company: frappe.query_report.filters[0].value,
+					},
+				};
+			},
 		},
 		{
 			"fieldname": "qty_to_make",
@@ -32,7 +46,7 @@ frappe.query_reports["BOM Stock Calculation"] = {
 			"fieldtype": "Check"
 		},
 	],
-	"formatter": function(value, row, column, data, default_formatter) {
+	"formatter": function (value, row, column, data, default_formatter) {
 		value = default_formatter(value, row, column, data);
 		if (column.id == "item") {
 			if (data["enough_parts_to_build"] > 0) {
@@ -42,4 +56,5 @@ frappe.query_reports["BOM Stock Calculation"] = {
 			}
 		}
 		return value
-	}};
+	}
+};
