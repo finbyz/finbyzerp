@@ -193,11 +193,11 @@ doc_events = {
 		"validate":"finbyzerp.finbyzerp.doc_events.user.validate_user"
 	},
 	"Sales Invoice": {
-		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert.before_insert",
 		"before_save":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_save",
 		"validate":[
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
-			"finbyzerp.doc_events.sales_invoice.si_validate"
+			"finbyzerp.finbyzerp.doc_events.sales_invoice.si_validate"
 		],
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		# "on_submit": "finbyzerp.api.sales_invoice_on_submit",
@@ -207,7 +207,7 @@ doc_events = {
 		"validate":"finbyzerp.finbyzerp.doc_events.override_conversion_factor.validate_conversion",
 	},
 	"Purchase Invoice": {
-		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert.before_insert",
 		"validate": "finbyzerp.finbyzerp.doc_events.purchase_invoice.pi_validate",
 	},
 	"Purchase Receipt": {
@@ -222,13 +222,13 @@ doc_events = {
 			"finbyzerp.finbyzerp.doc_events.stock_entry.after_insert",
 		],
 		"on_submit": [
-			"finbyzerp.finbyzerp.doc_events.stock_entry_on_submit",
+			"finbyzerp.finbyzerp.doc_events.stock_entry.stock_entry_on_submit",
             "finbyzerp.finbyzerp.doc_events.stock_entry.on_submit"
 		],
-		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert.before_insert",
 	},
 	"Journal Entry":{
-		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert.before_insert",
 	},
 	# "Payment Entry":{
 	# 	# "validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
