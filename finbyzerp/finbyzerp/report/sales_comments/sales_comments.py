@@ -47,23 +47,20 @@ def get_data(filters):
 
 	where_clause = ''
 	where_clause_for_comment=''
-	where_clause += " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
-	where_clause_for_comment+= " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
-
 	if not filters.doctype:
 		ref_doctypes = ["'Lead'", "'Customer'", "'Quotation'", "'Opportunity'", "'Sales Order'", "'Sales Invoice'", "'Delivery Note'"]
 	else:
 		ref_doctypes = ["'"+filters.doctype+"'"]
-		
+
 	where_clause += " and co.parenttype in (%s)" % ",".join(ref_doctypes)
 	where_clause_for_comment+=" and co.reference_doctype in (%s)" % ",".join(ref_doctypes)
+
+	where_clause += " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
+	where_clause_for_comment+= " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
 
 	if filters.user:
 		where_clause += " and co.added_by = '%s' " % filters.user
 		where_clause_for_comment+=" and co.owner = '%s' " % filters.user
-
-
-
 
 	data_for_crm_notes = frappe.db.sql(f"""
 		SELECT
@@ -81,8 +78,8 @@ def get_data(filters):
 		FROM
 			`tabComment` as co
 		WHERE
-			co.comment_type="Comment"
-			%s
+			1=1 %s
+			and co.comment_type="Comment"
 		ORDER BY
 			co.creation DESC""" % where_clause_for_comment, as_dict=1)
 
@@ -105,9 +102,6 @@ def get_data(filters):
 
 	# Convert the dictionary values into a flat list
 	final_data = [item for sublist in combined_data.values() for item in sublist]
-
-	
-
 
 	for row in final_data:
 		row["Next Contact Date"] = get_next_contact_date(row, filters)
