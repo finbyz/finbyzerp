@@ -77,15 +77,7 @@ doctype_list_js = {
 fixtures = [
     {
         "dt": "Custom Field",
-        "filters": [
-            ["name", "in", [
-                "Accounts Settings-send_overdue_reminder",
-                "Accounts Settings-send_testing_overdue_mail",
-                "Accounts Settings-test_recipients_emails",
-                "Company-send_from_overdue_email",
-                "Accounts Settings-recipients"
-            ]]
-        ]
+        "filters": {"module": ["in", ["Finbyzerp"]]},
     }
 ]
 # Doctype Js
