@@ -20,16 +20,16 @@ def execute(filters=None):
 	
 def get_columns():
 	columns = [
-		{ "label": _("Ref DocType"),"fieldname": "Ref DocType","fieldtype": "Data","width": 100},
-		{ "label": _("Ref DocName"),"fieldname": "Ref DocName","fieldtype": "Dynamic Link","options": "Ref DocType","width": 100},
+		{ "label": _("Ref DocType"),"fieldname": "Ref DocType","fieldtype": "Data","width": 125},
+		{ "label": _("Ref DocName"),"fieldname": "Ref DocName","fieldtype": "Dynamic Link","options": "Ref DocType","width": 150},
 		{ "label": _("Next Contact Date"),"fieldname": "Next Contact Date","fieldtype": "Date","width": 120},
-		{ "label": _("Date"),"fieldname": "Date","fieldtype": "Date","width": 120},
-		{ "label": _("Caller"),"fieldname": "Caller","fieldtype": "Data","width": 110},
-		{ "label": _("Organization"),"fieldname": "Organization","fieldtype": "Data","width": 180},
-		{ "label": _("Person"),"fieldname": "Person","fieldtype": "Data","width": 120},
+		{ "label": _("Date"),"fieldname": "Date","fieldtype": "Datetime","width": 180},
+		{ "label": _("Caller"),"fieldname": "Caller","fieldtype": "Data","width": 180},
+		{ "label": _("Organization"),"fieldname": "Organization","fieldtype": "Data","width": 200},
+		{ "label": _("Person"),"fieldname": "Person","fieldtype": "Data","width": 180},
 		{ "label": _("Comment"),"fieldname": "Comment","fieldtype": "Data","width": 400},
-		{ "label": _("Mobile"),"fieldname": "Mobile","fieldtype": "Data","width": 100},
-		{ "label": _("User"),"fieldname": "User","fieldtype": "Link","options":"User","width": 100},
+		{ "label": _("Mobile"),"fieldname": "Mobile","fieldtype": "Data","width": 140},
+		{ "label": _("User"),"fieldname": "User","fieldtype": "Link","options":"User","width": 200},
 		# _("Ref DocType") + ":Data:100",
 		# _("Ref DocName") + ":Dynamic Link/"+_("Ref DocType")+":100",
 		# _("Next Contact Date") + ":Date:120",
@@ -92,7 +92,7 @@ def get_data(filters):
 	if frappe.db.table_exists("Employee Fincall"):
 		data_from_employee_fincall = frappe.db.sql(f"""
 			SELECT
-				ef.link_to as "Ref DocType", ef.link_name as "Ref DocName", ef.owner as "User", ef.date as "Date", co.content as "Comment", e.user_id AS comment_email, c.full_name as contact
+				ef.link_to as "Ref DocType", ef.link_name as "Ref DocName", ef.owner as "User", ef.call_datetime as "Date", ef.spoke_about as "Comment", e.user_id AS comment_email, c.full_name as contact, ef.calltype, ef.name
 			FROM
 				`tabEmployee Fincall` as ef
 			LEFT JOIN `tabComment` as co ON ef.comment = co.name
@@ -104,6 +104,22 @@ def get_data(filters):
 				ef.date DESC""", as_dict=1)
 	# Combine data into a dictionary with (Ref DocType, Ref DocName) as the key
 	combined_data = {}
+	for row in data_from_employee_fincall:
+		if not row["Comment"]:
+			row["Comment"] = ""
+		if row["calltype"] == "Incoming":
+			svg = '<img src="/assets/productivity_next/calltype/svg/incomming.png">'
+		elif row["calltype"] == "Outgoing":
+			svg = '<img src="/assets/productivity_next/calltype/svg/outgoing.png">'
+		elif row["calltype"] == "Missed":
+			svg = '<img src="/assets/productivity_next/calltype/svg/missed.png">'
+		elif row["calltype"] == "Rejected":
+			svg = '<img src="/assets/productivity_next/calltype/svg/rejected.png">'
+		else:
+			svg = ""
+		
+		# Apply left alignment with inline CSS
+		row["Comment"] = f'<a href="/app/employee-fincall/{row["name"]}" style="text-align: left; display: block;">{svg} {row["Comment"]}</a>'
 
 	# Append data from data_for_crm_notes
 	for row in data_for_crm_notes:
