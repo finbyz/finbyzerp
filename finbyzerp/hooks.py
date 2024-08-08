@@ -394,7 +394,7 @@ PublicAPI.get_gstin_info = get_gstin_info
 
 from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
 from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as new_update_transaction_tax_details
-GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
+# GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
 
 # Override Trends Reports
 from erpnext.selling.report.sales_order_trends import sales_order_trends
