@@ -47,6 +47,7 @@ def get_data(filters):
 
 	where_clause = ''
 	where_clause_for_comment=''
+	where_clause_ef = ''
 	if not filters.doctype:
 		ref_doctypes = ["'Lead'", "'Customer'", "'Quotation'", "'Opportunity'", "'Sales Order'", "'Sales Invoice'", "'Delivery Note'"]
 	else:
@@ -57,10 +58,14 @@ def get_data(filters):
 
 	where_clause += " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
 	where_clause_for_comment+= " and co.creation between '%s 00:00:00' and '%s 23:59:59' " % (filters.from_date, filters.to_date)
+	
+	where_clause_ef += " and ef.date between '%s' and '%s' " % (filters.from_date, filters.to_date)
+	where_clause_ef += " and ef.link_to in (%s)" % ",".join(ref_doctypes)
 
 	if filters.user:
 		where_clause += " and co.added_by = '%s' " % filters.user
 		where_clause_for_comment+=" and co.owner = '%s' " % filters.user
+		where_clause_ef += " and ef.owner = '%s' " % filters.user
 
 	data_for_crm_notes = frappe.db.sql(f"""
 		SELECT
@@ -78,11 +83,25 @@ def get_data(filters):
 		FROM
 			`tabComment` as co
 		WHERE
-			1=1 %s
-			and co.comment_type="Comment"
+			co.comment_type="Comment"
+			%s
 		ORDER BY
 			co.creation DESC""" % where_clause_for_comment, as_dict=1)
-
+	
+	data_from_employee_fincall = []
+	if frappe.db.table_exists("Employee Fincall"):
+		data_from_employee_fincall = frappe.db.sql(f"""
+			SELECT
+				ef.link_to as "Ref DocType", ef.link_name as "Ref DocName", ef.owner as "User", ef.date as "Date", co.content as "Comment", e.user_id AS comment_email, c.full_name as contact
+			FROM
+				`tabEmployee Fincall` as ef
+			LEFT JOIN `tabComment` as co ON ef.comment = co.name
+			LEFT JOIN `tabEmployee` AS e ON e.name = ef.employee
+			LEFT JOIN `tabContact` AS c on c.name = ef.contact
+			WHERE
+				1=1 {where_clause_ef} and ef.contact is not null and ef.contact != '' and ef.comment is not null and ef.comment != '' 
+			ORDER BY
+				ef.date DESC""", as_dict=1)
 	# Combine data into a dictionary with (Ref DocType, Ref DocName) as the key
 	combined_data = {}
 
@@ -95,6 +114,13 @@ def get_data(filters):
 
 	# Append data from data_for_comments
 	for row in data_for_comments:
+		key = (row["Ref DocType"], row["Ref DocName"])
+		if key not in combined_data:
+			combined_data[key] = []
+		combined_data[key].append(row)
+
+	# Append data from data_from_employee_fincall
+	for row in data_from_employee_fincall:
 		key = (row["Ref DocType"], row["Ref DocName"])
 		if key not in combined_data:
 			combined_data[key] = []
@@ -117,14 +143,17 @@ def get_contact(row, filters):
 	party_type = filters.doctype or row["Ref DocType"]
 	party = row["Ref DocName"]
 	
-	if party_type in ["Lead", "Customer"]:
+	if party_type in ["Lead", "Customer", "Opportunity", "Company"]:
 		contact_person = get_default_contact(party_type, party)
 		
 		if not contact_person:
 			return None
 		
+		if party_type == "Company":
+			return None
+		
 		else:
-			return get_contact_details(contact_person)["contact_mobile"]
+			return get_contact_details(contact_person)["contact_mobile"] or None
 			
 	else:
 		contact_mobile = frappe.db.get_value(party_type, party, "contact_mobile") or None
@@ -146,7 +175,7 @@ def get_organization(row, filters):
 	party_type = filters.doctype or row["Ref DocType"]
 	party = row["Ref DocName"]
 	
-	if party_type == "Lead":
+	if party_type in ["Lead","Company"]:
 		organization = frappe.db.get_value(party_type, party, "company_name")
 	
 	elif party_type in ["Opportunity", "Customer", "Quotation"]:
@@ -158,18 +187,20 @@ def get_organization(row, filters):
 	return organization
 	
 def get_contact_display(row, filters):
+	if row.get("contact"):
+		return row.get("contact")
 
 	party_type = filters.doctype or row["Ref DocType"]
 	party = row["Ref DocName"]
 	
-	if party_type in ["Lead", "Customer"]:
+	if party_type in ["Lead", "Customer", "Opportunity", "Company"]:
 		contact_person = get_default_contact(party_type, party)
 		
 		if not contact_person:
 			return None
-		
+			
 		else:
-			return get_contact_details(contact_person)["contact_display"]
+			return get_contact_details(contact_person)["contact_display"] or None
 			
 	else:
 		contact_display = frappe.db.get_value(party_type, party, "contact_display") or None
