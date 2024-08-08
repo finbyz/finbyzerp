@@ -5,7 +5,7 @@ from frappe.model.utils import get_fetch_values
 from erpnext.stock.doctype.item.item import get_item_defaults
 from erpnext.setup.doctype.item_group.item_group import get_item_group_defaults
 from frappe.model.mapper import get_mapped_doc
-from erpnext.accounts.utils import get_fiscal_year, flt
+from erpnext.accounts.utils import get_fiscal_year, flt, cint
 @frappe.whitelist()
 def make_sales_invoice(source_name, target_doc=None, ignore_permissions=False):
     def postprocess(source, target):
