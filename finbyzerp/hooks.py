@@ -193,11 +193,11 @@ doc_events = {
 		"validate":"finbyzerp.finbyzerp.doc_events.user.validate_user"
 	},
 	"Sales Invoice": {
-		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert.before_insert",
 		"before_save":"finbyzerp.finbyzerp.doc_events.sales_invoice.before_save",
 		"validate":[
 			"finbyzerp.finbyzerp.doc_events.sales_invoice.validate",
-			"finbyzerp.doc_events.sales_invoice.si_validate"
+			"finbyzerp.finbyzerp.doc_events.sales_invoice.si_validate"
 		],
 		"on_trash": "finbyzerp.finbyzerp.doc_events.sales_invoice.on_trash",
 		# "on_submit": "finbyzerp.api.sales_invoice_on_submit",
@@ -207,7 +207,7 @@ doc_events = {
 		"validate":"finbyzerp.finbyzerp.doc_events.override_conversion_factor.validate_conversion",
 	},
 	"Purchase Invoice": {
-		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert.before_insert",
 		"validate": "finbyzerp.finbyzerp.doc_events.purchase_invoice.pi_validate",
 	},
 	"Purchase Receipt": {
@@ -222,13 +222,13 @@ doc_events = {
 			"finbyzerp.finbyzerp.doc_events.stock_entry.after_insert",
 		],
 		"on_submit": [
-			"finbyzerp.finbyzerp.doc_events.stock_entry_on_submit",
+			"finbyzerp.finbyzerp.doc_events.stock_entry.stock_entry_on_submit",
             "finbyzerp.finbyzerp.doc_events.stock_entry.on_submit"
 		],
-		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert.before_insert",
 	},
 	"Journal Entry":{
-		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert",
+		"before_insert": "finbyzerp.finbyzerp.doc_events.before_insert.before_insert",
 	},
 	# "Payment Entry":{
 	# 	# "validate":"finbyzerp.finbyzerp.doc_events.payment_entry.validate"
@@ -239,7 +239,7 @@ doc_events = {
 	("Purchase Order","Sales Order"):{
 		"before_cancel":"finbyzerp.finbyzerp.doc_events.before_cancel.po_so_before_cancel",
 	},
-	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice","Mould Trail Request", "Work Order Master", "Asset", "Leave Application" , "Contract Term"): {
+	("Pick List","Expense Claim", "Sales Invoice", "Purchase Invoice", "Payment Request", "Payment Entry", "Journal Entry", "Material Request", "Purchase Order", "Work Order", "Production Plan", "Stock Entry", "Quotation", "Sales Order", "Delivery Note", "Purchase Receipt", "Packing Slip","Jobwork Challan","Jobwork Finish","Outward Sample","Inward Sample","Manufacturing Consumption","Credit and Debit Note","Outward Tracking","Sample Requirement","Proforma Invoice","Mould Trail Request", "Work Order Master", "Asset", "Leave Application" , "Contract Term", "Bill of Entry"): {
 		"before_naming": "finbyzerp.finbyzerp.doc_events.before_naming.before_naming",
 	},
 	"Purchase Order": {
@@ -394,7 +394,7 @@ PublicAPI.get_gstin_info = get_gstin_info
 
 from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
 from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as new_update_transaction_tax_details
-GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
+# GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
 
 # Override Trends Reports
 from erpnext.selling.report.sales_order_trends import sales_order_trends
