@@ -133,7 +133,7 @@ website_context = {
 override_doctype_class = {
 	"Opportunity": "finbyzerp.finbyzerp.override.opportunity.CustomOpportunity",
     "Custom Field": "finbyzerp.finbyzerp.override.custom_field.CustomFieldOverride",
-    "Customize Form": "finbyzerp.finbyzerp.override.customize_form.CustomizeForm",
+    # "Customize Form": "finbyzerp.finbyzerp.override.customize_form.CustomizeForm",
     "Quality Inspection": "finbyzerp.finbyzerp.override.quality_inspection.QualityInspection",
     "Sales Invoice": "finbyzerp.finbyzerp.override.sales_invoice.SalesInvoice",
     "Purchase Invoice": "finbyzerp.finbyzerp.override.purchase_invoice.PurchaseInvoice",
