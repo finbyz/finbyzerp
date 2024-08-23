@@ -37,15 +37,18 @@ frappe.ui.form.on('Purchase Receipt', {
 });
 frappe.ui.form.on('Purchase Receipt Item', {
 	qty: function (frm,cdt,cdn) {
+
 		let d = locals[cdt][cdn];
 		frappe.db.get_value("Stock Settings", 'Stock Settings','calculate_conversion_factor_based_on_stock_quantity_and_quantity', function (r) {
 			if (cint(r.calculate_conversion_factor_based_on_stock_quantity_and_quantity) == 1) {
 				if(d.qty > 0){
 					if (d.stock_uom != d.uom) {
-						frappe.model.set_value(cdt, cdn, "conversion_factor", flt(d.stock_qty/d.qty));
+						d.conversion_factor = flt(d.stock_qty/d.qty);
 					}
 				}
 			}
+
+			frm.refresh_field('items');
 		});
 	},
 	stock_qty: function (frm,cdt,cdn) {
@@ -54,10 +57,12 @@ frappe.ui.form.on('Purchase Receipt Item', {
 			if (cint(r.calculate_conversion_factor_based_on_stock_quantity_and_quantity) == 1) {
 				if(d.qty > 0){
 					if (d.stock_uom != d.uom) {
-						frappe.model.set_value(cdt, cdn, "conversion_factor", flt(d.stock_qty/d.qty));
+						// frappe.model.set_value(cdt, cdn, "conversion_factor", flt(d.stock_qty/d.qty));
+						d.conversion_factor = flt(d.stock_qty/d.qty);
 					}
 				}
 			}
+			frm.refresh_field('items');
 		});
 	},
 });
