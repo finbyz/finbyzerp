@@ -53,12 +53,16 @@ from finbyzerp.finbyzerp.override.india_compliance.base import get_url as get_gs
 from finbyzerp.finbyzerp.override.india_compliance.e_invoice import einvoice_setup
 from finbyzerp.finbyzerp.override.india_compliance.e_waybill import ewaybill_setup
 from finbyzerp.finbyzerp.override.india_compliance.public import get_gstin_info
+from erpnext.buying.report.purchase_order_analysis import purchase_order_analysis
 from finbyzerp.finbyzerp.override.india_compliance.transaction_data import (
     update_transaction_tax_details,
 )
 from finbyzerp.finbyzerp.override.item_wise_sales_register import (
     execute as item_wise_sales_register_execute,
 )
+from finbyzerp.finbyzerp.override.report.purchase_order_analysis import get_data
+purchase_order_analysis.get_data = get_data
+
 from finbyzerp.finbyzerp.override.pending_so_items_for_purchase_request import (
     execute as pending_so_items_for_purchase_request_execute,
 )
