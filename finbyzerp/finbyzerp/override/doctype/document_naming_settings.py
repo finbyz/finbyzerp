@@ -1,6 +1,6 @@
 import frappe
 from frappe.core.doctype.document_naming_settings.document_naming_settings import (
-    DocumentNamingSettings,
+    DocumentNamingSettings as _DocumentNamingSettings,
 )
 from frappe.model.naming import parse_naming_series
 
@@ -51,7 +51,7 @@ def get_naming_series_options(doctype):
     return options_list
 
 
-class CustomDocumentNamingSettings(DocumentNamingSettings):
+class DocumentNamingSettings(_DocumentNamingSettings):
     def _get_prefixes(self, doctypes) -> list[str]:
         """Get all prefixes for naming series.
 

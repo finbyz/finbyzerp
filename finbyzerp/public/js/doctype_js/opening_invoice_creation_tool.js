@@ -1,7 +1,3 @@
-frappe.ui.form.on('Opening Invoice Creation Tool',{
-    
-})
-
 frappe.ui.form.on('Opening Invoice Creation Tool Item',{
     party: function(frm,cdt,cdn){
         var row = locals[cdt][cdn];

@@ -5,11 +5,11 @@ from erpnext.accounts.doctype.accounting_dimension.accounting_dimension import (
     get_accounting_dimensions,
 )
 from erpnext.accounts.doctype.opening_invoice_creation_tool.opening_invoice_creation_tool import (
-    OpeningInvoiceCreationTool,
+    OpeningInvoiceCreationTool as _OpeningInvoiceCreationTool,
 )
 
 
-class CustomOpeningInvoiceCreationTool(OpeningInvoiceCreationTool):
+class OpeningInvoiceCreationTool(_OpeningInvoiceCreationTool):
     @frappe.whitelist()
     def make_invoices(self):
         names = []

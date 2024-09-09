@@ -1,14 +1,17 @@
 import frappe
-import base64
-import os
+from frappe import _
 
 from finbyzerp.finbyzerp.override.india_compliance.e_invoice import get_auth_token
+from india_compliance.gst_india.api_classes.base import check_scheduler_status
 
-def ewaybill_setup(self, doc=None, *, company_gstin=None):
+def setup(self, doc=None, *, company_gstin=None):
 	self.gst_settings = frappe.get_cached_doc("GST Settings")
 	self.BASE_PATH = "enriched/ewb/ewayapi"
+
 	if not self.settings.enable_e_waybill:
 		frappe.throw(_("Please enable e-Waybill features in GST Settings first"))
+
+	check_scheduler_status()
 
 	if doc:
 		company_gstin = doc.company_gstin
@@ -34,6 +37,6 @@ def ewaybill_setup(self, doc=None, *, company_gstin=None):
 			"gstin": company_gstin,
 			"username": self.username,
 			"password": self.password,
-			"requestid": str(base64.b64encode(os.urandom(18))),
+			"requestid": self.generate_request_id(),
 		}
 	)
