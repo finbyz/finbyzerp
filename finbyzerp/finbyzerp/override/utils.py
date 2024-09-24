@@ -5,7 +5,7 @@ from erpnext.controllers.taxes_and_totals import calculate_taxes_and_totals as _
 class calculate_taxes_and_totals(_calculate_taxes_and_totals):
 	def calculate_totals(self):
 		if self.doc.get("taxes"):
-			self.doc.grand_total = flt(self.doc.get("taxes")[-1].total) + flt(self.doc.rounding_adjustment)
+			self.doc.grand_total = flt(self.doc.get("taxes")[-1].total, self.doc.precision("grand_total")) + flt(self.doc.rounding_adjustment)
 		else:
 			self.doc.grand_total = flt(self.doc.net_total)
 
