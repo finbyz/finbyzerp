@@ -76,7 +76,7 @@ frappe.ui.form.on('Purchase Order Item', {
 			if (cint(r.calculate_conversion_factor_based_on_stock_quantity_and_quantity) == 1) {
 				if(d.qty > 0){
 					if (d.stock_uom != d.uom) {
-						frappe.model.set_value(cdt, cdn, "conversion_factor", flt(d.stock_qty/d.qty));
+						frappe.model.set_value(cdt, cdn, "qty", flt(d.stock_qty/d.conversion_factor));
 					}
 				}
 			}
