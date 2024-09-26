@@ -5,5 +5,4 @@
 #finbyzerp.patches.create_comment_fields
 finbyzerp.patches.gst_settings
 finbyzerp.patches.navbar_setting
-finbyzerp.patches.delete_custom_qr
-finbyzerp.patches.delete_qr_field_from_database
+finbyzerp.patches.add_index_comments

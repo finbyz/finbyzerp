@@ -120,7 +120,7 @@ cur_frm.fields_dict.other_contacts.grid.get_field("contact").get_query = functio
 	if(cur_frm.doc.party_name) {
 		return {
 			query: "frappe.contacts.doctype.contact.contact.contact_query",
-			filters: { link_doctype: cur_frm.doc.party_type, link_name: cur_frm.doc.party_name} 
+			filters: { link_doctype: cur_frm.doc.party_type, link_name: cur_frm.doc.party} 
 		};
 	}
 	else frappe.throw(__("Please set Party"));
