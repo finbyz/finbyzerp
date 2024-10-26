@@ -16,7 +16,6 @@ jobs:
   commit-lint:
     name: 'Semantic Commits'
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
 
     steps:
       - uses: actions/checkout@v4
@@ -36,7 +35,6 @@ jobs:
   linter:
     name: 'Semgrep Rules'
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
 
     steps:
       - uses: actions/checkout@v4
