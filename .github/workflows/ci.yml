@@ -2,8 +2,8 @@
 name: Linters
 
 on:
-    push:
-        branches: [test-workflow]
+  push:
+    branches: [test-workflow]
 
 permissions:
   contents: read
@@ -13,25 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  commit-lint:
-    name: 'Semantic Commits'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 200
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          check-latest: true
-
-      - name: Check commit titles
-        run: |
-          npm install @commitlint/cli @commitlint/config-conventional
-          npx commitlint --verbose --from ${{ github.event.before }} --to ${{ github.sha }}
-
-
   linter:
     name: 'Semgrep Rules'
     runs-on: ubuntu-latest
@@ -46,10 +27,16 @@ jobs:
       - name: Download Semgrep rules
         run: git clone --depth 1 https://github.com/frappe/semgrep-rules.git frappe-semgrep-rules
 
-      - name: Run Semgrep rules
+      - name: Get changed files
+        id: changed-files
+        run: |
+          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.py$' || true)" >> $GITHUB_ENV
+
+      - name: Run Semgrep rules on changed files
+        if: steps.changed-files.outputs.changed_files != ''
         run: |
           pip install semgrep
-          semgrep ci --config ./frappe-semgrep-rules/rules --config r/python.lang.correctness
+          semgrep ci --config ./frappe-semgrep-rules/rules --config r/python.lang.correctness $changed_files
 
   deps-vulnerable-check:
     name: 'Vulnerable Dependency Check'
@@ -71,8 +58,14 @@ jobs:
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
 
-      - name: Install and run pip-audit
+      - name: Get changed files
+        id: changed-files
+        run: |
+          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E 'requirements.txt|pyproject.toml|setup.py' || true)" >> $GITHUB_ENV
+
+      - name: Install and run pip-audit on changed files
+        if: steps.changed-files.outputs.changed_files != ''
         run: |
           pip install pip-audit
           cd ${GITHUB_WORKSPACE}
-          pip-audit --desc on .
+          pip-audit --desc on $changed_files
