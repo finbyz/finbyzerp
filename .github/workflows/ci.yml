@@ -38,7 +38,7 @@ jobs:
         if: env.changed_files != ''
         run: |
           pip install semgrep
-          semgrep ci --config ./frappe-semgrep-rules/rules --config r/python.lang.correctness $changed_files
+          semgrep ci --config ./frappe-semgrep-rules/rules --config r/python.lang.correctness --include $changed_files
 
   deps-vulnerable-check:
     name: 'Vulnerable Dependency Check'
