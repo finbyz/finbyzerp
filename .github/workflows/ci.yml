@@ -2,14 +2,14 @@
 name: Linters
 
 on:
-  pull_request:
-  workflow_dispatch:
+    push:
+        branches: [test-workflow]
 
 permissions:
   contents: read
 
 concurrency:
-  group: commitcheck-frappe-${{ github.event_name }}-${{ github.event.number }}
+  group: commitcheck-frappe-${{ github.event_name }}-${{ github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -30,7 +30,7 @@ jobs:
       - name: Check commit titles
         run: |
           npm install @commitlint/cli @commitlint/config-conventional
-          npx commitlint --verbose --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }}
+          npx commitlint --verbose --from ${{ github.event.before }} --to ${{ github.sha }}
 
   docs-required:
     name: 'Documentation Required'
