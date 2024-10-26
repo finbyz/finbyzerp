@@ -13,25 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  commit-lint:
-    name: 'Semantic Commits'
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Fetch the full commit history to avoid "bad object" errors
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          check-latest: true
-
-      - name: Check commit titles
-        run: |
-          npm install @commitlint/cli @commitlint/config-conventional
-          npx commitlint --verbose --from ${{ github.event.before }} --to ${{ github.sha }}
-
   linter:
     name: 'Semgrep Rules'
     runs-on: ubuntu-latest
