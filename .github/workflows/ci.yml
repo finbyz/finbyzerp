@@ -1,0 +1,97 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'test-workflow'  # This will trigger the workflow on all branches
+  pull_request:
+    branches:
+      - 'test-workflow'  # This will trigger the workflow on PRs to any branch
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'  # Adjust as necessary
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pytest  # Add other Python dependencies as needed
+
+      - name: Run Python linting
+        run: |
+          flake8 .  # Check for Python code quality issues
+
+  validate:
+    runs-on: ubuntu-latest
+    needs: lint  # Only run validation if linting passes
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'  # Adjust as necessary
+
+      - name: Install JavaScript dependencies
+        run: |
+          npm install eslint stylelint htmlhint --save-dev
+
+      - name: Get changed files
+        id: files
+        run: |
+          echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})" >> $GITHUB_ENV
+
+      - name: Run ESLint on changed files
+        run: |
+          if [ -n "$changed_files" ]; then
+            npx eslint $changed_files
+          else
+            echo "No JavaScript files changed."
+          fi
+
+      - name: Run Stylelint on changed files
+        run: |
+          if [ -n "$changed_files" ]; then
+            npx stylelint $(echo "$changed_files" | grep -E '\.css$')
+          else
+            echo "No CSS files changed."
+          fi
+
+      - name: Run HTMLHint on changed files
+        run: |
+          if [ -n "$changed_files" ]; then
+            npx htmlhint $(echo "$changed_files" | grep -E '\.html$')
+          else
+            echo "No HTML files changed."
+          fi
+
+  test:
+    runs-on: ubuntu-latest
+    needs: validate  # Only run tests if validation passes
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'  # Adjust as necessary
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Install your project's dependencies
+          pip install pytest  # Ensure pytest is installed
+
+      - name: Run tests
+        run: |
+          pytest  # Run your tests
