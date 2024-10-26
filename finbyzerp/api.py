@@ -75,8 +75,10 @@ def send_sales_invoice_mails():
 		group_by= "customer,company",
 		fields=["group_concat(name) as name", "customer", "company"]
 	)
+	
 	if not frappe.db.exists("Email Template", "Payment Reminder"):
-		return "hello"
+		return
+	
 	email_template = frappe.get_doc("Email Template", "Payment Reminder")
 
 	if account_settings.send_testing_overdue_mail:
@@ -107,4 +109,4 @@ def send_sales_invoice_mails():
 			subject=frappe.render_template(email_template.subject, context),
 			message=frappe.render_template(email_template.response_html, context),
 		)
-	return "Payment Reminder Mails Send"
+return "Payment Reminder Mails Send"
