@@ -8,6 +8,9 @@ def get_url(self, *parts):
 	# If the first part is a URL, return it as it is
 	if parts and parts[0].startswith("https"):
 		return parts[0]
+	
+	if not parts[-1]:
+		parts = parts[:-1]
 
 	if self.BASE_PATH:
 		parts.insert(0, self.BASE_PATH)
