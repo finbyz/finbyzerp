@@ -102,6 +102,21 @@ def get_data(filters):
 				1=1 {where_clause_ef} and ef.contact is not null and ef.contact != '' and ef.comment is not null and ef.comment != '' 
 			ORDER BY
 				ef.date DESC""", as_dict=1)
+	
+	data_from_employee_fincall = []
+	if frappe.db.table_exists("Employee Fincall"):
+		data_from_employee_fincall = frappe.db.sql(f"""
+			SELECT
+				ef.link_to as "Ref DocType", ef.link_name as "Ref DocName", ef.owner as "User", ef.call_datetime as "Date", ef.spoke_about as "Comment", e.user_id AS comment_email, c.full_name as contact, ef.calltype, ef.name
+			FROM
+				`tabEmployee Fincall` as ef
+			LEFT JOIN `tabComment` as co ON ef.comment = co.name
+			LEFT JOIN `tabEmployee` AS e ON e.name = ef.employee
+			LEFT JOIN `tabContact` AS c on c.name = ef.contact
+			WHERE
+				1=1 {where_clause_ef} and ef.contact is not null and ef.contact != '' and ef.comment is not null and ef.comment != '' 
+			ORDER BY
+				ef.date DESC""", as_dict=1)
 	# Combine data into a dictionary with (Ref DocType, Ref DocName) as the key
 	combined_data = {}
 	for row in data_from_employee_fincall:

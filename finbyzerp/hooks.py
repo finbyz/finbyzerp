@@ -46,9 +46,9 @@ from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
 from india_compliance.gst_india.api_classes.public import PublicAPI
 from india_compliance.gst_india.api_classes.taxpayer_base import PublicCertificate
 from india_compliance.gst_india.api_classes.taxpayer_base import FilesAPI
+from india_compliance.gst_india.api_classes.taxpayer_base import TaxpayerBaseAPI, TaxpayerAuthenticate
 from india_compliance.gst_india.api_classes.taxpayer_returns import ReturnsAPI
-from finbyzerp.finbyzerp.override.india_compliance.taxpayer_returns import setup as returns_api_setup
-from finbyzerp.finbyzerp.override.india_compliance.taxpayer_base import get_gstn_public_certificate
+from finbyzerp.finbyzerp.override.india_compliance.taxpayer_base import setup as tax_payer_base_api, get_gstn_public_certificate
 
 from . import __version__ as app_version
 
@@ -74,7 +74,12 @@ website_context = {
 doctype_list_js = {
     "Batch": "public/js/doctype_js/batch_list.js",
 }
-
+fixtures = [
+    {
+        "dt": "Custom Field",
+        "filters": {"module": ["in", ["Finbyzerp"]]},
+    }
+]
 # Doctype Js
 doctype_js = {
     "Sales Order": "public/js/doctype_js/sales_order.js",
@@ -196,9 +201,9 @@ EWaybillAPI.setup = ewaybill_setup
 PublicAPI.get_gstin_info = get_gstin_info
 PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
 FilesAPI.BASE_PATH = "gstn/files"
-ReturnsAPI.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
-ReturnsAPI.BASE_PATH = "gstn"
-ReturnsAPI.setup = returns_api_setup
+TaxpayerAuthenticate.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
+TaxpayerBaseAPI.BASE_PATH = "gstn"
+TaxpayerBaseAPI.setup = tax_payer_base_api
 
 
 # Report
