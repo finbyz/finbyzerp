@@ -8,7 +8,7 @@ frappe.query_reports["Sales Comments"] = {
 			fieldname: "from_date",
 			label:__("From Date"),
 			fieldtype: "Date",
-			default : frappe.datetime.add_days(frappe.datetime.nowdate(), -30)
+			default : frappe.datetime.add_days(frappe.datetime.nowdate(), -7)
 		},
 		{
 			fieldname: "to_date",
