@@ -102,6 +102,21 @@ def get_data(filters):
 				1=1 {where_clause_ef} and ef.contact is not null and ef.contact != '' and ef.comment is not null and ef.comment != '' 
 			ORDER BY
 				ef.date DESC""", as_dict=1)
+	
+	data_from_employee_fincall = []
+	if frappe.db.table_exists("Employee Fincall"):
+		data_from_employee_fincall = frappe.db.sql(f"""
+			SELECT
+				ef.link_to as "Ref DocType", ef.link_name as "Ref DocName", ef.owner as "User", ef.call_datetime as "Date", ef.spoke_about as "Comment", e.user_id AS comment_email, c.full_name as contact, ef.calltype, ef.name
+			FROM
+				`tabEmployee Fincall` as ef
+			LEFT JOIN `tabComment` as co ON ef.comment = co.name
+			LEFT JOIN `tabEmployee` AS e ON e.name = ef.employee
+			LEFT JOIN `tabContact` AS c on c.name = ef.contact
+			WHERE
+				1=1 {where_clause_ef} and ef.contact is not null and ef.contact != '' and ef.comment is not null and ef.comment != '' 
+			ORDER BY
+				ef.date DESC""", as_dict=1)
 	# Combine data into a dictionary with (Ref DocType, Ref DocName) as the key
 	combined_data = {}
 	for row in data_from_employee_fincall:
@@ -116,7 +131,7 @@ def get_data(filters):
 		elif row["calltype"] == "Rejected":
 			svg = '<img src="/assets/productivity_next/calltype/svg/rejected.png">'
 		else:
-			svg = ""
+			svg = "" 
 		
 		# Apply left alignment with inline CSS
 		row["Comment"] = f'<a href="/app/employee-fincall/{row["name"]}" style="text-align: left; display: block;">{svg} {row["Comment"]}</a>'
@@ -172,7 +187,8 @@ def get_contact(row, filters):
 			return get_contact_details(contact_person)["contact_mobile"] or None
 			
 	else:
-		contact_mobile = frappe.db.get_value(party_type, party, "contact_mobile") or None
+		contact_mobile = frappe.db.sql(f"""select contact_mobile from `tab{party_type}` where name = '{party}'""")[0][0] or None
+		# contact_mobile = frappe.db.get_value(party_type, party, "contact_mobile") or None
 		
 		return contact_mobile
 	
@@ -181,26 +197,35 @@ def get_next_contact_date(row, filters):
 	party_type = filters.doctype or row["Ref DocType"]
 	party = row["Ref DocName"]
 	try:
-		next_contact_date = frappe.db.get_value(party_type, party, "contact_date") or None
+		next_contact_date = frappe.db.sql(f"""
+			SELECT contact_date
+			FROM `tab{party_type}`
+			WHERE name = '{party}'
+		""")[0][0] or None
+		# next_contact_date = frappe.db.get_value(party_type, party, "contact_date") or None
 	except:
 		next_contact_date = None
 	return next_contact_date
-
 def get_organization(row, filters):
-	
-	party_type = filters.doctype or row["Ref DocType"]
-	party = row["Ref DocName"]
-	
-	if party_type in ["Lead","Company"]:
-		organization = frappe.db.get_value(party_type, party, "company_name")
-	
-	elif party_type in ["Opportunity", "Customer", "Quotation"]:
-		organization = frappe.db.get_value(party_type, party, "customer_name")
-	
-	else:
-		organization = frappe.db.get_value(party_type, party, "customer")
-	
-	return organization
+    # Get party type and party name, or use default values if they are None
+    party_type = filters.get("doctype") or row.get("Ref DocType")
+    party = row.get("Ref DocName")
+
+    # Check if party and party_type have valid values before querying
+    if not party_type or not party:
+        return "Unknown Organization"  # Or use another default/fallback organization name
+
+    # Perform query based on party_type
+    if party_type in ["Lead", "Company"]:
+        organization = frappe.db.sql(f"""SELECT company_name FROM `tab{party_type}` WHERE name = %s""", party)
+    elif party_type in ["Opportunity", "Customer", "Quotation"]:
+        organization = frappe.db.sql(f"""SELECT customer_name FROM `tab{party_type}` WHERE name = %s""", party)
+    else:
+        organization = frappe.db.sql(f"""SELECT customer FROM `tab{party_type}` WHERE name = %s""", party)
+
+    # Safely retrieve the result from query and handle cases where no record is found
+    return organization[0][0] if organization else "Organization Not Found"
+
 	
 def get_contact_display(row, filters):
 	if row.get("contact"):
@@ -219,7 +244,8 @@ def get_contact_display(row, filters):
 			return get_contact_details(contact_person)["contact_display"] or None
 			
 	else:
-		contact_display = frappe.db.get_value(party_type, party, "contact_display") or None
+		contact_display = frappe.db.sql(f"""select contact_display from `tab{party_type}` where name = '{party}'""")[0][0] or None
+		# contact_display = frappe.db.get_value(party_type, party, "contact_display") or None
 		
 		return contact_display
 
