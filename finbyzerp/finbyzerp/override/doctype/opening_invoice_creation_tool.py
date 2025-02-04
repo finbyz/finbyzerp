@@ -57,6 +57,8 @@ class OpeningInvoiceCreationTool(OpeningInvoiceCreationTool_):
 
             if row.outstanding_amount < 0:
                 doc = frappe.new_doc("Journal Entry")
+                if self.branch:
+                    doc.branch = self.branch
                 doc.voucher_type = "Credit Note" if self.invoice_type == 'Sales' else "Debit Note"
                 doc.posting_date = row.posting_date
                 doc.company = self.company
@@ -185,7 +187,8 @@ class OpeningInvoiceCreationTool(OpeningInvoiceCreationTool_):
             "disable_rounded_total": 1,
             "currency": row.currency or frappe.get_cached_value('Company',  self.company,  "default_currency"),
             "conversion_rate": row.exchange_rate,
-            account_field: row.account
+            account_field: row.account,
+            "branch": self.branch
         })
 
         # accounting_dimension = get_accounting_dimensions()
