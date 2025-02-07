@@ -5,7 +5,7 @@ from frappe import _
 from frappe.utils import getdate, cstr, flt, date_diff, cint, get_link_to_form
 
 @frappe.whitelist()
-def get_gl_data(from_date,to_date,company,account, get_opening_closing_data):
+def get_gl_data(from_date,to_date,company,account, get_opening_closing_data=1):
     # Opening Balance
     gl_opening_entries = frappe.db.sql("""
         select sum(debit-credit) as balance
