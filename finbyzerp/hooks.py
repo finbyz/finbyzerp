@@ -294,9 +294,9 @@ from finbyzerp.print_format import get_pdf
 pdf.get_pdf = get_pdf
 
 
-from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
-from erpnext.stock.report.stock_ledger import stock_ledger
-stock_ledger.execute = stock_ledger_execute
+# from finbyzerp.finbyzerp.report.stock_ledger import execute as stock_ledger_execute
+# from erpnext.stock.report.stock_ledger import stock_ledger
+# stock_ledger.execute = stock_ledger_execute
 
 from finbyzerp.finbyzerp.report.stock_balance import execute as stock_balance_execute
 from erpnext.stock.report.stock_balance import stock_balance
