@@ -1,6 +1,6 @@
 import frappe
 from finbyzerp.e_invoice_override_14 import get_auth_token
-# from india_compliance.gst_india.api_classes.base import get_public_ip
+from finbyzerp.get_public_ip import get_public_ip
 from frappe import _
 
 def setup(self, company_gstin):
@@ -15,7 +15,7 @@ def setup(self, company_gstin):
             "gstin": self.company_gstin,
             "state-cd": self.company_gstin[:2],
             "username": self.username,
-            # "ip-usr": frappe.cache().hget("public_ip", "public_ip", get_public_ip),
+            "ip-usr": frappe.cache().hget("public_ip", "public_ip", get_public_ip),
             "txn": self.generate_request_id(length=32),
         }
     )
