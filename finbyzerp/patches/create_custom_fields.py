@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import frappe
 
 def execute():
-    create_unallocate_payment_field()
+    pass
 
 def create_unallocate_payment_field():
     doc = frappe.new_doc("Custom Field")
