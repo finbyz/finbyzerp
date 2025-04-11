@@ -1,5 +1,5 @@
 import frappe
-from india_compliance.gst_india.api_classes.base import get_public_ip
+from finbyzerp.finbyzerp.get_public_ip import get_public_ip
 from finbyzerp.finbyzerp.override.india_compliance.e_invoice import get_auth_token
 from frappe import _
 
