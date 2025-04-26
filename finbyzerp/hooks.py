@@ -15,6 +15,7 @@ from erpnext.selling.report.sales_order_analysis import sales_order_analysis
 from finbyzerp.finbyzerp.override.india_compliance.base import get_url as get_gsp_url
 from finbyzerp.finbyzerp.override.india_compliance.e_invoice import setup as einvoice_setup
 from finbyzerp.finbyzerp.override.india_compliance.e_waybill import setup as ewaybill_setup
+from finbyzerp.finbyzerp.override.india_compliance.e_waybill import get_transporter_details as ewaybill_get_transporter_details
 from finbyzerp.finbyzerp.override.india_compliance.public import get_gstin_info
 from finbyzerp.finbyzerp.override.india_compliance.gstr import get_transaction
 from finbyzerp.finbyzerp.override.pending_so_items_for_purchase_request import (
@@ -200,6 +201,7 @@ BaseAPI.BASE_URL="https://asp.resilient.tech"
 BaseAPI.get_url = get_gsp_url
 EInvoiceAPI.setup = einvoice_setup
 EWaybillAPI.setup = ewaybill_setup
+EWaybillAPI.get_transporter_details = ewaybill_get_transporter_details
 PublicAPI.get_gstin_info = get_gstin_info
 PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
 FilesAPI.BASE_PATH = "gstn/files"
