@@ -8,7 +8,7 @@ def validate(self,method):
 		frappe.msgprint("Please define correct expense account in Item Defaults.<br>In absence of same expense will be parked in 'Cost of Goods Sold' account")
 
 def before_validate(self,method):
-	if "'" in self.item_code or '"' in self.item_code:
+	if self.item_code and ("'" in self.item_code or '"' in self.item_code):
 		frappe.throw(""" Item Code not allowed with any special Characters like " or ' """)
 
 def before_rename(self, method, old, new, merge=False):
