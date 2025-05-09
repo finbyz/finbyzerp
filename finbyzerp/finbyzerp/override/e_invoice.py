@@ -102,7 +102,7 @@ def generate_e_invoice(docname, throw=True, force=False):
         {
             "irn": result.Irn,
             "einvoice_status": "Generated",
-            # "signed_qr_code": result.SignedQRCode #finbyz changes
+            "signed_qr_code": result.SignedQRCode #finbyz changes
         }
     )
 
