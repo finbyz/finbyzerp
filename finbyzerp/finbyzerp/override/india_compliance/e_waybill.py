@@ -40,3 +40,9 @@ def setup(self, doc=None, *, company_gstin=None):
 			"requestid": self.generate_request_id(),
 		}
 	)
+
+
+
+def get_transporter_details(self, transporter_id):
+	self.BASE_PATH = "enriched/ewb/master"
+	return self.get("GetTransporterDetails", params={"trn_no": transporter_id})
