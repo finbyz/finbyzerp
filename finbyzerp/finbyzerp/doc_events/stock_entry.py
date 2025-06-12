@@ -28,7 +28,7 @@ def validate_source_and_target_warehoouse(self):
 def create_quality_inspection_entry(self):
     for inspection_item in self.items:
         item = frappe.get_doc("Item", inspection_item.item_code)
-        if self.purpose == "Manufacture" or self.purpose == "Repack":
+        if self.purpose == "Manufacture":
             if (
                 item.inspection_required_after_stock_entry
                 and inspection_item.is_finished_item
