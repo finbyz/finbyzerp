@@ -44,10 +44,10 @@ from finbyzerp.finbyzerp.override.sales_order_analysis import (
     execute as sales_order_analysis_execute,
 )
 from india_compliance.gst_india.api_classes.base import BaseAPI
-from india_compliance.gst_india.api_classes.e_invoice import EInvoiceAPI
-from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
+from india_compliance.gst_india.api_classes.nic.e_invoice import EInvoiceAPI
+from india_compliance.gst_india.api_classes.nic.e_waybill import EWaybillAPI
 from india_compliance.gst_india.api_classes.public import PublicAPI
-from india_compliance.gst_india.api_classes.taxpayer_base import PublicCertificate
+from india_compliance.gst_india.api_classes.taxpayer_base import StaticResourcesAPI
 from india_compliance.gst_india.api_classes.taxpayer_base import FilesAPI
 from india_compliance.gst_india.api_classes.taxpayer_base import TaxpayerBaseAPI, TaxpayerAuthenticate
 from india_compliance.gst_india.api_classes.taxpayer_returns import ReturnsAPI
@@ -205,7 +205,7 @@ EInvoiceAPI.setup = einvoice_setup
 EWaybillAPI.setup = ewaybill_setup
 EWaybillAPI.get_transporter_details = ewaybill_get_transporter_details
 PublicAPI.get_gstin_info = get_gstin_info
-PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
+StaticResourcesAPI.get_gstn_public_certificate = get_gstn_public_certificate
 FilesAPI.BASE_PATH = "gstn/files"
 TaxpayerAuthenticate.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
 TaxpayerBaseAPI.BASE_PATH = "gstn"
