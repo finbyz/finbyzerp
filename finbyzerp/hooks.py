@@ -373,13 +373,13 @@ fixtures = [
       },
 ]
 
-from india_compliance.gst_india.api_classes.taxpayer_base import PublicCertificate
-from india_compliance.gst_india.api_classes.taxpayer_base import FilesAPI ,TaxpayerAuthenticate,TaxpayerBaseAPI
-from india_compliance.gst_india.api_classes.taxpayer_returns import ReturnsAPI
-from india_compliance.gst_india.api_classes.e_invoice import EInvoiceAPI
-from finbyzerp.e_invoice_override_14 import einvoice_setup
-from finbyzerp.returns import get_gstn_public_certificate
-from finbyzerp.taxpayer_base import setup as tax_payer_base_api
+# from india_compliance.gst_india.api_classes.taxpayer_base import PublicCertificate
+# from india_compliance.gst_india.api_classes.taxpayer_base import FilesAPI ,TaxpayerAuthenticate,TaxpayerBaseAPI
+# from india_compliance.gst_india.api_classes.taxpayer_returns import ReturnsAPI
+# from india_compliance.gst_india.api_classes.e_invoice import EInvoiceAPI
+# from finbyzerp.e_invoice_override_14 import einvoice_setup
+# from finbyzerp.returns import get_gstn_public_certificate
+# from finbyzerp.taxpayer_base import setup as tax_payer_base_api
 
 # PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
 # FilesAPI.BASE_PATH = "gstn/files"
@@ -388,21 +388,21 @@ from finbyzerp.taxpayer_base import setup as tax_payer_base_api
 # TaxpayerBaseAPI.setup = tax_payer_base_api
 # EInvoiceAPI.setup = einvoice_setup
 
-from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
-from finbyzerp.e_invoice_override_14 import ewaybill_setup
-EWaybillAPI.setup = ewaybill_setup
+# from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
+# from finbyzerp.e_invoice_override_14 import ewaybill_setup
+# EWaybillAPI.setup = ewaybill_setup
 
-from india_compliance.gst_india.api_classes.base import BaseAPI
-from finbyzerp.e_invoice_override_14 import get_url
-BaseAPI.get_url = get_url
+# from india_compliance.gst_india.api_classes.base import BaseAPI
+# from finbyzerp.e_invoice_override_14 import get_url
+# BaseAPI.get_url = get_url
 
-from india_compliance.gst_india.api_classes.public import PublicAPI
-from finbyzerp.e_invoice_override_14 import get_gstin_info
-PublicAPI.get_gstin_info = get_gstin_info 
+# from india_compliance.gst_india.api_classes.public import PublicAPI
+# from finbyzerp.e_invoice_override_14 import get_gstin_info
+# PublicAPI.get_gstin_info = get_gstin_info 
 
-from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
-from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as new_update_transaction_tax_details
-GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
+# from india_compliance.gst_india.utils.transaction_data import GSTTransactionData
+# from finbyzerp.e_invoice_override_14 import update_transaction_tax_details as new_update_transaction_tax_details
+# GSTTransactionData.update_transaction_tax_details = new_update_transaction_tax_details
 
 # Override Trends Reports
 from erpnext.selling.report.sales_order_trends import sales_order_trends
