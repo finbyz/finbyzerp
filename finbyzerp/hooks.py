@@ -381,12 +381,12 @@ from finbyzerp.e_invoice_override_14 import einvoice_setup
 from finbyzerp.returns import get_gstn_public_certificate
 from finbyzerp.taxpayer_base import setup as tax_payer_base_api
 
-PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
-FilesAPI.BASE_PATH = "gstn/files"
-TaxpayerAuthenticate.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
-TaxpayerBaseAPI.BASE_PATH = "gstn"
-TaxpayerBaseAPI.setup = tax_payer_base_api
-EInvoiceAPI.setup = einvoice_setup
+# PublicCertificate.get_gstn_public_certificate = get_gstn_public_certificate
+# FilesAPI.BASE_PATH = "gstn/files"
+# TaxpayerAuthenticate.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
+# TaxpayerBaseAPI.BASE_PATH = "gstn"
+# TaxpayerBaseAPI.setup = tax_payer_base_api
+# EInvoiceAPI.setup = einvoice_setup
 
 from india_compliance.gst_india.api_classes.e_waybill import EWaybillAPI
 from finbyzerp.e_invoice_override_14 import ewaybill_setup
