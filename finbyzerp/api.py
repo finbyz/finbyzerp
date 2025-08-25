@@ -818,7 +818,7 @@ def validate_returned_items(doc):
 				ref = valid_items.get(d.item_code, frappe._dict())
 				if d.stock_qty>0:
 					d.stock_qty=(-1)*(d.stock_qty)
-				 validate_quantity(doc, d.item_code, d, ref, valid_items, already_returned_items)
+				validate_quantity(doc, d.item_code, d, ref, valid_items, already_returned_items)
 
 				if ref.rate and doc.doctype in ("Delivery Note", "Sales Invoice") and flt(d.rate) > ref.rate:
 					frappe.throw(
@@ -1568,3 +1568,4 @@ def send_sales_invoice_mails():
 			frappe.log_error("Mail Sending Issue", frappe.get_traceback())
 
 			print(frappe.get_traceback())
+
