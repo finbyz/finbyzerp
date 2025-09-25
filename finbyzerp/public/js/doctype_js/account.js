@@ -80,7 +80,8 @@ frappe.ui.form.on('Account',{
                         from_date:val.from_date,
                         to_date:val.to_date,
                         company:frm.doc.company,
-                        account:frm.doc.name
+                        account:frm.doc.name,
+                        get_opening_closing_data:1
                     },
                     freeze:true,
                     callback: function(r){
