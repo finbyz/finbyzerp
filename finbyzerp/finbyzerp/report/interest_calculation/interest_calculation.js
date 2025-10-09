@@ -21,7 +21,7 @@ frappe.query_reports["Interest Calculation"] = {
 			get_query: () => {
 				return {
 					filters: {
-						'is_group': 1
+						'is_group': 0
 					}
 				};
 			}
