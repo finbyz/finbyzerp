@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 import functools
-from past.builtins import cmp
+# from past.builtins import cmp
 from frappe import _
 from frappe.utils import flt
 # import frappe
@@ -73,7 +73,11 @@ def get_data(filters):
 	return data
 
 def get_group_map(out):
-	sorted_out = sorted(out, key = lambda i: (i['indent'],i['parent_item_group']),reverse=True)
+	sorted_out = sorted(
+    out,
+    key=lambda i: (i.get('indent', 0), (i.get('parent_item_group') or "")),
+    reverse=True
+    )
 	item_group_map = {}
 	for row in sorted_out:
 		if row.is_group ==1 and item_group_map.get(row.item_group):
@@ -153,7 +157,7 @@ def get_item_group(filters):
 	# 	cond += " and authority = 'Authorized'"
 	# if filters.get('unauthorized') and not filters.get('authorized'):
 	# 	cond += " and authority = 'Unauthorized'"
-
+	
 	item = frappe.db.sql("""
 		select 
 			name, item_code, item_name, item_group as parent_item_group, 0 as is_group
@@ -174,14 +178,28 @@ def get_item_map(filters):
 	filter_warehouse = ''
 
 	if filters.get('warehouse'):
-		filter_warehouse = " and b.warehouse = '{}'".format(filters.warehouse)
+		filter_warehouse = " and sle.warehouse = '{}'".format(filters.warehouse)
 
+	# Modified query to calculate from Stock Ledger Entry excluding cancelled entries
 	data = frappe.db.sql(f"""
-		select b.item_code, sum(actual_qty) as qty, sum(stock_value) as value
-		from `tabBin` as b JOIN `tabWarehouse` as w on w.name = b.warehouse
-		where w.company = '{filters.company}'{filter_warehouse}
-		group by b.item_code
-	""", as_dict = 1)
+		select 
+			sle.item_code, 
+			sum(sle.actual_qty) as qty, 
+			sum(sle.stock_value_difference) as value
+		from 
+			`tabStock Ledger Entry` as sle
+		JOIN 
+			`tabWarehouse` as w on w.name = sle.warehouse
+		where 
+			w.company = '{filters.company}'
+			and sle.is_cancelled = 0
+			and sle.docstatus < 2
+			{filter_warehouse}
+		group by 
+			sle.item_code
+		having
+			sum(sle.actual_qty) != 0
+	""", as_dict=1)
 
 	item_map = {}
 
@@ -189,7 +207,7 @@ def get_item_map(filters):
 		item_map[row.item_code] = [row.qty, row.value]
 
 	return item_map
-
+	
 def filter_item_group(filters,item_group, depth=10):
 	parent_children_map = {}
 	item_group_by_name = {}
@@ -224,7 +242,12 @@ def filter_item_group(filters,item_group, depth=10):
 def sort_item_group(item_group, is_root=False, key="name"):
 
 	def compare_item_groups(a, b):
-		return cmp(a[key], b[key]) or 1
+		if a[key] > b[key]:
+			return 1
+		elif a[key] < b[key]:
+			return -1
+		else:
+			return 0
 
 	item_group.sort(key = functools.cmp_to_key(compare_item_groups))
 
