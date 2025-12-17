@@ -129,6 +129,9 @@ class OpeningInvoiceCreationTool(_OpeningInvoiceCreationTool):
                             "cost_center": row.cost_center,
                         },
                     )
+                for acc in doc.accounts:
+                    for d in get_accounting_dimensions():
+                        acc.set(d, row.get(d) or self.get(d))
 
                 doc.save()
                 doc.submit()
