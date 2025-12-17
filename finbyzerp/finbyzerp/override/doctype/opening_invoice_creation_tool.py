@@ -236,6 +236,10 @@ class OpeningInvoiceCreationTool(_OpeningInvoiceCreationTool):
         # 	args.update({
         # 		dimension: item.get(dimension)
         # 	})
+    
+        accounting_dimensions = get_accounting_dimensions()
+        for dimension in accounting_dimensions:
+            args.update({dimension: self.get(dimension) or item.get(dimension)})
 
         if self.invoice_type == "Sales":
             args["is_pos"] = 0
