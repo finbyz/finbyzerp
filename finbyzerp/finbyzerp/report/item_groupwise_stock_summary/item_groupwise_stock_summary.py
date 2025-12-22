@@ -108,8 +108,8 @@ def get_item_map(filters):
 							"igst_account":gst_accounts_reverse.igst_account,"cess_account":gst_accounts_reverse.cess_account,
 							"tcs_account":gst_accounts_reverse.tcs_account,"export_reverse_charge_account":gst_accounts_reverse.export_reverse_charge_account})
 
-	purchase_tax_amount_data = purchase_execute(filters)
-	sales_tax_amount_data = sales_execute(filters)
+	# purchase_tax_amount_data = purchase_execute(filters)
+	# sales_tax_amount_data = sales_execute(filters)
 		
 	# data = frappe.db.sql("""
 	# 	select pii.item_code, pii.net_amount as net_amount 
