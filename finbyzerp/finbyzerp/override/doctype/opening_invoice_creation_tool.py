@@ -253,7 +253,7 @@ class OpeningInvoiceCreationTool(_OpeningInvoiceCreationTool):
             # args['invoice_no'] = row.invoice_no
         else:
             args["bill_no"] = row.get("bill_no") or row.invoice_no
-
+        frappe.log_error("Invoice Args", str(args))
         return args
 @frappe.whitelist()
 def get_temporary_opening_account(company=None):
