@@ -137,9 +137,13 @@ class OpeningInvoiceCreationTool(_OpeningInvoiceCreationTool):
                 doc.submit()
                 names.append(doc.name)
             elif row.outstanding_amount > 0:
-                doc = frappe.get_doc(args).insert(
-                    set_name=args.get("invoice_number", None)
-                )
+                if args.get("invoice_number"):
+                    doc = frappe.get_doc(args).insert(
+                        set_name=args.get("invoice_number", None)
+                    )
+                else:
+                    doc = frappe.get_doc(args).insert()
+                    
                 doc.submit()
                 names.append(doc.name)
 
@@ -232,6 +236,7 @@ class OpeningInvoiceCreationTool(_OpeningInvoiceCreationTool):
                 or frappe.get_cached_value("Company", self.company, "default_currency"),
                 "conversion_rate": row.exchange_rate,
                 account_field: row.account,
+                "naming_series": "OSTE.####.",
             }
         )
 
