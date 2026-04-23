@@ -134,6 +134,9 @@ class OpeningInvoiceCreationTool(_OpeningInvoiceCreationTool):
                         acc.set(d, row.get(d) or self.get(d))
 
                 doc.save()
+                doc.taxes_and_charges = ""
+                doc.taxes = []
+                doc.save()
                 doc.submit()
                 names.append(doc.name)
             elif row.outstanding_amount > 0:
@@ -143,7 +146,10 @@ class OpeningInvoiceCreationTool(_OpeningInvoiceCreationTool):
                     )
                 else:
                     doc = frappe.get_doc(args).insert()
-                    
+                
+                doc.taxes_and_charges = ""
+                doc.taxes = []
+                doc.save()  
                 doc.submit()
                 names.append(doc.name)
 
