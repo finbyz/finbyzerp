@@ -197,7 +197,9 @@ scheduler_events = {
 
 
 # India Compliance Overrides
-BaseAPI.SENSITIVE_INFO = BaseAPI.SENSITIVE_INFO + ('authorization',)
+if hasattr(BaseAPI, "SENSITIVE_INFO"):
+   BaseAPI.SENSITIVE_INFO = BaseAPI.SENSITIVE_INFO + ('authorization',)
+
 BaseAPI.BASE_URL="https://asp.resilient.tech"
 BaseAPI.get_url = get_gsp_url
 BaseAPI.handle_http_code = custom_handle_http_code
@@ -207,7 +209,8 @@ EWaybillAPI.get_transporter_details = ewaybill_get_transporter_details
 PublicAPI.get_gstin_info = get_gstin_info
 StaticResourcesAPI.get_gstn_public_certificate = get_gstn_public_certificate
 FilesAPI.BASE_PATH = "gstn/files"
-TaxpayerAuthenticate.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
+if hasattr(TaxpayerBaseAPI, "SENSITIVE_INFO"):
+    TaxpayerAuthenticate.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
 TaxpayerBaseAPI.BASE_PATH = "gstn"
 TaxpayerBaseAPI.setup = tax_payer_base_api
 GSTR.get_transaction = get_transaction
