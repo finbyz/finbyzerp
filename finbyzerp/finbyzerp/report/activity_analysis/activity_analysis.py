@@ -89,10 +89,11 @@ def get_data_details(filters):
 			FROM
 				`tab{doc}`
 			WHERE
-				docstatus < 2
+				1=1
+        		{docstatus_cond}
 				{conditions}
 			ORDER BY
-				modified DESC""".format(date=date, title_field=title_field, other_fields=other_fields, doc=doc, conditions=conditions), as_dict=1)
+				modified DESC""".format(date=date, title_field=title_field, other_fields=other_fields, doc=doc, conditions=conditions, docstatus_cond=get_docstatus_condition(filters)), as_dict=1)
 
 		d = dt[:]
 		id = 0
@@ -223,13 +224,15 @@ def get_data(filters):
 			FROM
 				`tab{doc}`
 			WHERE
-				docstatus < 2
+				1=1
+        		{docstatus_cond}
 				{conditions}
 			GROUP BY
 				{group_by_field}
 			ORDER BY
 				modified DESC
-		""".format(doc=doc, conditions=conditions,group_by_field='owner'), as_dict=1)
+		""".format(doc=doc, conditions=conditions,group_by_field='owner',
+             docstatus_cond=get_docstatus_condition(filters)), as_dict=1)
 		
 		dt_map = {}
 		user_tuple = '('
@@ -259,10 +262,10 @@ def get_data(filters):
 					select child.owner,count(child.name) as total_items
 					from `tab{}` as child
 					JOIN `tab{}` as p on p.name = child.parent and p.owner = child.owner
-					where child.docstatus < 2 {}
+					where 1=1 {docstatus_cond} {conditions}
 					group by child.owner
 					ORDER BY child.modified desc
-				""".format(child_doctype_list[idx],doc,conditions),as_dict=1)
+				""".format(child_doctype_list[idx], doc, docstatus_cond=get_docstatus_condition(filters, alias="child"), conditions=conditions), as_dict=1)
 
 # Below Code is for Merge Multiple owners with its keys and values 
 # Example: items = [{"admin":{"total_entries":5,"total_items":10}},
@@ -294,6 +297,16 @@ def get_data(filters):
 		data.append({"created_by":get_user_fullname(row),"total_entries":entries_sum[row],"total_items":items_sum[row]})
 
 	return data
+
+def get_docstatus_condition(filters, alias=""):
+	docstatus_map = {"Draft": 0, "Submitted": 1, "Cancelled": 2}
+	field = "{0}docstatus".format(alias + "." if alias else "")
+	if filters.get("docstatus"):
+		return " and {0} = {1}".format(field, docstatus_map.get(filters.docstatus))
+	else:
+		# default behaviour unchanged: everything except cancelled
+		return " and {0} < 2".format(field)
+
 
 def get_chart_data(data,filters):
 

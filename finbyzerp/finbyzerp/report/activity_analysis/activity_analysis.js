@@ -45,5 +45,12 @@ frappe.query_reports["Activity Analysis"] = {
             "label": __("Show Details"),
             "fieldtype": "Check",
         },
+        {
+            "fieldname": "docstatus",
+            "label": __("Status"),
+            "fieldtype": "Select",
+            "options": "\nDraft\nSubmitted\nCancelled",
+            "default": ""
+        },
     ]
 };
