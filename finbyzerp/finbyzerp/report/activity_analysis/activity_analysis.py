@@ -35,6 +35,7 @@ def get_columns_details():
 		{ "label": _("Created By"),"fieldname": "Created By","fieldtype": "Link","options":"User","width": 150},
 		{ "label": _("Title"),"fieldname": "Title","fieldtype": "Data","width": 110},
 		{ "label": _("Item Name"),"fieldname": "Item Name","fieldtype": "Data","width": 180},
+		{ "label": _("Qty"),"fieldname": "Qty","fieldtype": "Float","width": 100},
 		{ "label": _("Amount"),"fieldname": "Amount","fieldtype": "Currency","width": 150}
 	]
 	return columns
@@ -114,7 +115,7 @@ def insert_items(data, row, doc, id):
 	if doc == "Journal Entry Account":
 		items = frappe.db.sql("""
 			SELECT
-				account as 'Item Name', if(credit > 0, credit, debit) as 'Amount', owner as 'Owner'
+				account as 'Item Name', if(credit > 0, credit, debit) as 'Amount', owner as 'Owner', NULL as 'Qty'
 			FROM
 				`tab{0}`
 			WHERE
@@ -122,7 +123,7 @@ def insert_items(data, row, doc, id):
 	else:
 		items = frappe.db.sql("""
 			SELECT
-				item_code as 'Item Name', amount as 'Amount', owner as 'Owner'
+				item_code as 'Item Name', amount as 'Amount', owner as 'Owner', qty as 'Qty'
 			FROM
 				`tab{0}`
 			WHERE
@@ -131,10 +132,11 @@ def insert_items(data, row, doc, id):
 	if items:
 		row["Item Name"] = items[0]["Item Name"]
 		row["Amount"] = items[0]["Amount"]
+		row["Qty"] = items[0]["Qty"]
 		row["Owner"] = get_user_fullname(items[0]["Owner"])
 
 	for i in items[1:]:
-		data.insert(id, {'Item Name': i['Item Name'], 'Amount': i["Amount"], 'Owner': get_user_fullname(i["Owner"])})
+		data.insert(id, {'Item Name': i['Item Name'], 'Amount': i["Amount"], 'Qty': i["Qty"], 'Owner': get_user_fullname(i["Owner"])})
 		id +=1
 
 	return id
