@@ -150,11 +150,11 @@ doc_events = {
     "Purchase Receipt": {
         "on_submit": "finbyzerp.finbyzerp.doc_events.purchase_receipt.on_submit"
     },
-    "Stock Entry": {
-        "validate": "finbyzerp.finbyzerp.doc_events.stock_entry.validate",
-        "after_insert": "finbyzerp.finbyzerp.doc_events.stock_entry.after_insert",
-        "on_submit": "finbyzerp.finbyzerp.doc_events.stock_entry.on_submit",
-    },
+    # "Stock Entry": {
+    #     "validate": "finbyzerp.finbyzerp.doc_events.stock_entry.validate",
+    #     "after_insert": "finbyzerp.finbyzerp.doc_events.stock_entry.after_insert",
+    #     "on_submit": "finbyzerp.finbyzerp.doc_events.stock_entry.on_submit",
+    # },
     "Item": {
         "validate": "finbyzerp.finbyzerp.doc_events.item.validate",
         "before_naming": "finbyzerp.finbyzerp.doc_events.item.before_validate",
