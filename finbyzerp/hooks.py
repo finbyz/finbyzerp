@@ -104,9 +104,6 @@ doctype_js = {
 
 # Doc Events
 doc_events = {
-    "*": {
-        "before_naming": "finbyzerp.finbyzerp.doc_events.naming_series.before_naming",
-    },
     ("Quotation", "Sales Order", "Delivery Note", "Sales Invoice"): {
         "on_submit": "finbyzerp.finbyzerp.doc_events.sales_comment.on_submit",
         "before_update_after_submit": "finbyzerp.finbyzerp.doc_events.sales_comment.before_update_after_submit",
