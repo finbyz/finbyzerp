@@ -8,6 +8,6 @@ readme = "README.md"
 dynamic = ["version"]
 
 [tool.bench.frappe-dependencies]
-frappe = ">=15.33.0"
-erpnext = ">=15.29.0"
-india_compliance = ">=5.9.2"
+frappe = ">=15.33.0,<16.0.0"
+erpnext = ">=15.29.0,<16.0.0"
+india_compliance = ">=5.9.2,<6.0.0"
