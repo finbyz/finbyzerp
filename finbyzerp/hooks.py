@@ -12,13 +12,6 @@ from erpnext.selling.report.pending_so_items_for_purchase_request import (
     pending_so_items_for_purchase_request,
 )
 from erpnext.selling.report.sales_order_analysis import sales_order_analysis
-# from finbyzerp.finbyzerp.override.india_compliance.base import get_url as get_gsp_url
-# from finbyzerp.finbyzerp.override.india_compliance.base import custom_handle_http_code
-# from finbyzerp.finbyzerp.override.india_compliance.e_invoice import setup as einvoice_setup
-# from finbyzerp.finbyzerp.override.india_compliance.e_waybill import setup as ewaybill_setup
-# from finbyzerp.finbyzerp.override.india_compliance.e_waybill import get_transporter_details as ewaybill_get_transporter_details
-# from finbyzerp.finbyzerp.override.india_compliance.public import get_gstin_info
-# from finbyzerp.finbyzerp.override.india_compliance.gstr import get_transaction
 from finbyzerp.finbyzerp.override.pending_so_items_for_purchase_request import (
     execute as pending_so_items_for_purchase_request_execute,
 )
@@ -43,16 +36,6 @@ from finbyzerp.finbyzerp.override.report.sales_invoice_trends import (
 from finbyzerp.finbyzerp.override.sales_order_analysis import (
     execute as sales_order_analysis_execute,
 )
-# from india_compliance.gst_india.api_classes.base import BaseAPI
-# from india_compliance.gst_india.api_classes.nic.e_invoice import EInvoiceAPI
-# from india_compliance.gst_india.api_classes.nic.e_waybill import EWaybillAPI
-# from india_compliance.gst_india.api_classes.public import PublicAPI
-# from india_compliance.gst_india.api_classes.taxpayer_base import StaticResourcesAPI
-# from india_compliance.gst_india.api_classes.taxpayer_base import FilesAPI
-# from india_compliance.gst_india.api_classes.taxpayer_base import TaxpayerBaseAPI, TaxpayerAuthenticate
-# from india_compliance.gst_india.api_classes.taxpayer_returns import ReturnsAPI
-# from india_compliance.gst_india.utils.gstr_2.gstr import GSTR
-# from finbyzerp.finbyzerp.override.india_compliance.taxpayer_base import setup as tax_payer_base_api, get_gstn_public_certificate
 
 from . import __version__ as app_version
 
@@ -196,21 +179,6 @@ scheduler_events = {
 }
 
 
-# India Compliance Overrides
-# BaseAPI.SENSITIVE_INFO = BaseAPI.SENSITIVE_INFO + ('authorization',)
-# BaseAPI.BASE_URL="https://asp.resilient.tech"
-# BaseAPI.get_url = get_gsp_url
-# BaseAPI.handle_http_code = custom_handle_http_code
-# EInvoiceAPI.setup = einvoice_setup
-# EWaybillAPI.setup = ewaybill_setup
-# EWaybillAPI.get_transporter_details = ewaybill_get_transporter_details
-# PublicAPI.get_gstin_info = get_gstin_info
-# StaticResourcesAPI.get_gstn_public_certificate = get_gstn_public_certificate
-# FilesAPI.BASE_PATH = "gstn/files"
-# TaxpayerAuthenticate.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
-# TaxpayerBaseAPI.BASE_PATH = "gstn"
-# TaxpayerBaseAPI.setup = tax_payer_base_api
-# GSTR.get_transaction = get_transaction
 
 
 # Report
