@@ -7,6 +7,7 @@ from erpnext.accounts.utils import create_payment_ledger_entry
 
 @frappe.whitelist()
 def unallocate_payment(child_doc_name,parent_doc_name,reference_doctype,reference_name,adv_adj=False, update_outstanding="Yes"):
+	frappe.has_permission("Payment Entry", "write", parent_doc_name, throw=True)
 	if reference_doctype in ['Sales Invoice','Purchase Invoice']:
 		doc = frappe.get_doc("Payment Entry",parent_doc_name)
 		gl_map = doc.build_gl_map()

@@ -45,20 +45,13 @@ def check_counter_series(name, company_series=None, date=None):
 	else:
 		return int(frappe.db.get_value("Series", name, "current", order_by="name")) + 1
 
-
-@frappe.whitelist()
-def repost_transaction_entries():
-	execute_repost_item_valuation()
-
 # email templates
 
-@frappe.whitelist()
 def sales_invoice_payment_remainder():
 	frappe.enqueue(send_sales_invoice_mails, queue='long', timeout=5000, job_name='Payment Reminder Mails')
 	return "Payment Reminder Mails Send"
 
 
-@frappe.whitelist()
 def send_sales_invoice_mails():
 	account_settings = frappe.get_doc("Accounts Settings")
 

@@ -7,11 +7,12 @@ from frappe.utils import getdate, cstr, flt, date_diff, cint, get_link_to_form
 @frappe.whitelist()
 def get_gl_data(from_date,to_date,company,account, get_opening_closing_data=1):
     # Opening Balance
+    frappe.has_permission("Account", "read", account, throw=True)
     gl_opening_entries = frappe.db.sql("""
         select sum(debit-credit) as balance
         from `tabGL Entry`
-        where company = '{company}' and account = '{account}' and posting_date < '{from_date}' AND is_cancelled=0
-    """.format(company=company,account=account,from_date=from_date))
+        where company = %(company)s and account = %(account)s and posting_date < %(from_date)s AND is_cancelled=0
+    """, {"company": company, "account": account, "from_date": from_date})
 
     date_wise_balance = []
 
@@ -25,9 +26,9 @@ def get_gl_data(from_date,to_date,company,account, get_opening_closing_data=1):
     gl_entries = frappe.db.sql("""
         select debit, credit, posting_date
         from `tabGL Entry`
-        where company = '{company}' and account = '{account}' and posting_date BETWEEN '{from_date}' AND '{to_date}' AND is_cancelled=0
-        order by posting_date asc    
-    """.format(company=company,account=account,from_date=from_date,to_date=to_date),as_dict=1)
+        where company = %(company)s and account = %(account)s and posting_date BETWEEN %(from_date)s AND %(to_date)s AND is_cancelled=0
+        order by posting_date asc
+    """, {"company": company, "account": account, "from_date": from_date, "to_date": to_date}, as_dict=1)
 
     for idx,gl in enumerate(gl_entries):
         day_diff = date_diff(gl.posting_date,previous_date)
@@ -51,6 +52,8 @@ def get_gl_data(from_date,to_date,company,account, get_opening_closing_data=1):
 
 @frappe.whitelist()
 def create_item(doc_name):
+    frappe.has_permission("Account", "read", doc_name, throw=True)
+    frappe.has_permission("Item", "create", throw=True)
     if not cint(frappe.db.get_value("Accounts Settings","Accounts Settings","enable_expense_item_creation")) == 1:
         frappe.throw("Please Enable 'Create Item on Creation of Expense Account' in 'Accounts Settings'")
     self = frappe.get_doc("Account",doc_name)

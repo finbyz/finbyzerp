@@ -241,6 +241,7 @@ def get_context(customer, doc):
 
 @frappe.whitelist()
 def fetch_customers(customer_collection, collection_name, primary_mandatory):
+	frappe.has_permission("Statement of Accounts", "read", throw=True)
 	customer_list = []
 	customers = []
 
@@ -290,6 +291,7 @@ def get_customer_emails(type, customer_name, primary_mandatory, billing_and_prim
 	"""Returns first email from Contact Email table as a Billing email
 	when Is Billing Contact checked
 	and Primary email- email with Is Primary checked"""
+	frappe.has_permission("Statement of Accounts", "read", throw=True)
 
 	billing_email = frappe.db.sql(f"""
 		SELECT
@@ -305,11 +307,11 @@ def get_customer_emails(type, customer_name, primary_mandatory, billing_and_prim
 		ON
 			contact.name=link.parent
 		WHERE
-			link.link_doctype='{type}'
-			and link.link_name='{customer_name}'
+			link.link_doctype=%s
+			and link.link_name=%s
 			and contact.is_billing_contact=1
 		ORDER BY
-			contact.creation desc"""
+			contact.creation desc""", (type, customer_name)
 		)
 
 	if len(billing_email) == 0 or (billing_email[0][0] is None):
@@ -329,6 +331,7 @@ def get_customer_emails(type, customer_name, primary_mandatory, billing_and_prim
 
 @frappe.whitelist()
 def download_statements(document_name):
+	frappe.has_permission("Statement of Accounts", "read", document_name, throw=True)
 	doc = frappe.get_doc("Statement of Accounts", document_name)
 	report = get_report_pdf(doc)
 	
@@ -340,6 +343,7 @@ def download_statements(document_name):
 
 @frappe.whitelist()
 def send_emails(document_name, from_scheduler=False):
+	frappe.has_permission("Statement of Accounts", "write", document_name, throw=True)
 	doc = frappe.get_doc("Statement of Accounts", document_name)
 	report = get_report_pdf(doc, consolidated=False)
 
@@ -383,7 +387,6 @@ def send_emails(document_name, from_scheduler=False):
 		return False
 
 
-@frappe.whitelist()
 def send_auto_email():
 	selected = frappe.get_list(
 		"Statement of Accounts",

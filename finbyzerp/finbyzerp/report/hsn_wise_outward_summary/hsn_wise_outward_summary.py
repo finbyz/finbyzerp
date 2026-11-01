@@ -12,7 +12,6 @@ from six import iteritems
 
 import erpnext
 from india_compliance.gst_india.utils import get_gst_accounts_by_type
-from india_compliance.gst_india.report.gstr_1.gstr_1 import get_company_gstin_number
 
 def execute(filters=None):
 	return _execute(filters)
@@ -301,71 +300,3 @@ def get_merged_data(columns, data):
 		result.append(value)
 
 	return result
-
-
-@frappe.whitelist()
-def get_json(filters, report_name, data):
-	filters = json.loads(filters)
-	report_data = json.loads(data)
-	gstin = filters.get("company_gstin") or get_company_gstin_number(filters["company"])
-
-	if not filters.get("from_date") or not filters.get("to_date"):
-		frappe.throw(_("Please enter From Date and To Date to generate JSON"))
-
-	fp = "%02d%s" % (getdate(filters["to_date"]).month, getdate(filters["to_date"]).year)
-
-	gst_json = {"version": "GST3.0.3", "hash": "hash", "gstin": gstin, "fp": fp}
-
-	gst_json["hsn"] = {"data": get_hsn_wise_json_data(filters, report_data)}
-
-	return {"report_name": report_name, "data": gst_json}
-
-
-@frappe.whitelist()
-def download_json_file():
-	"""download json content in a file"""
-	data = frappe._dict(frappe.local.form_dict)
-	frappe.response["filename"] = frappe.scrub("{0}".format(data["report_name"])) + ".json"
-	frappe.response["filecontent"] = data["data"]
-	frappe.response["content_type"] = "application/json"
-	frappe.response["type"] = "download"
-
-
-def get_hsn_wise_json_data(filters, report_data):
-
-	filters = frappe._dict(filters)
-	gst_accounts = get_gst_accounts_by_type(filters.company)
-	data = []
-	count = 1
-
-	for hsn in report_data:
-		row = {
-			"num": count,
-			"hsn_sc": hsn.get("gst_hsn_code"),
-			"desc": hsn.get("description"),
-			"uqc": hsn.get("stock_uom").upper(),
-			"qty": hsn.get("stock_qty"),
-			"rt": flt(hsn.get("tax_rate"), 2),
-			"txval": flt(hsn.get("taxable_amount", 2)),
-			"iamt": 0.0,
-			"camt": 0.0,
-			"samt": 0.0,
-			"csamt": 0.0,
-		}
-
-		for account in gst_accounts.get("igst_account"):
-			row["iamt"] += flt(hsn.get(frappe.scrub(cstr(account)), 0.0), 2)
-
-		for account in gst_accounts.get("cgst_account"):
-			row["camt"] += flt(hsn.get(frappe.scrub(cstr(account)), 0.0), 2)
-
-		for account in gst_accounts.get("sgst_account"):
-			row["samt"] += flt(hsn.get(frappe.scrub(cstr(account)), 0.0), 2)
-
-		for account in gst_accounts.get("cess_account"):
-			row["csamt"] += flt(hsn.get(frappe.scrub(cstr(account)), 0.0), 2)
-
-		data.append(row)
-		count += 1
-
-	return data

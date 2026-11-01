@@ -1117,6 +1117,8 @@ class ReceivablePayableReport(object):
 
 @frappe.whitelist()
 def make_payment_entry(doctype, docname):
+	frappe.has_permission(doctype, "read", docname, throw=True)
+	frappe.has_permission("Payment Entry", "create", throw=True)
 	pe_data = frappe.db.sql(
 		f"""
 			SELECT

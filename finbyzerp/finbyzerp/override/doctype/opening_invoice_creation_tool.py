@@ -255,6 +255,7 @@ class OpeningInvoiceCreationTool(_OpeningInvoiceCreationTool):
         return args
 @frappe.whitelist()
 def get_temporary_opening_account(company=None):
+	frappe.has_permission("Account", "read", throw=True)
 	if not company:
 		return
 
@@ -269,6 +270,7 @@ def get_temporary_opening_account(company=None):
 
 @frappe.whitelist()
 def get_account_currency(party, company, invoice_type):
+    frappe.has_permission("Account", "read", throw=True)
     account = frappe.db.get_value(
         "Party Account", {"parent": party, "company": company}, "account"
     )
