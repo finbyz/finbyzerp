@@ -2,36 +2,12 @@
 # Imports
 
 from __future__ import unicode_literals
-from erpnext.buying.report.purchase_order_trends import purchase_order_trends
-from erpnext.stock.report.purchase_receipt_trends import purchase_receipt_trends
-from erpnext.accounts.report.purchase_invoice_trends import purchase_invoice_trends
-from erpnext.selling.report.sales_order_trends import sales_order_trends
-from erpnext.accounts.report.sales_invoice_trends import sales_invoice_trends
-from erpnext.stock.report.delivery_note_trends import delivery_note_trends
 from erpnext.selling.report.pending_so_items_for_purchase_request import (
     pending_so_items_for_purchase_request,
 )
 from erpnext.selling.report.sales_order_analysis import sales_order_analysis
 from finbyzerp.finbyzerp.override.pending_so_items_for_purchase_request import (
     execute as pending_so_items_for_purchase_request_execute,
-)
-from finbyzerp.finbyzerp.override.report.purchase_order_trends import (
-    execute as purchase_order_trends_execute,
-)
-from finbyzerp.finbyzerp.override.report.purchase_receipt_trends import (
-    execute as purchase_receipt_trends_execute,
-)
-from finbyzerp.finbyzerp.override.report.purchase_invoice_trends import (
-    execute as purchase_invoice_trends_execute,
-)
-from finbyzerp.finbyzerp.override.report.sales_order_trends import (
-    execute as sales_order_trends_execute,
-)
-from finbyzerp.finbyzerp.override.report.delivery_note_trends import (
-    execute as delivery_note_trends_execute,
-)
-from finbyzerp.finbyzerp.override.report.sales_invoice_trends import (
-    execute as sales_invoice_trends_execute,
 )
 from finbyzerp.finbyzerp.override.sales_order_analysis import (
     execute as sales_order_analysis_execute,
@@ -185,9 +161,3 @@ scheduler_events = {
 sales_order_analysis.execute = sales_order_analysis_execute
 pending_so_items_for_purchase_request.execute = pending_so_items_for_purchase_request_execute
 
-sales_order_trends.execute = sales_order_trends_execute
-delivery_note_trends.execute = delivery_note_trends_execute
-sales_invoice_trends.execute = sales_invoice_trends_execute
-purchase_order_trends.execute = purchase_order_trends_execute
-purchase_receipt_trends.execute = purchase_receipt_trends_execute
-purchase_invoice_trends.execute = purchase_invoice_trends_execute
