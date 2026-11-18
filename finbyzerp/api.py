@@ -65,20 +65,16 @@ def send_sales_invoice_mails():
 	if not account_settings.send_overdue_reminder:
 		return
 
-	invoices = frappe.get_all("Sales Invoice", filters={
+	data = frappe.get_all("Sales Invoice", filters={
 			'status': ['in', ('Overdue')],
 			'outstanding_amount':(">", 5000),
 			'docstatus': 1,
 			'is_opening': 'No',
 		},
 		order_by='posting_date',
-		fields=["name", "customer", "company"]
+		group_by= "customer,company",
+		fields=["group_concat(name) as name", "customer", "company"]
 	)
-	# v16 does not allow group_concat() in fields, so group per customer and company here
-	grouped = {}
-	for inv in invoices:
-		grouped.setdefault((inv.customer, inv.company), []).append(inv.name)
-	data = [frappe._dict(customer=customer, company=company, name=",".join(names)) for (customer, company), names in grouped.items()]
 	if not frappe.db.exists("Email Template", "Payment Reminder"):
 		return "hello"
 	email_template = frappe.get_doc("Email Template", "Payment Reminder")

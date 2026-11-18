@@ -4,6 +4,7 @@
 from __future__ import unicode_literals
 import frappe
 import functools
+from past.builtins import cmp
 from frappe import _
 from frappe.utils import flt
 # import frappe
@@ -223,7 +224,7 @@ def filter_item_group(filters,item_group, depth=10):
 def sort_item_group(item_group, is_root=False, key="name"):
 
 	def compare_item_groups(a, b):
-		return ((a[key] > b[key]) - (a[key] < b[key])) or 1
+		return cmp(a[key], b[key]) or 1
 
 	item_group.sort(key = functools.cmp_to_key(compare_item_groups))
 

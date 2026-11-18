@@ -8,9 +8,11 @@ import frappe
 from frappe import _
 from frappe.model.meta import get_field_precision
 from frappe.utils import cstr, flt, getdate
+from six import iteritems
 
 import erpnext
-from india_compliance.gst_india.utils import get_company_gstin_number, get_gst_accounts_by_type
+from india_compliance.gst_india.utils import get_gst_accounts_by_type
+from india_compliance.gst_india.report.gstr_1.gstr_1 import get_company_gstin_number
 
 def execute(filters=None):
 	return _execute(filters)
@@ -295,7 +297,7 @@ def get_merged_data(columns, data):
 				else:
 					merged_hsn_dict[key][d["fieldname"]] = row[i]
 
-	for key, value in merged_hsn_dict.items():
+	for key, value in iteritems(merged_hsn_dict):
 		result.append(value)
 
 	return result
