@@ -145,11 +145,5 @@ frappe.query_reports["Party Ledger"] = {
 	]
 };
 
-erpnext.dimension_filters.forEach((dimension) => {
-	frappe.query_reports["Party Ledger"].filters.splice(15, 0 ,{
-		"fieldname": dimension["fieldname"],
-		"label": __(dimension["label"]),
-		"fieldtype": "Link",
-		"options": dimension["document_type"]
-	});
-});
+// NewV16: erpnext.dimension_filters was removed; use the v16 helper
+erpnext.utils.add_dimensions("Party Ledger", 15);

@@ -4,7 +4,12 @@
 from __future__ import unicode_literals
 import frappe
 import functools
-from past.builtins import cmp
+
+
+def cmp(a, b):
+	# NewV16: python-future (`past`) is not installed on Python 3.14
+	return (a > b) - (a < b)
+
 from frappe import _
 from frappe.utils import flt
 # import frappe

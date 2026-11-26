@@ -98,8 +98,6 @@ doctype_js = {
     "GST Settings": "public/js/doctype_js/gst_settings.js",
     "Opportunity": "public/js/doctype_js/opportunity.js",
     "Opening Invoice Creation Tool": "public/js/doctype_js/opening_invoice_creation_tool.js",
-    "BOM": "public/js/doctype_js/bom.js",
-    "Quotation": "public/js/doctype_js/quotation.js",
 }
 
 # Doc Events
@@ -197,8 +195,11 @@ scheduler_events = {
 
 
 # India Compliance Overrides
-if hasattr(BaseAPI, "SENSITIVE_INFO"):
-   BaseAPI.SENSITIVE_INFO = BaseAPI.SENSITIVE_INFO + ('authorization',)
+# NewV16: India Compliance 16 removed SENSITIVE_INFO; masking uses DEFAULT_MASK_MAP.
+# Without this the GSP bearer token / app secret is stored unmasked in Integration Request logs.
+for _key in ("authorization", "Authorization", "gspappsecret", "client_secret"):
+    if _key not in BaseAPI.DEFAULT_MASK_MAP["headers"]:
+        BaseAPI.DEFAULT_MASK_MAP["headers"].append(_key)
 
 BaseAPI.BASE_URL="https://asp.resilient.tech"
 BaseAPI.get_url = get_gsp_url
@@ -209,11 +210,10 @@ EWaybillAPI.get_transporter_details = ewaybill_get_transporter_details
 PublicAPI.get_gstin_info = get_gstin_info
 StaticResourcesAPI.get_gstn_public_certificate = get_gstn_public_certificate
 FilesAPI.BASE_PATH = "gstn/files"
-if hasattr(TaxpayerBaseAPI, "SENSITIVE_INFO"):
-    TaxpayerAuthenticate.SENSITIVE_INFO = ReturnsAPI.SENSITIVE_INFO + ('authorization',)
 TaxpayerBaseAPI.BASE_PATH = "gstn"
 TaxpayerBaseAPI.setup = tax_payer_base_api
-GSTR.get_transaction = get_transaction
+# NewV16: removed GSTR.get_transaction patch. v16 signature is (details, items=None) and the old
+# (supplier, invoice) copy raised TypeError on every GSTR-2A/2B download. Core v16 builds the items itself.
 
 
 # Report
@@ -226,3 +226,7 @@ sales_invoice_trends.execute = sales_invoice_trends_execute
 purchase_order_trends.execute = purchase_order_trends_execute
 purchase_receipt_trends.execute = purchase_receipt_trends_execute
 purchase_invoice_trends.execute = purchase_invoice_trends_execute
+
+# NewV16: make sure the monkey patches in this file are applied in every worker process
+before_request = ["finbyzerp.ensure_monkey_patches"]
+before_job = ["finbyzerp.ensure_monkey_patches"]
