@@ -1,4 +1,5 @@
 import frappe
+from frappe import _  # NewV16: was used in the except branch but never imported
 from frappe.core.doctype.document_naming_settings.document_naming_settings import (
     DocumentNamingSettings as _DocumentNamingSettings,
 )

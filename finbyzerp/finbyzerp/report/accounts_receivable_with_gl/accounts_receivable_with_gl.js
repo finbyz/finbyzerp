@@ -199,12 +199,6 @@ frappe.query_reports["Accounts Receivable with GL"] = {
 	}
 }
 
-erpnext.dimension_filters.forEach((dimension) => {
-	frappe.query_reports["Accounts Receivable"].filters.splice(9, 0 ,{
-		"fieldname": dimension["fieldname"],
-		"label": __(dimension["label"]),
-		"fieldtype": "Link",
-		"options": dimension["document_type"]
-	});
-});
+// NewV16: erpnext.dimension_filters was removed; use the v16 helper
+erpnext.utils.add_dimensions("Accounts Receivable with GL", 9);
 

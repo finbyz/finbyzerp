@@ -6,8 +6,9 @@ import frappe
 import collections, functools, operator
 from frappe import _
 from frappe.utils import flt
-# from finbyzerp.finbyzerp.override.item_wise_purchase_register import _execute as purchase_execute
-# from finbyzerp.finbyzerp.override.item_wise_sales_register import _execute as sales_execute
+# NewV16: the finbyzerp forks of these reports were removed; v16 core returns the same row shape
+from erpnext.accounts.report.item_wise_purchase_register.item_wise_purchase_register import _execute as purchase_execute
+from erpnext.accounts.report.item_wise_sales_register.item_wise_sales_register import _execute as sales_execute
 
 def execute(filters=None):
 	columns, data = [], []
@@ -91,22 +92,30 @@ def get_item_group(filters):
 	return (item_group + item)
 	
 
+def _gst_account_row(company, account_type):
+	# NewV16: GST Account rows are keyed by account_type (Input / Output / Purchase Reverse Charge ...);
+	# is_reverse_charge_account and export_reverse_charge_account do not exist
+	row = frappe.db.get_value(
+		"GST Account",
+		{"parent": "GST Settings", "company": company, "account_type": account_type},
+		["cgst_account", "sgst_account", "igst_account", "cess_account", "tcs_account"],
+		as_dict=True,
+	)
+	return row
+
+
 def get_item_map(filters):
-	if not frappe.db.exists("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":0}):
+	gst_accounts = _gst_account_row(filters.company, "Input")
+	if not gst_accounts:
 		frappe.throw(f"Please Define GST Account For Company: {filters.company} in GST Settings")
-	gst_accounts = frappe.get_doc("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":0})
-
-	if not frappe.db.exists("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":1}):
+	gst_accounts_reverse = _gst_account_row(filters.company, "Purchase Reverse Charge")
+	if not gst_accounts_reverse:
 		frappe.throw(f"Please Define Reverse Charge GST Accounts For Company: {filters.company} in GST Settings")
-	gst_accounts_reverse = frappe.get_doc("GST Account",{"parent":"GST Settings","company":filters.company,"is_reverse_charge_account":1})
 
-	accounts = frappe._dict({"cgst_account":gst_accounts.cgst_account,"sgst_account":gst_accounts.sgst_account,
-							"igst_account":gst_accounts.igst_account,"cess_account":gst_accounts.cess_account,
-							"tcs_account":gst_accounts.tcs_account,"export_reverse_charge_account":gst_accounts.export_reverse_charge_account})
-
-	reverse_accounts = frappe._dict({"cgst_account":gst_accounts_reverse.cgst_account,"sgst_account":gst_accounts_reverse.sgst_account,
-							"igst_account":gst_accounts_reverse.igst_account,"cess_account":gst_accounts_reverse.cess_account,
-							"tcs_account":gst_accounts_reverse.tcs_account,"export_reverse_charge_account":gst_accounts_reverse.export_reverse_charge_account})
+	accounts = frappe._dict(gst_accounts, export_reverse_charge_account=None)
+	reverse_accounts = frappe._dict(gst_accounts_reverse, export_reverse_charge_account=None)
+	# NewV16: sales tax is booked on the Output GST accounts
+	sales_accounts = frappe._dict(_gst_account_row(filters.company, "Output") or gst_accounts, export_reverse_charge_account=None)
 
 	# purchase_tax_amount_data = purchase_execute(filters)
 	# sales_tax_amount_data = sales_execute(filters)
@@ -123,10 +132,10 @@ def get_item_map(filters):
 	if filters.get('purchase') and not filters.get('sales'):
 		item_map, item_tax_map = get_purchase_data(filters,accounts,reverse_accounts,item_map,item_tax_map,purchase_tax_amount_data)
 	elif filters.get('sales') and not filters.get('purchase'):
-		item_map, item_tax_map = get_sales_data(filters,accounts,reverse_accounts,item_map,item_tax_map,sales_tax_amount_data)
+		item_map, item_tax_map = get_sales_data(filters,sales_accounts,reverse_accounts,item_map,item_tax_map,sales_tax_amount_data)
 	else:
 		item_map, item_tax_map = get_purchase_data(filters,accounts,reverse_accounts,item_map,item_tax_map,purchase_tax_amount_data)
-		item_map, item_tax_map = get_sales_data(filters,accounts,reverse_accounts,item_map,item_tax_map,sales_tax_amount_data)
+		item_map, item_tax_map = get_sales_data(filters,sales_accounts,reverse_accounts,item_map,item_tax_map,sales_tax_amount_data)
 
 	return item_map, item_tax_map
 

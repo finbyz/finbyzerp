@@ -65,9 +65,16 @@ def send_sales_invoice_mails():
 			'is_opening': 'No',
 		},
 		order_by='posting_date',
-		group_by= "customer,company",
-		fields=["group_concat(name) as name", "customer", "company"]
+		fields=["name", "customer", "company"]
 	)
+	# NewV16: v16 get_all rejects SQL functions like group_concat in fields; group in Python instead
+	grouped = {}
+	for row in data:
+		key = (row.customer, row.company)
+		if key not in grouped:
+			grouped[key] = frappe._dict(customer=row.customer, company=row.company, names=[])
+		grouped[key].names.append(row.name)
+	data = list(grouped.values())
 	if not frappe.db.exists("Email Template", "Payment Reminder"):
 		return "hello"
 	email_template = frappe.get_doc("Email Template", "Payment Reminder")
@@ -82,7 +89,7 @@ def send_sales_invoice_mails():
 			continue
 		
 		context = {"customer": d.customer, "company": d.company}
-		context['sales_invoices'] = [frappe.get_doc("Sales Invoice", name) for name in d.name.split(",")]
+		context['sales_invoices'] = [frappe.get_doc("Sales Invoice", name) for name in d.names]
 
 		recipients_emails = ",".join([doc.email for doc in context['sales_invoices'] if doc.email and doc.email.replace(" ", "")])
 		emails = ",".join(sorted(list(set(recipients_emails.split(",")))))

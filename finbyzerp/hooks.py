@@ -57,8 +57,6 @@ doctype_js = {
     "GST Settings": "public/js/doctype_js/gst_settings.js",
     "Opportunity": "public/js/doctype_js/opportunity.js",
     "Opening Invoice Creation Tool": "public/js/doctype_js/opening_invoice_creation_tool.js",
-    "BOM": "public/js/doctype_js/bom.js",
-    "Quotation": "public/js/doctype_js/quotation.js",
 }
 
 # Doc Events
@@ -161,3 +159,6 @@ scheduler_events = {
 sales_order_analysis.execute = sales_order_analysis_execute
 pending_so_items_for_purchase_request.execute = pending_so_items_for_purchase_request_execute
 
+# NewV16: make sure the monkey patches in this file are applied in every worker process
+before_request = ["finbyzerp.ensure_monkey_patches"]
+before_job = ["finbyzerp.ensure_monkey_patches"]
